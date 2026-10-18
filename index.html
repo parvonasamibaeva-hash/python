@@ -93,6 +93,8 @@ body.quiz-mode .quiz-view{display:block}
 .CodeMirror .CodeMirror-linewidget .debug-inline-widget.is-error .debug-inline-title{color:#ff9da5!important}
 @media(max-width:700px){.CodeMirror .CodeMirror-linewidget .debug-inline-widget{width:calc(100% - 10px)!important;margin-left:4px!important;margin-right:4px!important;padding:8px!important;font-size:11px!important}.CodeMirror .CodeMirror-linewidget .debug-inline-widget .debug-inline-vars{grid-template-columns:1fr 1fr!important}}
 
+
+.lesson-access-manager{margin-top:20px;padding:16px;border:1px solid #e0e5ef;border-radius:14px;background:#fbfcfe}.lesson-access-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.lesson-access-head h3{margin:0!important}.lesson-access-head p{font-size:12px;color:#737d8d;margin:5px 0 0}.lesson-access-head label{font-size:12px;font-weight:700;color:#596273}.lesson-access-head select{display:block;margin-top:5px;padding:9px;border:1px solid #d7ddea;border-radius:8px;background:#fff}.lesson-access-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}.lesson-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e4e8f0;border-radius:10px;padding:11px;background:#fff}.lesson-access-row strong{font-size:13px;color:#303746}.lesson-access-row small{display:block;color:#737d8d;font-size:11px;margin-top:3px}.lesson-access-toggle{border:0;border-radius:8px;padding:8px 10px;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap}.lesson-access-toggle.is-open{background:#e8f7ed;color:#187344}.lesson-access-toggle.is-closed{background:#edf0f5;color:#596273}.lesson-access-message{font-size:12px;color:#187344;margin-top:10px;min-height:15px}.lesson-locked-note{font-size:11px;color:#aeb6c5;padding:8px 9px}.lesson-head-locked{opacity:.7}@media(max-width:600px){.lesson-access-rows{grid-template-columns:1fr}.lesson-access-head{display:block}.lesson-access-head label{display:block;margin-top:12px}}
 </style>
 <style id="quiz-design-fix">
 /* ===== ВИКТОРИНА — ЕДИНЫЙ СТИЛЬ С САЙТОМ ===== */
@@ -486,6 +488,11 @@ body.auth-required #mainApp { visibility:hidden !important; pointer-events:none 
         <div id="createdStudentCredentials" class="account-created-code" hidden></div>
         <div id="accountManagerMessage" class="auth-message"></div>
         <div class="account-list" id="accountList"></div>
+        <div class="lesson-access-manager" id="lessonAccessManager">
+          <div class="lesson-access-head"><div><h3>Доступ к занятиям</h3><p>Настрой видимость занятий для выбранной группы.</p></div><label>Группа<select id="lessonAccessGroup"><option value="thursday">Четверговая группа</option><option value="individual">Индивидуальные занятия</option></select></label></div>
+          <div id="lessonAccessRows" class="lesson-access-rows"><div class="teacher-loading">Загружаем настройки доступа…</div></div>
+          <div id="lessonAccessMessage" class="lesson-access-message" aria-live="polite"></div>
+        </div>
       </section>
       <div id="teacherLessonCards" class="teacher-lesson-grid">
         <div class="teacher-loading">Загружаем данные из Google Таблицы…</div>
@@ -631,6 +638,9 @@ const STUDENT_NAME_KEY='python_student_name_v1';
 const AUTH_STORAGE_KEY='python_auth_session_v1';
 let authSession=JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)||'null');
 let authMode='student';
+let lessonAccessGroup='individual';
+let lessonAccessState={};
+const LESSON_ACCESS_DEFAULT_OPEN=true;
 function authRequest(payload){return fetch(QUIZ_RESULTS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}).then(r=>r.json());}
 function showAuthMessage(message,type='error'){const el=document.getElementById('authMessage');el.textContent=message||'';el.className='auth-message'+(message?' show '+type:'');}
 function showAccountManagerMessage(message,type='error'){const el=document.getElementById('accountManagerMessage');el.textContent=message||'';el.className='auth-message'+(message?' show '+type:'');}
@@ -639,6 +649,53 @@ function applyAuthSession(session){document.body.classList.remove('auth-required
 function showAuthScreen(){document.body.classList.remove('auth-checking');document.body.classList.add('auth-required');document.getElementById('authOverlay').hidden=false;document.getElementById('sessionBar').hidden=true;document.getElementById('teacherDashboardButton').hidden=true;document.getElementById('studentDashboardButton').hidden=true;}
 function logoutAccount(){authSession=null;localStorage.removeItem(AUTH_STORAGE_KEY);document.body.classList.remove('teacher-dashboard-mode','student-dashboard-mode','quiz-mode','teacher-detail','mobile-menu-open');closeTeacherDashboard();closeStudentDashboard();closeQuiz();showAuthScreen();setAuthMode('student');document.getElementById('authLogin').value='';document.getElementById('authCode').value='';document.getElementById('teacherCode').value='';showAuthMessage('');document.getElementById('authLogin').focus({preventScroll:true});}
 document.getElementById('studentLoginTab').onclick=()=>setAuthMode('student');document.getElementById('teacherLoginTab').onclick=()=>setAuthMode('teacher');document.getElementById('logoutButton').onclick=logoutAccount;
+
+async function refreshLessonAccess(session=authSession){
+  if(!session||!session.token)return;
+  try{
+    const result=await authRequest({action:'getLessonAccess',token:session.token});
+    if(!result.success)throw new Error(result.error||'Не удалось загрузить доступ к занятиям');
+    lessonAccessGroup=result.group||session.group||'individual';
+    lessonAccessState=result.access||{};
+    if(session.role==='student'){
+      session.group=lessonAccessGroup;
+      authSession=session;
+      localStorage.setItem(AUTH_STORAGE_KEY,JSON.stringify(session));
+      const currentTask=allTasks.find(task=>task.key===state.currentKey);
+      if(currentTask&&!lessonIsVisibleForCurrentStudent(currentTask.lessonId)){
+        const firstVisibleTask=allTasks.find(task=>lessonIsVisibleForCurrentStudent(task.lessonId));
+        if(firstVisibleTask)state.currentKey=firstVisibleTask.key;
+        saveState();
+      }
+      renderNav();
+    }else renderLessonAccessControls();
+  }catch(err){
+    console.warn('Не удалось обновить доступ к занятиям:',err);
+    lessonAccessGroup=session.group||'individual';
+  }
+}
+function lessonIsVisibleForCurrentStudent(lessonId){
+  if(!authSession||authSession.role!=='student'||lessonAccessGroup!=='thursday')return true;
+  const key='thursday:'+Number(lessonId);
+  return Object.prototype.hasOwnProperty.call(lessonAccessState,key)?lessonAccessState[key]===true:LESSON_ACCESS_DEFAULT_OPEN;
+}
+function renderLessonAccessControls(){
+  const rows=document.getElementById('lessonAccessRows');
+  const groupSelect=document.getElementById('lessonAccessGroup');
+  if(!rows||!groupSelect)return;
+  const group=groupSelect.value||'thursday';
+  const titles={1:'Ввод-вывод данных и переменные',2:'Цифры, числа и типы данных',3:'Условные операторы',4:'Условные операторы',5:'Вложенные и каскадные условия',6:'Цикл while',7:'Цикл while: обработка цифр и условия'};
+  rows.innerHTML=Array.from({length:7},(_,i)=>{const id=i+1;const key=group+':'+id;const isOpen=Object.prototype.hasOwnProperty.call(lessonAccessState,key)?lessonAccessState[key]===true:LESSON_ACCESS_DEFAULT_OPEN;return `<div class="lesson-access-row"><div><strong>Занятие ${id}</strong><small>${titles[id]}</small></div><button type="button" class="lesson-access-toggle ${isOpen?'is-open':'is-closed'}" data-access-lesson="${id}" data-access-open="${isOpen}">${isOpen?'Открыто':'Закрыто'}</button></div>`}).join('');
+  rows.querySelectorAll('[data-access-lesson]').forEach(button=>button.onclick=async()=>{
+    const lessonId=Number(button.dataset.accessLesson);const open=button.dataset.accessOpen!=='true';button.disabled=true;
+    const message=document.getElementById('lessonAccessMessage');message.textContent='Сохраняем…';
+    try{const result=await authRequest({action:'setLessonAccess',token:authSession.token,lessonId,group,open});if(!result.success)throw new Error(result.error||'Не удалось сохранить настройку');lessonAccessState[group+':'+lessonId]=open;renderLessonAccessControls();message.textContent=`Занятие ${lessonId}: ${open?'открыто':'закрыто'} для группы.`;if(authSession.role==='student'&&lessonAccessGroup==='thursday')renderNav();}
+    catch(err){message.textContent=err.message||'Не удалось сохранить настройку';button.disabled=false;}
+  });
+}
+const lessonAccessGroupSelect=document.getElementById('lessonAccessGroup');
+if(lessonAccessGroupSelect)lessonAccessGroupSelect.addEventListener('change',()=>{const message=document.getElementById('lessonAccessMessage');if(message)message.textContent='';renderLessonAccessControls();});
+async function loadLessonAccessControls(){if(!authSession||authSession.role!=='teacher')return;const select=document.getElementById('lessonAccessGroup');if(select)select.value='thursday';await refreshLessonAccess(authSession);renderLessonAccessControls();}
 
 document.getElementById('authForm').addEventListener('submit',async e=>{
   e.preventDefault();const btn=document.getElementById('authSubmit');btn.disabled=true;btn.textContent='Проверяем…';showAuthMessage('');
@@ -655,11 +712,11 @@ document.getElementById('authForm').addEventListener('submit',async e=>{
     }
     applyAuthSession(result.session);showAuthMessage('');
     if(authSession.role==='teacher'){document.getElementById('accountManager').hidden=false;loadAccountList();}
-    else{renderNav();updateStats();loadTask();}
+    else{await refreshLessonAccess(authSession);renderNav();updateStats();loadTask();}
   }catch(err){showAuthMessage(err.message||'Не удалось связаться с сервером. Проверь, что Apps Script обновлён и опубликован.');}
   finally{btn.disabled=false;btn.textContent=authMode==='student'?'Войти как ученик':'Войти как преподаватель';}
 });
-async function loadAccountList(){if(!authSession||authSession.role!=='teacher')return;const box=document.getElementById('accountList');box.innerHTML='<div class="teacher-loading">Загружаем аккаунты…</div>';try{const r=await authRequest({action:'listStudents',token:authSession.token});if(!r.success)throw new Error(r.error||'Не удалось загрузить аккаунты');box.innerHTML=(r.students||[]).map(st=>`<div class="account-row"><div><strong>${escapeHtml(st.name)}</strong><small>Логин: ${escapeHtml(st.login)} · ${st.active?'активен':'отключён'}</small><label style="display:block;margin-top:8px;font-size:12px;color:#596273">Группа обучения <select data-group-id="${escapeHtml(st.id)}" style="display:block;margin-top:4px;padding:8px;border:1px solid #d7ddea;border-radius:8px;max-width:260px;width:100%"><option value="individual" ${st.group!=='thursday'?'selected':''}>Индивидуальные занятия</option><option value="thursday" ${st.group==='thursday'?'selected':''}>Четверговая группа</option></select></label></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" data-view-id="${escapeHtml(st.id)}" data-view-name="${escapeHtml(st.name)}">Посмотреть профиль</button><button type="button" data-reset-id="${escapeHtml(st.id)}" data-reset-name="${escapeHtml(st.name)}">Выдать новый код</button></div></div>`).join('')||'<div class="student-dashboard-empty">Пока нет аккаунтов учеников.</div>';box.querySelectorAll('[data-group-id]').forEach(sel=>sel.onchange=async()=>{try{const out=await authRequest({action:'setStudentGroup',token:authSession.token,studentId:sel.dataset.groupId,group:sel.value});if(!out.success)throw new Error(out.error||'Не удалось изменить группу');showAccountManagerMessage('Группа ученика обновлена. При следующем входе настройки применятся.','success')}catch(err){showAccountManagerMessage(err.message);await loadAccountList()}});box.querySelectorAll('[data-reset-id]').forEach(b=>b.onclick=()=>resetStudentCode(b.dataset.resetId,b.dataset.resetName));box.querySelectorAll('[data-view-id]').forEach(b=>b.onclick=()=>viewStudentAccount(b.dataset.viewId,b.dataset.viewName));}catch(err){box.innerHTML='';showAccountManagerMessage(err.message);}}
+async function loadAccountList(){if(!authSession||authSession.role!=='teacher')return;const box=document.getElementById('accountList');box.innerHTML='<div class="teacher-loading">Загружаем аккаунты…</div>';try{const r=await authRequest({action:'listStudents',token:authSession.token});if(!r.success)throw new Error(r.error||'Не удалось загрузить аккаунты');box.innerHTML=(r.students||[]).map(st=>`<div class="account-row"><div><strong>${escapeHtml(st.name)}</strong><small>Логин: ${escapeHtml(st.login)} · ${st.active?'активен':'отключён'}</small><label style="display:block;margin-top:8px;font-size:12px;color:#596273">Группа обучения <select data-group-id="${escapeHtml(st.id)}" style="display:block;margin-top:4px;padding:8px;border:1px solid #d7ddea;border-radius:8px;max-width:260px;width:100%"><option value="individual" ${st.group!=='thursday'?'selected':''}>Индивидуальные занятия</option><option value="thursday" ${st.group==='thursday'?'selected':''}>Четверговая группа</option></select></label></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" data-view-id="${escapeHtml(st.id)}" data-view-name="${escapeHtml(st.name)}">Посмотреть профиль</button><button type="button" data-reset-id="${escapeHtml(st.id)}" data-reset-name="${escapeHtml(st.name)}">Выдать новый код</button></div></div>`).join('')||'<div class="student-dashboard-empty">Пока нет аккаунтов учеников.</div>';box.querySelectorAll('[data-group-id]').forEach(sel=>sel.onchange=async()=>{try{const out=await authRequest({action:'setStudentGroup',token:authSession.token,studentId:sel.dataset.groupId,group:sel.value});if(!out.success)throw new Error(out.error||'Не удалось изменить группу');showAccountManagerMessage('Группа ученика обновлена. При следующем входе настройки применятся.','success')}catch(err){showAccountManagerMessage(err.message);await loadAccountList()}});box.querySelectorAll('[data-reset-id]').forEach(b=>b.onclick=()=>resetStudentCode(b.dataset.resetId,b.dataset.resetName));box.querySelectorAll('[data-view-id]').forEach(b=>b.onclick=()=>viewStudentAccount(b.dataset.viewId,b.dataset.viewName));await loadLessonAccessControls();}catch(err){box.innerHTML='';showAccountManagerMessage(err.message);}}
 document.getElementById('createStudentButton').onclick=async()=>{const name=document.getElementById('newStudentName').value.trim();if(!name){showAccountManagerMessage('Введи имя ученика.');return;}const btn=document.getElementById('createStudentButton');btn.disabled=true;try{const r=await authRequest({action:'createStudent',token:authSession&&authSession.token,name});if(!r.success)throw new Error(r.error||'Не удалось создать аккаунт');const c=document.getElementById('createdStudentCredentials');c.hidden=false;c.textContent=`Сохрани и передай ученику: логин ${r.login} · код доступа ${r.code}. Код больше не будет показан полностью.`;document.getElementById('newStudentName').value='';showAccountManagerMessage('Аккаунт создан. Передай данные ученику безопасным способом.','success');await loadAccountList();}catch(err){showAccountManagerMessage(err.message);}finally{btn.disabled=false;}};
 
 let teacherViewingStudent=null;
@@ -688,7 +745,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
         catch(syncError){state.solved={};saveState();renderNav();updateStats();}
       }
       applyAuthSession(r.session);
-      if(authSession.role==='teacher')loadAccountList();else{renderNav();updateStats();loadTask();}
+      if(authSession.role==='teacher')loadAccountList();else{await refreshLessonAccess(authSession);renderNav();updateStats();loadTask();}
     }catch(e){logoutAccount();showAuthMessage('Сеанс истёк. Войди снова.');}
   }else showAuthScreen();
 });
@@ -1538,6 +1595,7 @@ function openVariablesIoAnimation(){
 function renderNav(){
   lessonNav.innerHTML='';
   lessons.forEach(l=>{
+    if(!lessonIsVisibleForCurrentStudent(l.id))return;
     const wrap=document.createElement('div');
     wrap.className='lesson '+(state.openLessons[l.id]?'open':'');
     const head=document.createElement('button');
