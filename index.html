@@ -1214,6 +1214,10 @@ const lesson6Tasks=[
 {id:21,title:"Задача 21. Количество цифр",level:"medium",short:"Посчитай количество цифр в положительном числе.",problem:"Пользователь вводит положительное целое число. Определите количество цифр в нём с помощью while.",examples:"5832 → 4",starter:"# Увеличь счётчик и убери последнюю цифру",hint:"Каждый раз, когда убираешь последнюю цифру через // 10, увеличивай count на 1.",theory:"Количество итераций при последовательном удалении цифр равно количеству цифр.",tests:[{input:["5832"],expected:"4"},{input:["7"],expected:"1"}]},
 {id:22,title:"Задача 22. Произведение цифр",level:"medium",short:"Вычисли произведение всех цифр числа.",problem:"Пользователь вводит положительное целое число. Найдите произведение его цифр с помощью while.",examples:"234 → 24",starter:"# Умножь product на последнюю цифру",hint:"Последняя цифра — n % 10. Затем убери её с помощью n //= 10.",theory:"Для произведения начальное значение накопителя — 1.",tests:[{input:["234"],expected:"24"},{input:["105"],expected:"0"}]},
 {id:23,title:"Задача 23. Цифры больше 4",level:"medium",short:"Выведи цифры числа, которые больше 4.",problem:"Пользователь вводит положительное целое число. Выведите все цифры числа, которые больше 4, начиная с последней цифры.",examples:"5832 → 8 5",starter:"# Проверь digit",hint:"На каждой итерации получай последнюю цифру и проверяй digit > 4.",theory:"Последняя цифра извлекается выражением n % 10.",tests:[]}
+,{id:24,title:"Домашнее задание 1. Таблица температур",level:"homework",short:"Переведи температуры от 0 до 100 °C в градусы Фаренгейта.",problem:"Выведите таблицу перевода температур из градусов Цельсия в градусы Фаренгейта для значений от 0 до 100 с шагом 10. Формула: F = C * 1.8 + 32.",examples:"Проверь свою таблицу для нескольких значений температуры.",starter:"",hint:"Вспомни, как изменяется значение счётчика на каждом шаге цикла.",theory:"Цикл while подходит для перебора значений с постоянным шагом.",tests:[]},
+{id:25,title:"Домашнее задание 2. Таблица умножения для выбранного числа",level:"homework",short:"Выведи произведения введённого числа на числа от 1 до 10.",problem:"Пользователь вводит число. Выведите произведения этого числа на числа от 1 до 10. Например, для 7 — от 7 * 1 до 7 * 10.",examples:"Введи число и проверь, что программа выводит десять результатов.",starter:"",hint:"Используй отдельную переменную-счётчик, которая изменяется на каждом повторении.",theory:"Переменная i последовательно принимает значения от 1 до 10.",tests:[]},
+{id:26,title:"Домашнее задание 3. Числа Коллатца",level:"homework",short:"Построй последовательность Коллатца для введённого числа.",problem:"Пользователь вводит положительное целое число n. Пока n не равно 1: если число чётное, разделите его на 2; если нечётное, умножьте на 3 и прибавьте 1. После каждого изменения выводите число.",examples:"Проверь программу на нескольких положительных начальных числах.",starter:"",hint:"На каждом шаге выбери действие в зависимости от того, чётное число или нечётное.",theory:"Цикл продолжается до тех пор, пока n не станет равным 1.",tests:[]},
+{id:27,title:"Домашнее задание 4. Перевёрнутое число",level:"homework",short:"Запиши цифры числа в обратном порядке.",problem:"Пользователь вводит положительное целое число. Выведите число, записанное в обратном порядке, используя while и арифметические операции // и %.",examples:"Проверь программу на нескольких положительных числах, в том числе на числе с нулём в конце.",starter:"",hint:"Подумай, как получать последнюю цифру числа и постепенно собирать новое число.",theory:"Чтобы перевернуть число, каждый раз сдвигай результат влево на разряд и добавляй последнюю цифру исходного числа.",tests:[{input:["12345"],expected:"54321"},{input:["120"],expected:"21"}]}
 ];
 const homeworkTasks=[
 {id:1,title:"Задача 1. Максимальная цифра числа",level:"homework",short:"Найди самую большую цифру в числе.",problem:"Дано натуральное число n. Найдите самую большую цифру в его записи.",examples:"48271 → 8\n593 → 9",starter:"# Получи последнюю цифру числа и сравни её с максимумом",hint:"Подсказка 1: Как получить последнюю цифру числа?\n\nПодсказка 2: Сохраняй найденную цифру, если она больше текущего максимума.\n\nПодсказка 3: Начни с max_digit = 0. В цикле получай digit = n % 10, сравни с max_digit, затем выполни n //= 10.",theory:"Оператор n % 10 получает последнюю цифру числа. Оператор n // 10 удаляет последнюю цифру. Цикл while n > 0 повторяет действия, пока в числе остаются цифры.",tests:[{input:["48271"],expected:"8"},{input:["593"],expected:"9"},{input:["111"],expected:"1"}]},
@@ -1283,7 +1287,8 @@ if(!saved.__collapsedLessonsInitialized){
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
 const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},solved:saved.solved||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{}};
-if(String(state.currentKey).startsWith('6-')||String(state.currentKey).startsWith('7-'))state.openLessons[6]=true;
+if(String(state.currentKey).startsWith('6-'))state.openLessons[6]=true;
+if(String(state.currentKey).startsWith('7-'))state.openLessons[7]=true;
 // Remove old prefilled input-variable scaffolds from lessons 3-5, but preserve any real student solution.
 for(const lesson of lessons.filter(l=>l.id>=3&&l.id<=5)){for(const task of lesson.tasks){const key=lesson.id+'-'+task.id;const code=saved.codes&&saved.codes[key];if(typeof code!=='string'||!code.trim())continue;const lines=code.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const isOnlyStarter=lines.length>0&&lines.every(line=>line.startsWith('#')||/^[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?:int\s*\(\s*)?input\s*\(\s*\)\s*\)?(?:\s*#.*)?$/.test(line));if(isOnlyStarter){const comments=lines.filter(line=>line.startsWith('#'));state.codes[key]=comments.length?comments.join('\n'):'# Напиши программу';}}}
 
@@ -1377,7 +1382,7 @@ function openWhileAnimation(){
 
 function renderNav(){
   lessonNav.innerHTML='';
-  lessons.filter(l=>l.id!==7).forEach(l=>{
+  lessons.forEach(l=>{
     const wrap=document.createElement('div');
     wrap.className='lesson '+(state.openLessons[l.id]?'open':'');
     const head=document.createElement('button');
@@ -1438,45 +1443,6 @@ function renderNav(){
         body.appendChild(b);
       });
     });
-    if(l.id===6){
-      const hw=getLesson(7);
-      if(hw){
-        const hwWrap=document.createElement('div');
-        hwWrap.className='homework-nav '+(state.openLessons[7]?'open':'');
-        hwWrap.style.cssText='margin:10px 0 4px;border:1px solid #303747;border-radius:12px;overflow:hidden;background:#252b39';
-        const hwHead=document.createElement('button');
-        hwHead.type='button';
-        hwHead.className='lesson-head homework-nav-head';
-        hwHead.style.cssText='width:100%;padding:12px 10px;background:#252b39;color:#fff;font-size:13px;';
-        hwHead.innerHTML=`<span>▸</span><span class="lesson-head-title"><strong>Занятие 7.</strong> <span>Цикл while: обработка цифр и условия</span></span><span class="lesson-head-arrow">›</span>`;
-        hwHead.onclick=()=>{state.openLessons[6]=true;state.openLessons[7]=!state.openLessons[7];saveState();renderNav()};
-        hwWrap.appendChild(hwHead);
-        const hwBody=document.createElement('div');
-        hwBody.className='lesson-body';
-        hwBody.style.display=state.openLessons[7]?'block':'none';
-        hwBody.style.padding='6px';
-        const hwIntro=document.createElement('div');
-        hwIntro.className='lesson-intro';
-        hwIntro.textContent='Занятие 7 · обработка цифр и условия';
-        hwBody.appendChild(hwIntro);
-        const isThursdayGroup=!!(authSession&&authSession.role==='student'&&authSession.group==='thursday');
-        const unfinishedLesson6=isThursdayGroup?lesson6Tasks.filter(task=>!state.solved['6-'+task.id]):[];
-        const visibleHomeworkTasks=isThursdayGroup&&unfinishedLesson6.length?unfinishedLesson6:hw.tasks;
-        if(isThursdayGroup&&unfinishedLesson6.length){
-          const note=document.createElement('div');note.className='lesson-intro';note.textContent='Сначала заверши оставшиеся задачи занятия 6. После этого здесь откроется теория и практика занятия 7.';hwBody.appendChild(note);
-        }
-        visibleHomeworkTasks.forEach(t=>{
-          const taskKey=isThursdayGroup&&unfinishedLesson6.length?'6-'+t.id:t.key;
-          const b=document.createElement('button');
-          b.className='task-button '+(taskKey===state.currentKey?'active ':'')+(state.solved[taskKey]?'solved':'');
-          b.innerHTML=`<span class="task-stars">${t.stars||''}</span><span>${t.title}</span><span class="task-check">${state.solved[taskKey]?'✓':''}</span>`;
-          b.onclick=()=>selectTask(taskKey);
-          hwBody.appendChild(b);
-        });
-        hwWrap.appendChild(hwBody);
-        body.appendChild(hwWrap);
-      }
-    }
     wrap.appendChild(body);
     lessonNav.appendChild(wrap);
   });
