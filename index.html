@@ -706,12 +706,12 @@ document.getElementById('authForm').addEventListener('submit',async e=>{
     if(result.session.role==='student'){
       try{activateStudentLocalState(result.session);await syncStudentProgressFromServer(result.session);saveState();}
       catch(syncError){
-        state.solved={};saveState();renderNav();updateStats();
+        // Не стираем локально сохранённые решения при сетевой ошибке.
         throw new Error('Вход выполнен, но прогресс не удалось загрузить с сервера. Обнови страницу или попробуй ещё раз. '+(syncError.message||''));
       }
     }
     applyAuthSession(result.session);showAuthMessage('');
-    if(authSession.role==='teacher'){document.getElementById('accountManager').hidden=false;loadAccountList();}
+    if(authSession.role==='teacher'){activateStudentLocalState(authSession);renderNav();updateStats();loadTask();document.getElementById('accountManager').hidden=false;loadAccountList();}
     else{await refreshLessonAccess(authSession);renderNav();updateStats();loadTask();}
   }catch(err){showAuthMessage(err.message||'Не удалось связаться с сервером. Проверь, что Apps Script обновлён и опубликован.');}
   finally{btn.disabled=false;btn.textContent=authMode==='student'?'Войти как ученик':'Войти как преподаватель';}
@@ -729,7 +729,7 @@ async function viewStudentAccount(studentId, studentName){
     teacherViewingStudent={id:studentId,name:studentName};
     closeTeacherDashboard();closeQuiz();document.body.classList.add('student-dashboard-mode');studentDashboardView.setAttribute('aria-hidden','false');
     studentDashboardButton.classList.remove('active');teacherDashboardButton.classList.add('active');
-    studentDashboardRows=(r.tasks||[]).map(normalizeStudentRow);restoreStudentProgress(studentDashboardRows,studentName);buildStudentDashboard(studentDashboardRows,studentName);
+    studentDashboardRows=(r.tasks||[]).map(normalizeStudentRow);buildStudentDashboard(studentDashboardRows,studentName);
     studentProfileName.textContent=studentName+' (просмотр преподавателем)';
     showStudentDashboardStatus('Режим просмотра преподавателя: ты смотришь сохранённый прогресс и решения этого ученика.');
   }catch(err){showAccountManagerMessage(err.message);}
@@ -742,7 +742,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
       const r=await authRequest({action:'whoami',token:authSession.token});if(!r.success)throw new Error('Сеанс истёк');
       if(r.session.role==='student'){
         try{await syncStudentProgressFromServer(r.session);}
-        catch(syncError){state.solved={};saveState();renderNav();updateStats();}
+        catch(syncError){console.warn('Серверный прогресс временно недоступен. Локальные данные не изменены:',syncError);}
       }
       applyAuthSession(r.session);
       if(authSession.role==='teacher')loadAccountList();else{await refreshLessonAccess(authSession);renderNav();updateStats();loadTask();}
@@ -1754,7 +1754,7 @@ function setStudentName(name){
 }
 
 function restoreStudentProgress(rows,name){
-  const mine=rows.filter(r=>r.name.toLowerCase()===name.toLowerCase() && String(r.result).toLowerCase()==='решена');
+  const mine=rows.filter(r=>String(r.result).toLowerCase()==='решена');
   const latest=new Map();
   mine.forEach(r=>latest.set(r.lesson+'::'+r.taskId,r));
 
@@ -1780,17 +1780,11 @@ async function syncStudentProgressFromServer(session){
   if(!response || !response.success) throw new Error((response&&response.error)||'Не удалось загрузить прогресс ученика с сервера.');
   const rows=(Array.isArray(response.tasks)?response.tasks:[]).map(normalizeStudentRow);
 
-  // Убираем локальные отметки о решении, чтобы они не переносились между аккаунтами/браузерами.
-  const oldSolvedKeys=Object.keys(state.solved).filter(key=>state.solved[key]);
+  // Сервер подтверждает статус «решено», но отсутствие записи или кода в ответе
+  // не должно уничтожать локальную копию работы ученика. Данные уже разделены
+  // по ID аккаунта через storageKeyForAccount / activateStudentLocalState.
+  // Сбрасываем только флаги решения, затем восстанавливаем подтверждённые.
   state.solved={};
-  oldSolvedKeys.forEach(key=>{
-    delete state.codes[key];
-    delete state.ratings[key];
-    delete state.attempts[key];
-    delete state.hints[key];
-    delete state.failedCodes[key];
-    delete state.manualRunPassed[key];
-  });
 
   restoreStudentProgress(rows,session.name);
   // Обновляем редактор выбранной задачи, чтобы показать код из серверной записи.
@@ -1808,7 +1802,7 @@ function buildStudentDashboard(rows,name){
     return;
   }
 
-  const mine=rows.filter(r=>r.name.toLowerCase()===clean.toLowerCase() && String(r.result).toLowerCase()==='решена');
+  const mine=rows.filter(r=>String(r.result).toLowerCase()==='решена');
   const latest=new Map();
   mine.forEach(r=>latest.set(r.lesson+'::'+r.taskId,r));
   const unique=[...latest.values()];
@@ -1843,11 +1837,23 @@ function buildStudentDashboard(rows,name){
     });
     solutionsBox.innerHTML=solvedRows.length?solvedRows.map(r=>{
       const match=allTasks.find(t=>('Занятие '+t.lessonId)===r.lesson && String(t.id)===String(r.taskId));
-      const hasSolution=!!(r.solution || (match && state.codes[match.key]));
+      const hasSolution=!!(r.solution || (!teacherViewingStudent && match && state.codes[match.key]));
       return `<div class="student-solution-row"><div><div class="student-solution-title">${escapeHtml(r.title||('Задача '+r.taskId))}</div><div class="student-solution-meta">${escapeHtml(r.lesson)} · ${hasSolution?'код решения сохранён':'задача решена; код не был сохранён ранее'}</div></div><button type="button" class="student-solution-open" data-solution-key="${match?escapeHtml(match.key):''}" ${match&&hasSolution?'':'disabled'}>${hasSolution?'Посмотреть решение':'Нет сохранённого кода'}</button></div>`;
     }).join(''):'<div class="student-dashboard-empty">Пока нет решённых задач.</div>';
     solutionsBox.querySelectorAll('[data-solution-key]').forEach(button=>{
-      button.addEventListener('click',()=>{const key=button.getAttribute('data-solution-key');if(key)selectTask(key);});
+      button.addEventListener('click',()=>{
+        const key=button.getAttribute('data-solution-key');
+        if(!key)return;
+        if(teacherViewingStudent){
+          const savedRow=solvedRows.find(row=>{
+            const lessonId=Number(row.lesson.replace('Занятие ',''));
+            return `${lessonId}-${row.taskId}`===key;
+          });
+          if(savedRow&&savedRow.solution)showSavedStudentSolution(savedRow);
+          return;
+        }
+        selectTask(key);
+      });
     });
   }
 
@@ -1855,6 +1861,24 @@ function buildStudentDashboard(rows,name){
     studentDashboardStatus.textContent='Для этого имени пока нет сохранённых решений. Реши первую задачу — и она появится здесь.';
     studentDashboardStatus.classList.add('show');
   }
+}
+
+// Учитель читает серверный код в отдельном окне, не меняя код в редакторе.
+function showSavedStudentSolution(row){
+  const modal=document.getElementById('theoryModal');
+  const title=document.getElementById('modalTitle');
+  const body=document.getElementById('modalBody');
+  modal.classList.remove('lesson2-theory-open');
+  title.textContent=(teacherViewingStudent?teacherViewingStudent.name+' — ':'')+(row.title||'Решение задачи');
+  body.replaceChildren();
+  const note=document.createElement('p');
+  note.textContent='Сохранённое решение ученика из Google Таблицы (только просмотр).';
+  note.style.cssText='color:#697384;font-size:13px;line-height:1.5';
+  const pre=document.createElement('pre');
+  pre.textContent=row.solution;
+  pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f6f9;border:1px solid #e2e6ef;border-radius:10px;padding:16px;font:14px/1.6 Consolas,monospace;user-select:text';
+  body.append(note,pre);
+  openModal(modal);
 }
 
 async function loadStudentDashboard(){
