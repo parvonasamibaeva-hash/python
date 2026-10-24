@@ -525,7 +525,8 @@ body.auth-required #mainApp { visibility:hidden !important; pointer-events:none 
         <div class="account-list" id="accountList"></div>
         <div class="lesson-access-manager" id="lessonAccessManager">
           <div class="lesson-access-head"><div><span class="access-eyebrow">УЧЕБНЫЙ МАРШРУТ</span><h3>Кому открываем занятия?</h3><p>Настрой общий маршрут группы или доступ конкретного ученика.</p></div><span id="accessSummary" class="access-summary"></span></div>
-          <div class="access-tabs" role="group" aria-label="Режим настройки доступа"><button type="button" data-access-mode="group" aria-pressed="true">Четверговая группа</button><button type="button" data-access-mode="student" aria-pressed="false">Отдельный ученик</button></div>
+          <div class="access-tabs" role="group" aria-label="Режим настройки доступа"><button type="button" data-access-mode="group" aria-pressed="true">Группы учеников</button><button type="button" data-access-mode="student" aria-pressed="false">Отдельный ученик</button></div>
+          <div id="accessGroupPicker" class="access-picker" hidden><label>Кому меняем доступ<select id="accessGroupTarget"><option value="thursday">Четверговая группа</option><option value="individual">Индивидуальные занятия</option></select></label></div>
           <div id="accessStudentPicker" class="access-picker" hidden><label>Кого показать<select id="lessonAccessGroup"><option value="all">Всех учеников</option><option value="individual">Индивидуальные занятия</option><option value="thursday">Четверговая группа</option></select></label><label>Ученик<select id="lessonAccessStudent"></select></label></div>
           <p id="accessHelp" class="access-help"></p>
           <div id="lessonAccessRows" class="lesson-access-rows"><div class="teacher-loading">Загружаем настройки доступа…</div></div>
@@ -749,10 +750,11 @@ function renderLessonAccessControls(){
   const rows=document.getElementById('lessonAccessRows');if(!rows)return;
   const student=accessMode==='student'?accessStudents.find(s=>s.id===document.getElementById('lessonAccessStudent').value):null;
   document.getElementById('accessStudentPicker').hidden=accessMode!=='student';
+  document.getElementById('accessGroupPicker').hidden=accessMode!=='group';
   document.querySelectorAll('[data-access-mode]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.accessMode===accessMode));b.disabled=accessBusy;});
-  document.getElementById('lessonAccessGroup').disabled=accessBusy;document.getElementById('lessonAccessStudent').disabled=accessBusy;
-  const group=student?(student.group||'individual'):'thursday';
-  document.getElementById('accessHelp').textContent=accessMode==='group'?'Общий доступ действует на группу. Личные исключения сохраняются. «Открыть всем» и «Закрыть всем» заменяют исключения для выбранного занятия.':student?(group==='thursday'?'Личная настройка важнее групповой. «Как у группы» возвращает общий доступ.':'Выбери доступ к каждому занятию. «По умолчанию» возвращает общую настройку индивидуальных занятий.'):'Добавь ученика или выбери другой фильтр.';
+  document.getElementById('lessonAccessGroup').disabled=accessBusy;document.getElementById('lessonAccessStudent').disabled=accessBusy;document.getElementById('accessGroupTarget').disabled=accessBusy;
+  const group=student?(student.group||'individual'):document.getElementById('accessGroupTarget').value;
+  document.getElementById('accessHelp').textContent=accessMode==='group'?'Настройка применяется к выбранной группе: '+(group==='thursday'?'четверговой':'индивидуальных занятий')+'. «Открыть всем»/«Закрыть всем» относятся только к этой группе. Личные исключения могут влиять на результат.':student?(group==='thursday'?'Личная настройка важнее групповой. «Как у группы» возвращает общий доступ.':'Выбери доступ к каждому занятию. «По умолчанию» возвращает общую настройку индивидуальных занятий.'):'Добавь ученика или выбери другой фильтр.';
   if(accessMode==='student'&&!student){rows.innerHTML='<div class="access-empty">В этом списке пока нет учеников.</div>';document.getElementById('accessSummary').textContent='';return;}
   let opened=0;
   rows.innerHTML=Array.from({length:lessons.length},(_,i)=>{
@@ -762,7 +764,7 @@ function renderLessonAccessControls(){
     const commonKey=group+':'+id;
     const common=Object.prototype.hasOwnProperty.call(lessonAccessState,commonKey)?lessonAccessState[commonKey]:LESSON_ACCESS_DEFAULT_OPEN;
     const source=student?(hasPersonal?'Личная настройка':group==='thursday'?'По настройке группы':'Общая настройка'):'По умолчанию для группы';
-    const overrides=student?0:accessStudents.filter(s=>s.group==='thursday'&&Object.prototype.hasOwnProperty.call(lessonAccessState,'student:'+s.id+':'+id)).length;
+    const overrides=student?0:accessStudents.filter(s=>(s.group||'individual')===group&&Object.prototype.hasOwnProperty.call(lessonAccessState,'student:'+s.id+':'+id)).length;
     const selected=student?(hasPersonal?String(lessonAccessState[personal]):'inherit'):String(common);
     const choices=(student?[['inherit',group==='thursday'?'Как у группы':'По умолчанию'],['true','Открыто'],['false','Закрыто']]:[['true','Открыто'],['false','Закрыто']]).map(([v,label])=>'<button type="button" data-access-value="'+v+'" data-lesson="'+id+'" aria-pressed="'+(selected===v)+'" '+(accessBusy||!accessReady?'disabled':'')+'>'+label+'</button>').join('');
     const lesson=getLesson(id);
@@ -776,18 +778,20 @@ async function saveAccessSetting(lessonId,value,applyToAll){
   const student=accessMode==='student'?accessStudents.find(s=>s.id===document.getElementById('lessonAccessStudent').value):null;
   if(accessMode==='student'&&!student)return;
   const message=document.getElementById('lessonAccessMessage');
-  const payload={action:'setLessonAccess',token:authSession.token,lessonId,open:value==='inherit'?null:value==='true',group:'thursday',applyToAll};
+  const group=student?(student.group||'individual'):document.getElementById('accessGroupTarget').value;
+  const payload={action:'setLessonAccess',token:authSession.token,lessonId,open:value==='inherit'?null:value==='true',group,applyToAll};
   if(student)payload.studentId=student.id;
   accessBusy=true;renderLessonAccessControls();message.textContent='Сохраняем доступ…';message.classList.remove('access-error');
   try{
     const r=await authRequest(payload);if(!r.success)throw new Error(r.error||'Не удалось сохранить доступ.');
     if(!r.access)throw new Error('Обнови Apps Script: сервер пока не поддерживает личный доступ.');
     lessonAccessState=r.access;
-    message.textContent='Занятие '+lessonId+': '+(student?student.name:applyToAll?'вся четверговая группа':'общая настройка группы')+' — '+(value==='inherit'?'общая настройка восстановлена':value==='true'?'доступ открыт':'доступ закрыт')+'.';
+    message.textContent='Занятие '+lessonId+': '+(student?student.name:applyToAll?(group==='thursday'?'вся четверговая группа':'все индивидуальные ученики'):'общая настройка '+(group==='thursday'?'четверговой группы':'индивидуальных учеников'))+' — '+(value==='inherit'?'общая настройка восстановлена':value==='true'?'доступ открыт':'доступ закрыт')+'.';
   }catch(error){message.textContent=error.message;message.classList.add('access-error');}
   finally{accessBusy=false;renderLessonAccessControls();}
 }
 document.querySelectorAll('[data-access-mode]').forEach(b=>b.onclick=()=>{accessMode=b.dataset.accessMode;populateAccessStudents();renderLessonAccessControls();document.getElementById('lessonAccessMessage').textContent='';});
+document.getElementById('accessGroupTarget').onchange=renderLessonAccessControls;
 document.getElementById('lessonAccessGroup').onchange=()=>{populateAccessStudents();renderLessonAccessControls()};
 document.getElementById('lessonAccessStudent').onchange=renderLessonAccessControls;
 async function loadLessonAccessControls(){
