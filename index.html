@@ -830,7 +830,10 @@ async function viewStudentAccount(studentId, studentName){
     teacherViewingStudent={id:studentId,name:studentName};
     closeTeacherDashboard();closeQuiz();document.body.classList.add('student-dashboard-mode');studentDashboardView.setAttribute('aria-hidden','false');
     studentDashboardButton.classList.remove('active');teacherDashboardButton.classList.add('active');
-    studentDashboardRows=(r.tasks||[]).map(normalizeStudentRow);restoreStudentProgress(studentDashboardRows,studentName);buildStudentDashboard(studentDashboardRows,studentName);
+    studentDashboardRows=(r.tasks||[]).map(normalizeStudentRow);
+    // Режим просмотра преподавателем не должен менять состояние его редактора:
+    // данные профиля используются только для построения кабинета и read-only просмотра.
+    buildStudentDashboard(studentDashboardRows,studentName);
     studentProfileName.textContent=studentName+' (просмотр преподавателем)';
     showStudentDashboardStatus('Режим просмотра преподавателя: ты смотришь сохранённый прогресс и решения этого ученика.');
   }catch(err){showAccountManagerMessage(err.message);}
@@ -1425,7 +1428,7 @@ if(!saved.__collapsedLessonsInitialized){
   saved.__collapsedLessonsInitialized=true;
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
-const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},solved:saved.solved||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
+const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},solved:saved.solved||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},taskSubmissionIds:saved.taskSubmissionIds||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
 if(String(state.currentKey).startsWith('6-'))state.openLessons[6]=true;
 if(String(state.currentKey).startsWith('7-'))state.openLessons[7]=true;
 // Remove old prefilled input-variable scaffolds from lessons 3-5, but preserve any real student solution.
@@ -1532,7 +1535,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
 closeMobileMenu();
 
 function saveState(){localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(state))}
-function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:{},attempts:{},failedCodes:{},hints:{},solved:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
+function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:{},attempts:{},failedCodes:{},hints:{},solved:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},taskSubmissionIds:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
 function currentTask(){return allTasks.find(t=>t.key===state.currentKey)||allTasks[0]}
 function getLesson(id){return lessons.find(l=>l.id===id)}
 function levelOrder(level){return {past:1,pro:2,boss:3,hard:4}[level]||1}
@@ -2033,11 +2036,21 @@ function buildStudentDashboard(rows,name){
     });
     solutionsBox.innerHTML=solvedRows.length?solvedRows.map(r=>{
       const match=allTasks.find(t=>('Занятие '+t.lessonId)===r.lesson && String(t.id)===String(r.taskId));
-      const hasSolution=!!(r.solution || (match && state.codes[match.key]));
+      const hasSolution=teacherViewingStudent?!!r.solution:!!(r.solution || (match && state.codes[match.key]));
       return `<div class="student-solution-row"><div><div class="student-solution-title">${escapeHtml(r.title||('Задача '+r.taskId))}</div><div class="student-solution-meta">${escapeHtml(r.lesson)} · ${hasSolution?'код решения сохранён':'задача решена; код не был сохранён ранее'}</div></div><button type="button" class="student-solution-open" data-solution-key="${match?escapeHtml(match.key):''}" ${match&&hasSolution?'':'disabled'}>${hasSolution?'Посмотреть решение':'Нет сохранённого кода'}</button></div>`;
     }).join(''):'<div class="student-dashboard-empty">Пока нет решённых задач.</div>';
     solutionsBox.querySelectorAll('[data-solution-key]').forEach(button=>{
-      button.addEventListener('click',()=>{const key=button.getAttribute('data-solution-key');if(key)selectTask(key);});
+      button.addEventListener('click',()=>{
+        const key=button.getAttribute('data-solution-key');
+        if(!key)return;
+        const row=solvedRows.find(item=>{
+          const itemTask=allTasks.find(task=>('Занятие '+task.lessonId)===item.lesson&&String(task.id)===String(item.taskId));
+          return itemTask&&itemTask.key===key;
+        });
+        if(teacherViewingStudent){
+          openStudentSolutionPreview(key,row&&row.solution||'');
+        }else selectTask(key);
+      });
     });
   }
 
@@ -2045,6 +2058,22 @@ function buildStudentDashboard(rows,name){
     studentDashboardStatus.textContent='Для этого имени пока нет сохранённых решений. Реши первую задачу — и она появится здесь.';
     studentDashboardStatus.classList.add('show');
   }
+}
+
+function openStudentSolutionPreview(key,solution){
+  const task=allTasks.find(item=>item.key===key);
+  if(!task)return;
+  modalTitle.textContent=`${task.title} — решение ученика`;
+  modalBody.innerHTML='';
+  const note=document.createElement('p');
+  note.className='student-dashboard-note';
+  note.textContent='Режим просмотра: код открыт только для чтения и не меняет редактор преподавателя.';
+  const pre=document.createElement('pre');
+  pre.className='quiz-code';
+  pre.textContent=String(solution||'');
+  modalBody.append(note,pre);
+  theoryModal.classList.remove('lesson2-theory-open');
+  openModal(theoryModal);
 }
 
 async function loadStudentDashboard(){
@@ -2574,8 +2603,12 @@ function markResultSent(key,ok){
 async function sendTaskResult(t,sessionOverride){
   const sess=sessionOverride||authSession;
   if(!sess||sess.role!=='student')return {success:false,skipped:true,error:'Не выполнен вход в аккаунт ученика.'};
+  state.taskSubmissionIds=state.taskSubmissionIds||{};
+  const submissionId=state.taskSubmissionIds[t.key]||(state.taskSubmissionIds[t.key]=`${sess.accountId||'student'}:${t.key}`);
+  saveState();
   const payload={
     type:'task',
+    submissionId,
     token:sess.token,
     accountId:sess.accountId,
     name:sess.name,
@@ -2588,15 +2621,18 @@ async function sendTaskResult(t,sessionOverride){
     rating:Number(state.ratings[t.key]||0)||'',
     solution:String(state.codes[t.key]||editor.getValue()||'')
   };
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),20000);
   try{
-    const response=await fetch(QUIZ_RESULTS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    const response=await fetch(QUIZ_RESULTS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),signal:controller.signal});
+    if(!response.ok)throw new Error('Сервер недоступен (HTTP '+response.status+').');
     const data=await response.json();
     markResultSent(t.key,!!(data&&data.success));
     return data;
   }catch(error){
     markResultSent(t.key,false);
-    return {success:false,error:String(error)};
-  }
+    return {success:false,error:error.name==='AbortError'?'Сервер не ответил за 20 секунд.':String(error)};
+  }finally{clearTimeout(timer);}
 }
 
 async function runPython(){const t=currentTask();if(t.lessonId===6&&t.title==="Задача 5. Измени начальное значение"){const fields=[['experimentI0','i0','0\n1\n2\n3\n4\n5\n6\n7\n8\n9'],['experimentI5','i5','5\n6\n7\n8\n9'],['experimentI10','i10','nothing']];const answers={};for(const [id,key] of fields)answers[key]=document.getElementById(id).value.trim();state.experimentAnswers=state.experimentAnswers||{};state.experimentAnswers[t.key]=answers;const empty=fields.filter(([id])=>!document.getElementById(id).value.trim());if(empty.length){saveState();showStatus('warning','Заполни результаты всех трёх экспериментов: i = 0, i = 5 и i = 10.');return}const norm=v=>v.toLowerCase().replace(/\s+/g,' ').trim();const ok0=norm(answers.i0)===norm(fields[0][2])||norm(answers.i0)===norm('0 1 2 3 4 5 6 7 8 9');const ok5=norm(answers.i5)===norm(fields[1][2])||norm(answers.i5)===norm('5 6 7 8 9');const ok10=['ничего не выведено','ничего','не выводится','нет вывода','пусто'].includes(norm(answers.i10));if(ok0&&ok5&&ok10){state.solved[t.key]=true;saveState();renderNav();updateProgress(Number(state.attempts[t.key]||0));renderRating();updateStats();const sent=await sendTaskResult(t);showStatus(sent.success?'success':'warning',sent.success?'🎉 Все три результата верны! Задача решена и сохранена.':'🎉 Все три результата верны! Задача решена, но серверное сохранение пока не подтверждено.');updateSubmitButton();return}else{recordTaskFailure(t);saveState();updateProgress(Number(state.attempts[t.key]||0));showStatus('error','Пока не все ответы верны. Сравни результаты с тремя запусками программы. Для i = 10 условие i < 10 ложно сразу, поэтому тело цикла не выполняется.');return}}if(t.lessonId===6&&t.title==="Задача 10. Что изменится при перестановке строк?"){const a=document.getElementById('task10VariantA').value.trim();const b=document.getElementById('task10VariantB').value.trim();const explanation=document.getElementById('task10Explanation').value.trim();state.task10Answers=state.task10Answers||{};state.task10Answers[t.key]={a,b,explanation};saveState();if(!a||!b||!explanation){showStatus('warning','Заполни оба поля с результатами и напиши объяснение.');return}const norm=v=>v.toLowerCase().replace(/[^0-9]+/g,' ').trim().replace(/\s+/g,' ');const correctA=norm(a)==='1 2 3 4 5';const correctB=norm(b)==='2 3 4 5 6';const exp=explanation.toLowerCase().replace(/ё/g,'е');const split=exp.search(/вариант\s*б|вариант б|варианте б|б:/);const partA=split>=0?exp.slice(0,split):exp;const partB=split>=0?exp.slice(split):'';const mentionsPrintA=/(вывод|печата|print)/i.test(partA);const mentionsIncreaseA=/(увелич|прибав|i\s*\+=\s*1|счетчик.*меня)/i.test(partA);const mentionsIncreaseB=/(увелич|прибав|i\s*\+=\s*1|счетчик.*меня)/i.test(partB);const mentionsPrintB=/(вывод|печата|print)/i.test(partB);const outputA=partA.search(/вывод|печата|print/i);const increaseA=partA.search(/увелич|прибав|i\s*\+=\s*1|счетчик/i);const increaseB=partB.search(/увелич|прибав|i\s*\+=\s*1|счетчик/i);const outputB=partB.search(/вывод|печата|print/i);const orderA=mentionsPrintA&&mentionsIncreaseA&&outputA>=0&&increaseA>outputA;const orderB=mentionsIncreaseB&&mentionsPrintB&&increaseB>=0&&outputB>increaseB;if(correctA&&correctB&&orderA&&orderB){state.solved[t.key]=true;state.codes[t.key]=`Вариант А: ${a}\nВариант Б: ${b}\nОбъяснение: ${explanation}`;saveState();renderNav();updateProgress(Number(state.attempts[t.key]||0));renderRating();updateStats();const sent=await sendTaskResult(t);showStatus(sent.success?'success':'warning',sent.success?'🎉 Всё верно! Оба результата и объяснение правильные. Задача решена и сохранена.':'🎉 Ответы верны! Задача решена, но серверное сохранение пока не подтверждено.');updateSubmitButton();return}else{recordTaskFailure(t);saveState();updateProgress(Number(state.attempts[t.key]||0));let message='Проверь ответы и объяснение.';if(!correctA||!correctB)message='Одна или обе последовательности чисел неверны. Проверь каждый вариант отдельно.';else message='Последовательности верны, но объяснение должно указать порядок команд в обоих вариантах: в А сначала выводится число, затем увеличивается i; в Б сначала увеличивается i, затем выводится число.';showStatus('error',message);return}}if(t.lessonId===6&&(t.title==="Задача 13. Сколько раз выполнится цикл?"||t.title==="Задача 7. Сколько раз напечатается сообщение?"||t.title==="Задача 8. Сколько раз напечатается сообщение?"||t.title==="Задача 9. Ровно N повторений")){const task7Count=t.title==="Задача 7. Сколько раз напечатается сообщение?";const task8Count=t.title==="Задача 8. Сколько раз напечатается сообщение?";const task9Count=t.title==="Задача 9. Ровно N повторений";const answer=String(document.getElementById('numericAnswer').value).trim();if(!answer){showStatus('warning','Введи ответ цифрами.');return}if(Number(answer)===(task7Count?0:task8Count?9:7)){state.solved[t.key]=true;state.codes[t.key]=answer;saveState();renderNav();updateProgress(Number(state.attempts[t.key]||0));renderRating();updateStats();const sent=await sendTaskResult(t);showStatus(sent.success?'success':'warning',task7Count?(sent.success?'🎉 Верно! Цикл не выполнится ни разу. Ответ сохранён.':'🎉 Верно! Цикл не выполнится ни разу.'):task8Count?(sent.success?'🎉 Верно! Сообщение напечатается 9 раз. Ответ сохранён.':'🎉 Верно! Сообщение напечатается 9 раз.'):(sent.success?'🎉 Верно! Программа напечатает Python! 7 раз. Ответ сохранён.':'🎉 Верно! Программа напечатает Python! 7 раз.'));runButton.disabled=false;return}else{recordTaskFailure(t);state.codes[t.key]=answer;saveState();updateProgress(Number(state.attempts[t.key]||0));showStatus('error',task7Count?'Пока неверно. Условие проверяется до выполнения тела цикла.':task8Count?'Пока неверно. Посчитай значения i, при которых условие i < 10 остаётся истинным.':'Пока неверно. Проверь, с какого значения начинается i и при каком значении условие i <= 11 ещё истинно.');return}}if(state.solved[t.key]){showStatus('success','🎉 Эта задача уже решена.');return}const code=normalizeCode(editor.getValue());if(!code){showStatus('warning','Сначала напиши программу.');return}runButton.disabled=true;hintButton.disabled=true;runButton.textContent='⏳ Проверяем...';const result=await checkTask(t,code);if(result.type==='execution_error'){recordTaskFailure(t);showConsoleOutput(explainPythonError(result.error||'Неизвестная ошибка выполнения.').message,false);showStatus('error','⚠️ Программа не смогла выполниться. Неудачная попытка учтена. Прочитай объяснение в терминале, исправь код и попробуй снова.');runButton.disabled=false;updateSubmitButton();updateHintButton(Number(state.attempts[t.key]||0));return}if(result.type==='success'){state.solved[t.key]=true;state.codes[t.key]=code;saveState();renderNav();updateProgress(Number(state.attempts[t.key]||0));renderRating();updateStats();const sent=await sendTaskResult(t);if(sent.success){showStatus('success','🎉 Отлично! Все скрытые проверки пройдены.\n\nЗадача решена! Результат сохранён для преподавателя.\n\nТеперь оцени сложность задачи звёздочками.');}else if(sent.skipped){showStatus('success','🎉 Отлично! Все скрытые проверки пройдены.\n\nЗадача решена! Имя не указано, поэтому результат пока не отправлен преподавателю.\n\nТеперь оцени сложность задачи звёздочками.');}else{showStatus('warning','🎉 Задача решена, но результат пока не удалось отправить преподавателю.\n\nПроверь подключение к интернету.');}runButton.disabled=false;updateSubmitButton();return}if(!state.failedCodes[t.key])state.failedCodes[t.key]=[];state.failedCodes[t.key].push(code);recordTaskFailure(t);state.codes[t.key]=code;scheduleDraftSave(t);const a=state.attempts[t.key];saveState();updateProgress(a);scheduleDraftSave(t);showStatus(a>=5?'warning':'error',`❌ Программа выполнилась, но решение не прошло проверку.\n\n${result.expected!==undefined?explainWrongOutput(result.expected,result.actual):'Проверь, соответствует ли решение всем требованиям задачи и работает ли оно в разных случаях.'}\n\nНеудачных попыток: ${a}${a>=5?'\n\n💡 Доступные подсказки уже открыты на странице.':'\n\nИсправь программу и проверь её снова.'}`);runButton.disabled=false;updateSubmitButton();updateHintButton(a)}
