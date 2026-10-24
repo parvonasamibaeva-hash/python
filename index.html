@@ -755,7 +755,7 @@ function renderLessonAccessControls(){
   document.getElementById('accessHelp').textContent=accessMode==='group'?'Общий доступ действует на группу. Личные исключения сохраняются. «Открыть всем» и «Закрыть всем» заменяют исключения для выбранного занятия.':student?(group==='thursday'?'Личная настройка важнее групповой. «Как у группы» возвращает общий доступ.':'Выбери доступ к каждому занятию. «По умолчанию» возвращает общую настройку индивидуальных занятий.'):'Добавь ученика или выбери другой фильтр.';
   if(accessMode==='student'&&!student){rows.innerHTML='<div class="access-empty">В этом списке пока нет учеников.</div>';document.getElementById('accessSummary').textContent='';return;}
   let opened=0;
-  rows.innerHTML=Array.from({length:7},(_,i)=>{
+  rows.innerHTML=Array.from({length:lessons.length},(_,i)=>{
     const id=i+1,personal=student?'student:'+student.id+':'+id:'',hasPersonal=student&&Object.prototype.hasOwnProperty.call(lessonAccessState,personal);
     const value=student?effectiveLessonAccess(id,student.id,group):effectiveLessonAccess(id,'',group);
     if(value)opened++;
@@ -768,7 +768,7 @@ function renderLessonAccessControls(){
     const lesson=getLesson(id);
     return '<article class="access-lesson '+(value?'access-open':'access-closed')+'"><div class="access-card-top"><span class="access-number">'+String(id).padStart(2,'0')+'</span><span class="access-status">'+(value?'Доступ открыт':'Доступ закрыт')+'</span></div><h4>Занятие '+id+'</h4><p class="access-topic">'+escapeHtml(lesson.subtitle||lesson.title)+'</p><div class="access-choice" role="group" aria-label="Доступ к занятию '+id+'">'+choices+'</div><div class="access-source">'+source+(overrides?' · Личных исключений: '+overrides:'')+'</div>'+(!student?'<div class="access-bulk"><button type="button" data-access-value="true" data-all="true" data-lesson="'+id+'" '+(accessBusy||!accessReady?'disabled':'')+'>Открыть всем</button><button type="button" data-access-value="false" data-all="true" data-lesson="'+id+'" '+(accessBusy||!accessReady?'disabled':'')+'>Закрыть всем</button></div>':'')+'</article>';
   }).join('');
-  document.getElementById('accessSummary').textContent=opened+' из 7 открыто';
+  document.getElementById('accessSummary').textContent=opened+' из '+lessons.length+' открыто';
   rows.querySelectorAll('[data-access-value]').forEach(button=>button.onclick=()=>saveAccessSetting(Number(button.dataset.lesson),button.dataset.accessValue,button.dataset.all==='true'));
 }
 async function saveAccessSetting(lessonId,value,applyToAll){
@@ -1382,6 +1382,704 @@ const lesson6Tasks=[
 ];
 const homeworkTasks=[{"id":1,"title":"Задача 1. Количество цифр, равных 3","level":"base","short":"Посчитай, сколько раз в числе встречается цифра 3.","problem":"Дано натуральное число n. Посчитай, сколько раз в нём встречается цифра 3.","examples":"13308 → 2; 987 → 0","starter":"","hint":"Подсказка 1. Начни со счётчика count = 0.\n\nПодсказка 2. Извлекай цифры по одной и сравнивай каждую с числом 3.\n\nПодсказка 3. Если digit == 3, увеличивай счётчик. После обработки цифры убирай её из n.","theory":"Счётчик увеличивается только при совпадении с цифрой 3.","tests":[{"input":["13308"],"expected":"2"},{"input":["987"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"0"},{"input":["90305"],"expected":"1"},{"input":["55555"],"expected":"0"}]},{"id":2,"title":"Задача 2. Количество цифр, меньших 4","level":"base","short":"Найди количество цифр, которые строго меньше 4.","problem":"Дано натуральное число n. Найди количество цифр, которые строго меньше 4.","examples":"42103 → 4; 987 → 0","starter":"","hint":"Подсказка 1. На каждом шаге получай последнюю цифру.\n\nПодсказка 2. Проверь условие digit < 4.\n\nПодсказка 3. Увеличивай счётчик только тогда, когда условие истинно.","theory":"Цифра 0 тоже меньше 4, поэтому она учитывается.","tests":[{"input":["42103"],"expected":"4"},{"input":["987"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"3"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"0"}]},{"id":3,"title":"Задача 3. Сколько цифр делятся на 3","level":"base","short":"Посчитай цифры числа, которые делятся на 3 без остатка.","problem":"Дано натуральное число n. Посчитай цифры числа, которые делятся на 3 без остатка.","examples":"93614 → 3; 124 → 0","starter":"","hint":"Подсказка 1. Проверяй каждую цифру, а не всё число.\n\nПодсказка 2. Число делится на 3 без остатка, если digit % 3 == 0.\n\nПодсказка 3. При выполнении условия увеличивай счётчик.","theory":"Ноль тоже делится на 3 без остатка.","tests":[{"input":["93614"],"expected":"3"},{"input":["124"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"2"},{"input":["90305"],"expected":"4"},{"input":["55555"],"expected":"0"}]},{"id":4,"title":"Задача 4. Есть ли цифра больше предыдущей справа","level":"base","short":"Сравни соседние цифры при проходе справа налево.","problem":"Дано натуральное число n. Определи, встречается ли при просмотре цифр справа налево цифра, которая больше цифры непосредственно справа от неё. Выведи YES или NO.","examples":"123 → NO; 132 → YES","starter":"","hint":"Подсказка 1. Запомни предыдущую извлечённую цифру.\n\nПодсказка 2. На следующем шаге сравни текущую цифру с предыдущей.\n\nПодсказка 3. Если текущая цифра больше предыдущей, установи флаг found = True.","theory":"Здесь сравниваются соседние цифры, а не цифры со всем числом.","tests":[{"input":["123"],"expected":"NO"},{"input":["132"],"expected":"YES"},{"input":["7"],"expected":"NO"},{"input":["100"],"expected":"YES"},{"input":["90305"],"expected":"YES"},{"input":["55555"],"expected":"NO"}]},{"id":5,"title":"Задача 5. Количество чётных цифр","level":"medium","short":"Посчитай цифры, равные 0, 2, 4, 6 или 8.","problem":"Дано натуральное число n. Посчитай, сколько цифр числа принадлежат набору 0, 2, 4, 6, 8. Нельзя использовать строковые преобразования.","examples":"24681 → 4; 13579 → 0","starter":"","hint":"Подсказка 1. Все цифры нужно проверять по одной.\n\nПодсказка 2. Чётная цифра удовлетворяет условию digit % 2 == 0.\n\nПодсказка 3. Увеличивай счётчик при выполнении условия.","theory":"Здесь нужно посчитать количество чётных цифр, а не их сумму.","tests":[{"input":["24681"],"expected":"4"},{"input":["13579"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"2"},{"input":["90305"],"expected":"2"},{"input":["55555"],"expected":"0"}]},{"id":6,"title":"Задача 6. Сумма цифр, которые больше 4","level":"medium","short":"Найди сумму цифр, которые строго больше 4.","problem":"Дано натуральное число n. Найди сумму только тех цифр, которые строго больше 4.","examples":"58321 → 13; 1234 → 0","starter":"","hint":"Подсказка 1. Начни total = 0.\n\nПодсказка 2. Проверь каждую цифру условием digit > 4.\n\nПодсказка 3. При истинном условии прибавляй digit к total.","theory":"Если подходящих цифр нет, сумма остаётся равной 0.","tests":[{"input":["58321"],"expected":"13"},{"input":["1234"],"expected":"0"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"0"},{"input":["90305"],"expected":"14"},{"input":["55555"],"expected":"25"}]},{"id":7,"title":"Задача 7. Первая справа цифра, которая больше 5","level":"medium","short":"Найди первую справа цифру больше 5 или выведи -1.","problem":"Дано натуральное число n. Выведи первую цифру больше 5, если смотреть справа налево. Если такой цифры нет, выведи -1.","examples":"241879 → 9; 12345 → -1","starter":"","hint":"Подсказка 1. Цифры уже извлекаются справа налево.\n\nПодсказка 2. Когда digit > 5, нужная цифра найдена.\n\nПодсказка 3. Сохрани её и останови цикл командой break.","theory":"Проверяется условие, а не точное совпадение с заданной цифрой.","tests":[{"input":["241879"],"expected":"9"},{"input":["12345"],"expected":"-1"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"-1"},{"input":["90305"],"expected":"9"},{"input":["55555"],"expected":"-1"}]},{"id":8,"title":"Задача 8. Сколько цифр больше средней цифры","level":"medium","short":"Для трёхзначного числа посчитай цифры больше средней.","problem":"Дано трёхзначное натуральное число n. Найди количество цифр, которые больше средней (второй слева) цифры числа.","examples":"583 → 0; 274 → 0; 192 → 0","starter":"","hint":"Подсказка 1. Для трёхзначного числа средняя цифра — (n // 10) % 10.\n\nПодсказка 2. Сохрани исходное число и сравни с ним цифры по одной.\n\nПодсказка 3. Считай только цифры, строго большие средней цифры.","theory":"Среднюю цифру нужно извлечь до цикла, потому что затем n будет изменяться.","tests":[{"input":["583"],"expected":"0"},{"input":["274"],"expected":"0"},{"input":["192"],"expected":"0"},{"input":["100"],"expected":"1"},{"input":["999"],"expected":"0"},{"input":["137"],"expected":"1"},{"input":["573"],"expected":"0"}]},{"id":9,"title":"Задача 9. Произведение цифр на нечётных позициях справа","level":"medium","short":"Перемножь цифры на позициях 1, 3, 5 и так далее справа налево.","problem":"Дано натуральное число n. Нумеруй цифры справа налево начиная с позиции 1. Найди произведение цифр на позициях 1, 3, 5 и так далее.","examples":"12345 → 15; 2468 → 32","starter":"","hint":"Подсказка 1. Заведи position = 1 и product = 1.\n\nПодсказка 2. На каждом шаге проверяй, является ли позиция нечётной.\n\nПодсказка 3. Умножай product на цифру только на нечётных позициях, затем увеличивай position.","theory":"Позиции считаются справа налево: единицы — первая позиция.","tests":[{"input":["12345"],"expected":"15"},{"input":["2468"],"expected":"32"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"0"},{"input":["90305"],"expected":"135"},{"input":["55555"],"expected":"125"}]},{"id":10,"title":"Задача 10. Есть ли две одинаковые соседние цифры","level":"medium","short":"Выведи YES, если рядом стоят одинаковые цифры.","problem":"Дано натуральное число n. Выведи YES, если в записи числа есть две одинаковые цифры, стоящие рядом. Иначе NO.","examples":"1228 → YES; 1234 → NO","starter":"","hint":"Подсказка 1. Сохрани последнюю цифру как previous.\n\nПодсказка 2. Извлеки следующую и сравни с previous.\n\nПодсказка 3. Если цифры равны, запомни успех; обновляй previous на каждом шаге.","theory":"Сравниваются только соседние цифры.","tests":[{"input":["1228"],"expected":"YES"},{"input":["1234"],"expected":"NO"},{"input":["7"],"expected":"NO"},{"input":["100"],"expected":"YES"},{"input":["90305"],"expected":"NO"},{"input":["55555"],"expected":"YES"}]},{"id":11,"title":"Задача 11. Количество переходов от нечётной цифры к чётной","level":"hard","short":"Посчитай соседние пары, где справа чётная цифра, а слева нечётная.","problem":"Дано натуральное число n. При просмотре цифр справа налево посчитай, сколько раз чётная цифра стоит непосредственно слева от нечётной цифры.","examples":"1234 → 1; 2468 → 0","starter":"","hint":"Подсказка 1. Сохрани предыдущую извлечённую цифру.\n\nПодсказка 2. digit находится слева от previous.\n\nПодсказка 3. Если previous нечётная, а digit чётная, увеличивай счётчик.","theory":"Важна ориентация соседней пары: число обрабатывается справа налево.","tests":[{"input":["1234"],"expected":"1"},{"input":["2468"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"0"},{"input":["90305"],"expected":"2"},{"input":["55555"],"expected":"0"}]},{"id":12,"title":"Задача 12. Найти наименьшую нечётную цифру","level":"hard","short":"Найди минимальную нечётную цифру или выведи -1.","problem":"Дано натуральное число n. Найди наименьшую нечётную цифру. Если нечётных цифр нет, выведи -1.","examples":"8642 → -1; 5827 → 5","starter":"","hint":"Подсказка 1. Инициализируй answer значением 10 — это больше любой цифры.\n\nПодсказка 2. Рассматривай только цифры, для которых digit % 2 == 1.\n\nПодсказка 3. Если подходящая цифра меньше answer, обнови answer; в конце проверь, осталась ли answer равной 10.","theory":"Ищется минимум только среди цифр, удовлетворяющих дополнительному условию.","tests":[{"input":["8642"],"expected":"-1"},{"input":["5827"],"expected":"5"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"5"}]},{"id":13,"title":"Задача 13. Сравнить суммы пар цифр","level":"hard","short":"Сравни сумму двух левых цифр с суммой двух правых.","problem":"Дано четырёхзначное число abcd. Выведи YES, если сумма первой и второй цифр слева меньше суммы третьей и четвёртой цифр, иначе NO.","examples":"1239 → YES; 4321 → NO","starter":"","hint":"Подсказка 1. Сохрани исходное число.\n\nПодсказка 2. Извлеки четыре цифры с помощью // и %.\n\nПодсказка 3. Сравни сумму двух левых цифр с суммой двух правых.","theory":"Это задача на разряды и условие; цикл while здесь не обязателен.","tests":[{"input":["1239"],"expected":"YES"},{"input":["4321"],"expected":"NO"},{"input":["1000"],"expected":"NO"},{"input":["9999"],"expected":"NO"},{"input":["5050"],"expected":"NO"},{"input":["2340"],"expected":"NO"}]},{"id":14,"title":"Задача 14. Есть ли соседние цифры с разницей 2","level":"hard","short":"Найди соседние цифры, разность которых по модулю равна 2.","problem":"Дано натуральное число n. Определи, есть ли в числе две соседние цифры, разность между которыми по модулю равна 2. Выведи YES или NO.","examples":"1357 → YES; 111 → NO","starter":"","hint":"Подсказка 1. Сравнивай соседние цифры, сохраняя предыдущую.\n\nПодсказка 2. Разность может быть как положительной, так и отрицательной.\n\nПодсказка 3. Используй условие abs(digit - previous) == 2.","theory":"Функция abs возвращает модуль числа.","tests":[{"input":["1357"],"expected":"YES"},{"input":["111"],"expected":"NO"},{"input":["7"],"expected":"NO"},{"input":["100"],"expected":"NO"},{"input":["90305"],"expected":"NO"},{"input":["55555"],"expected":"NO"}]},{"id":15,"title":"Задача 15. Длина серии одинаковых цифр в конце числа","level":"hard","short":"Посчитай, сколько одинаковых цифр подряд стоит в конце числа.","problem":"Дано натуральное число n. Посчитай, сколько одинаковых цифр подряд стоит в конце числа.","examples":"73555 → 3; 7771 → 1","starter":"","hint":"Подсказка 1. Запомни последнюю цифру исходного числа.\n\nПодсказка 2. Начни count с 0 и обрабатывай цифры справа налево.\n\nПодсказка 3. Пока цифра совпадает с запомненной, увеличивай счётчик; при первом несовпадении остановись.","theory":"Это серия в конце числа, а не максимальная серия в любом месте числа.","tests":[{"input":["73555"],"expected":"3"},{"input":["7771"],"expected":"1"},{"input":["7"],"expected":"1"},{"input":["100"],"expected":"2"},{"input":["90305"],"expected":"1"},{"input":["55555"],"expected":"5"}]},{"id":16,"title":"Задача 16. Сравнить количество цифр двух чисел","level":"hard","short":"Сравни количество цифр двух чисел без преобразования в строки.","problem":"Даны два натуральных числа a и b. Выведи YES, если у них одинаковое количество цифр, иначе NO. Преобразовывать числа в строки нельзя.","examples":"1234 и 9876 → YES; 99 и 100 → NO","starter":"","hint":"Подсказка 1. Создай отдельный счётчик для каждого числа.\n\nПодсказка 2. В каждом цикле дели соответствующее число на 10, пока оно больше нуля.\n\nПодсказка 3. Сравни полученные счётчики.","theory":"Для каждого числа выполняется отдельный проход.","tests":[{"input":["1234","9876"],"expected":"YES"},{"input":["99","100"],"expected":"NO"},{"input":["7","5"],"expected":"YES"},{"input":["10","99"],"expected":"YES"},{"input":["100","999"],"expected":"YES"},{"input":["5","10"],"expected":"NO"}]},{"id":17,"title":"Задача 17. Сколько цифр нужно заменить, чтобы все стали чётными","level":"boss","short":"Посчитай количество нечётных цифр.","problem":"Дано натуральное число n. Посчитай количество нечётных цифр в числе: каждая из них требует замены на чётную. Само число изменять не нужно.","examples":"13579 → 5; 2468 → 0","starter":"","hint":"Подсказка 1. Проходи по цифрам числа.\n\nПодсказка 2. Нечётная цифра удовлетворяет digit % 2 != 0.\n\nПодсказка 3. Подсчитай количество таких цифр.","theory":"Это задача на подсчёт нечётных цифр.","tests":[{"input":["13579"],"expected":"5"},{"input":["2468"],"expected":"0"},{"input":["7"],"expected":"1"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"5"}]},{"id":18,"title":"Задача 18. Наибольшая цифра, встречающаяся ровно один раз","level":"boss","short":"Найди максимальную цифру, встречающуюся один раз, или выведи -1.","problem":"Дано натуральное число n. Найди наибольшую цифру, которая встречается в числе ровно один раз. Если такой цифры нет, выведи -1.","examples":"5825281 → 1; 777 → -1","starter":"","hint":"Подсказка 1. Сохрани исходное число.\n\nПодсказка 2. Для каждой цифры d от 0 до 9 посчитай её количество в исходном числе отдельным проходом.\n\nПодсказка 3. Если count == 1 и d больше текущего ответа, обнови ответ.","theory":"Здесь нужен вложенный цикл: внешний выбирает цифру, внутренний считает её появления.","tests":[{"input":["5825281"],"expected":"1"},{"input":["777"],"expected":"-1"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"9"},{"input":["55555"],"expected":"-1"}]},{"id":19,"title":"Задача 19. Разделить цифры на две группы с равными суммами","level":"boss","short":"Сравни суммы двух левых и двух правых цифр.","problem":"Дано четырёхзначное число n. Выведи YES, если сумма первых двух цифр слева равна сумме двух последних, иначе NO.","examples":"1230 → YES; 1234 → NO","starter":"","hint":"Подсказка 1. Сохрани исходное число.\n\nПодсказка 2. Извлеки цифры тысяч, сотен, десятков и единиц.\n\nПодсказка 3. Сравни сумму двух левых цифр с суммой двух правых.","theory":"Можно решить арифметически; объясни, почему здесь не нужен цикл.","tests":[{"input":["1230"],"expected":"YES"},{"input":["1234"],"expected":"NO"},{"input":["1000"],"expected":"NO"},{"input":["9999"],"expected":"YES"},{"input":["5050"],"expected":"YES"},{"input":["2340"],"expected":"NO"}]},{"id":20,"title":"Задача 20. Наибольшая сумма двух соседних цифр","level":"boss","short":"Найди максимальную сумму двух соседних цифр.","problem":"Дано натуральное число n. Найди наибольшую сумму двух соседних цифр. Если число состоит из одной цифры, выведи эту цифру.","examples":"5831 → 13; 246 → 10","starter":"","hint":"Подсказка 1. Сохрани последнюю цифру как previous.\n\nПодсказка 2. На каждом шаге получай следующую цифру и складывай её с previous.\n\nПодсказка 3. Сохраняй максимальную сумму пары и обновляй previous.","theory":"Нужно проверить каждую соседнюю пару цифр.","tests":[{"input":["5831"],"expected":"13"},{"input":["246"],"expected":"10"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"9"},{"input":["55555"],"expected":"10"}]},{"id":21,"title":"Задача 21. Домашняя 1. Сколько цифр делятся на 5","level":"homework","short":"Посчитай цифры числа, делящиеся на 5 без остатка.","problem":"Дано натуральное число n. Посчитай, сколько его цифр делятся на 5 без остатка.","examples":"10525 → 3; 1234 → 0","starter":"","hint":"Подсказка 1. Проверяй каждую цифру отдельно.\n\nПодсказка 2. Цифра делится на 5 без остатка, если digit % 5 == 0.\n\nПодсказка 3. Не забудь: 0 тоже делится на 5 без остатка.","theory":"Ноль тоже делится на 5 без остатка.","tests":[{"input":["10525"],"expected":"3"},{"input":["1234"],"expected":"0"},{"input":["7"],"expected":"0"},{"input":["100"],"expected":"2"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"5"}]},{"id":22,"title":"Задача 22. Домашняя 2. Наибольшая цифра меньше 5","level":"homework","short":"Найди наибольшую цифру строго меньше 5 или выведи -1.","problem":"Дано натуральное число n. Найди наибольшую цифру, которая строго меньше 5. Если таких цифр нет, выведи -1.","examples":"5837 → 3; 987 → -1","starter":"","hint":"Подсказка 1. Заведи answer = -1.\n\nПодсказка 2. Рассматривай только цифры, для которых digit < 5.\n\nПодсказка 3. Если такая цифра больше текущего answer, обнови ответ.","theory":"Сохраняй максимум среди цифр, меньших 5.","tests":[{"input":["5837"],"expected":"3"},{"input":["987"],"expected":"-1"},{"input":["7"],"expected":"-1"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"-1"}]},{"id":23,"title":"Задача 23. Домашняя 3. Соседние цифры с одинаковой чётностью","level":"homework","short":"Проверь, есть ли две соседние цифры одинаковой чётности.","problem":"Дано натуральное число n. Выведи YES, если найдутся две соседние цифры, которые обе чётные или обе нечётные. Иначе NO.","examples":"1234 → NO; 1235 → YES","starter":"","hint":"Подсказка 1. Сохрани последнюю цифру и её чётность.\n\nПодсказка 2. Сравнивай чётность текущей и предыдущей цифры.\n\nПодсказка 3. Если digit % 2 == previous % 2, значит найдено совпадение чётности.","theory":"Соседние цифры имеют одинаковую чётность, если остатки от деления на 2 равны.","tests":[{"input":["1234"],"expected":"NO"},{"input":["1235"],"expected":"YES"},{"input":["7"],"expected":"NO"},{"input":["100"],"expected":"YES"},{"input":["90305"],"expected":"NO"},{"input":["55555"],"expected":"YES"}]},{"id":24,"title":"Задача 24. Домашняя 4. Наименьшая цифра, встречающаяся один раз","level":"homework","short":"Найди минимальную цифру, встречающуюся ровно один раз, или выведи -1.","problem":"Дано натуральное число n. Найди наименьшую цифру, которая встречается в записи ровно один раз. Если такой цифры нет, выведи -1.","examples":"1122334 → 4; 777 → -1","starter":"","hint":"Подсказка 1. Сохрани исходное число.\n\nПодсказка 2. Перебирай цифры d от 0 до 9 и для каждой считай число появлений во втором цикле.\n\nПодсказка 3. Если цифра встречается ровно один раз и меньше текущего ответа, сохрани её.","theory":"Используй вложенный цикл: для каждой цифры от 0 до 9 считай количество появлений.","tests":[{"input":["1122334"],"expected":"4"},{"input":["777"],"expected":"-1"},{"input":["7"],"expected":"7"},{"input":["100"],"expected":"1"},{"input":["90305"],"expected":"3"},{"input":["55555"],"expected":"-1"}]}];
 const lesson2TheoryHtml = "<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Цифры, числа и типы данных — интерактивный урок</title>\n<style>\n  :root {\n    --ink: #182338;\n    --muted: #64748b;\n    --paper: #f5f7fb;\n    --card: #ffffff;\n    --blue: #3867f4;\n    --blue-soft: #e8efff;\n    --green: #15845b;\n    --green-soft: #e3f8ee;\n    --purple: #7c3aed;\n    --purple-soft: #f1eaff;\n    --orange: #c76b13;\n    --orange-soft: #fff0dc;\n    --line: #e5eaf2;\n    --shadow: 0 14px 35px rgba(30, 50, 90, .08);\n  }\n  * { box-sizing: border-box; }\n  html { scroll-behavior: smooth; }\n  body {\n    margin: 0; background: var(--paper); color: var(--ink);\n    font-family: Inter, \"Segoe UI\", Arial, sans-serif; line-height: 1.6;\n  }\n  .hero {\n    background: radial-gradient(circle at 85% 15%, #6f8dff 0, transparent 28%),\n                linear-gradient(135deg, #172747, #263f75);\n    color: white; padding: 48px 22px 42px;\n  }\n  .hero-inner, main { max-width: 1050px; margin: 0 auto; }\n  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .76rem; font-weight: 800; opacity: .8; }\n  h1 { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.08; margin: 12px 0 16px; }\n  .hero p { max-width: 700px; font-size: 1.1rem; color: #e2eaff; margin: 0; }\n  .hero-pills { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 24px; }\n  .hero-pills span { padding: 7px 12px; border: 1px solid #ffffff40; background: #ffffff12; border-radius: 999px; font-size: .9rem; }\n  main { padding: 26px 18px 60px; }\n  .section { margin: 26px 0; scroll-margin-top: 20px; }\n  .section-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }\n  .num { display: grid; place-items: center; flex: 0 0 42px; height: 42px; border-radius: 14px; background: var(--blue-soft); color: var(--blue); font-weight: 900; }\n  h2 { font-size: clamp(1.35rem, 3vw, 1.8rem); line-height: 1.2; margin: 2px 0 6px; }\n  h3 { margin: 0 0 8px; font-size: 1.08rem; }\n  .sub { margin: 0; color: var(--muted); }\n  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 22px; box-shadow: var(--shadow); }\n  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }\n  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }\n  .digits { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 8px; margin: 18px 0; }\n  .digit {\n    border: 1px solid #dce5f7; background: #f7f9ff; color: #2449b8; border-radius: 12px;\n    min-height: 48px; font-size: 1.15rem; font-weight: 800; cursor: pointer; transition: .18s;\n  }\n  .digit:hover, .digit.active { background: var(--blue); color: white; transform: translateY(-2px); border-color: var(--blue); }\n  .notice { border-radius: 14px; background: #f0f5ff; padding: 13px 15px; color: #2b477d; }\n  .number-builder { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }\n  .number-builder input { width: 100%; max-width: 230px; padding: 12px 14px; border: 1px solid #cfd9eb; border-radius: 12px; font: inherit; font-size: 1.1rem; }\n  button { font: inherit; }\n  .btn { background: var(--blue); color: white; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 750; cursor: pointer; }\n  .btn:hover { filter: brightness(.94); }\n  .btn.secondary { color: var(--blue); background: var(--blue-soft); }\n  .result { min-height: 48px; margin-top: 12px; padding: 12px 14px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; }\n  .type-card { position: relative; overflow: hidden; }\n  .type-card::before { content: \"\"; position: absolute; height: 5px; left: 0; top: 0; right: 0; background: var(--accent); }\n  .type-card.int { --accent: var(--blue); --tint: var(--blue-soft); }\n  .type-card.float { --accent: var(--green); --tint: var(--green-soft); }\n  .type-card.str { --accent: var(--purple); --tint: var(--purple-soft); }\n  .type-name { display: inline-block; color: var(--accent); background: var(--tint); border-radius: 10px; padding: 5px 10px; font-weight: 900; margin-bottom: 10px; }\n  .example { font-family: Consolas, \"Courier New\", monospace; background: #172338; color: #eef4ff; border-radius: 12px; padding: 12px 14px; overflow-wrap: anywhere; }\n  .example .comment { color: #a9bbd6; }\n  .type-card p { color: var(--muted); margin: 8px 0 14px; }\n  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }\n  .compare-item { border-radius: 15px; padding: 16px; border: 1px solid var(--line); }\n  .compare-item .big { font: 800 1.8rem Consolas, monospace; margin: 5px 0; }\n  .compare-item.number { background: var(--blue-soft); border-color: #cfddff; }\n  .compare-item.text { background: var(--purple-soft); border-color: #e0d0ff; }\n  .label-small { color: var(--muted); font-size: .88rem; }\n  .variable-visual { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 0 4px; }\n  .box-label { width: min(100%, 280px); padding: 11px; text-align: center; border-radius: 13px; background: var(--blue-soft); color: #2449b8; font-weight: 850; }\n  .arrow { color: #8090aa; font-size: 1.6rem; line-height: 1; }\n  .box-value { width: min(100%, 280px); padding: 18px; text-align: center; border: 2px solid #8baaff; border-radius: 18px; background: white; }\n  .box-value strong { font-size: 2rem; color: var(--blue); display: block; }\n  .interactive-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }\n  input, select { font: inherit; }\n  .field { padding: 11px 13px; border: 1px solid #cfd9eb; border-radius: 12px; min-width: 0; background: white; }\n  .type-output { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }\n  .chip { border-radius: 999px; padding: 6px 11px; background: #edf2f8; font-weight: 750; font-size: .9rem; }\n  .chip.blue { background: var(--blue-soft); color: #2449b8; }\n  .chip.green { background: var(--green-soft); color: #116c49; }\n  .chip.purple { background: var(--purple-soft); color: #6d28d9; }\n  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }\n  .step { border: 1px solid var(--line); border-radius: 15px; padding: 15px; background: #fbfcff; }\n  .step b { display: block; margin-bottom: 5px; }\n  .step span { color: var(--muted); font-size: .92rem; }\n  .code-output { white-space: pre-wrap; min-height: 50px; }\n  .footer { text-align: center; color: var(--muted); padding: 14px 0 0; font-size: .9rem; }\n  @media (max-width: 760px) {\n    .grid, .grid.three { grid-template-columns: 1fr; }\n    .digits { grid-template-columns: repeat(5, minmax(0, 1fr)); }\n    .steps { grid-template-columns: 1fr; }\n    .card { padding: 17px; }\n  }\n  @media (max-width: 420px) {\n    .compare { grid-template-columns: 1fr; }\n    .hero { padding-top: 34px; }\n  }\n</style>\n</head>\n<body>\n<header class=\"hero\">\n  <div class=\"hero-inner\">\n    <div class=\"eyebrow\">Информатика · занятие 2</div>\n    <h1>Цифры, числа<br>и типы данных</h1>\n    <p>Разберёмся, как компьютер понимает числа и текст, что такое переменная и как Python работает с разными видами информации.</p>\n    <div class=\"hero-pills\">\n      <span>🔢 Цифры и числа</span><span>📦 Переменные</span><span>🧩 Типы данных</span><span>💻 Python</span>\n    </div>\n  </div>\n</header>\n\n<main>\n  <section class=\"section\" id=\"digits\">\n    <div class=\"section-head\"><div class=\"num\">1</div><div><h2>Цифры и числа</h2><p class=\"sub\">Цифры — это знаки, с помощью которых мы записываем числа.</p></div></div>\n    <div class=\"card\">\n      <p>В обычной десятичной системе всего <b>10 цифр</b>: от 0 до 9. Из них можно составить много разных чисел. Например, число 148 состоит из цифр 1, 4 и 8.</p>\n      <div class=\"digits\" id=\"digitButtons\" aria-label=\"Выбери цифру\"></div>\n      <div class=\"notice\" id=\"digitInfo\" aria-live=\"polite\">Нажми на любую цифру — посмотрим, как она используется.</div>\n      <h3 style=\"margin-top:22px\">Собери число</h3>\n      <p class=\"sub\">Введи целое число и нажми кнопку.</p>\n      <div class=\"number-builder\">\n        <input id=\"numberInput\" type=\"text\" inputmode=\"numeric\" value=\"148\" aria-label=\"Введи число\" maxlength=\"18\">\n        <button class=\"btn\" id=\"analyzeNumber\">Разобрать число</button>\n      </div>\n      <div class=\"result\" id=\"numberResult\" aria-live=\"polite\">Число 148 состоит из трёх цифр: 1, 4 и 8.</div>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"types\">\n    <div class=\"section-head\"><div class=\"num\">2</div><div><h2>Что такое типы данных?</h2><p class=\"sub\">Тип данных показывает, какую информацию хранит программа.</p></div></div>\n    <div class=\"grid three\">\n      <article class=\"card type-card int\">\n        <span class=\"type-name\">int</span><h3>Целые числа</h3>\n        <p>Числа без дробной части.</p>\n        <div class=\"example\">age = 10<br>score = -3</div>\n        <p>Например: количество учеников, число яблок, этаж.</p>\n      </article>\n      <article class=\"card type-card float\">\n        <span class=\"type-name\">float</span><h3>Дробные числа</h3>\n        <p>Числа, у которых есть дробная часть. В Python пишем точку.</p>\n        <div class=\"example\">height = 1.7<br>price = 2.5</div>\n        <p>Например: рост, масса или температура.</p>\n      </article>\n      <article class=\"card type-card str\">\n        <span class=\"type-name\">str</span><h3>Строки — текст</h3>\n        <p>Буквы, слова и другие символы в кавычках.</p>\n        <div class=\"example\">name = \"Маша\"<br>code = \"123\"</div>\n        <p>Например: имя, сообщение или номер, который нужно хранить как текст.</p>\n      </article>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"difference\">\n    <div class=\"section-head\"><div class=\"num\">3</div><div><h2>Число 123 и текст \"123\" — не одно и то же</h2><p class=\"sub\">Внешне они похожи, но компьютер обращается с ними по-разному.</p></div></div>\n    <div class=\"card\">\n      <div class=\"compare\">\n        <div class=\"compare-item number\"><span class=\"chip blue\">int</span><div class=\"big\">123</div><b>Это число</b><div class=\"label-small\">Можно выполнять математические действия.</div></div>\n        <div class=\"compare-item text\"><span class=\"chip purple\">str</span><div class=\"big\">\"123\"</div><b>Это текст</b><div class=\"label-small\">Это символы «1», «2» и «3» в кавычках.</div></div>\n      </div>\n      <h3 style=\"margin-top:22px\">Попробуй сложить</h3>\n      <p class=\"sub\">Выбери действие, чтобы увидеть разницу.</p>\n      <div class=\"interactive-row\" style=\"margin-top:12px\">\n        <button class=\"btn\" data-demo=\"numbers\">123 + 7</button>\n        <button class=\"btn secondary\" data-demo=\"strings\">\"123\" + \"7\"</button>\n      </div>\n      <div class=\"result code-output\" id=\"additionResult\" aria-live=\"polite\">Нажми на одну из кнопок.</div>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"variables\">\n    <div class=\"section-head\"><div class=\"num\">4</div><div><h2>Что такое переменная?</h2><p class=\"sub\">Переменная — это именованное место, в котором программа хранит значение.</p></div></div>\n    <div class=\"grid\">\n      <div class=\"card\">\n        <p>Представь коробку с наклейкой. На наклейке написано имя, а внутри лежит значение.</p>\n        <div class=\"example\">age = 11<br>print(age)</div>\n        <div class=\"steps\">\n          <div class=\"step\"><b>age</b><span>Имя переменной — название коробки.</span></div>\n          <div class=\"step\"><b>=</b><span>Присваивание — положить значение в переменную.</span></div>\n          <div class=\"step\"><b>11</b><span>Значение, которое хранится внутри.</span></div>\n        </div>\n      </div>\n      <div class=\"card\">\n        <h3>Измени значение в коробке</h3>\n        <div class=\"variable-visual\">\n          <div class=\"box-label\" id=\"varLabel\">age</div><div class=\"arrow\">↓</div>\n          <div class=\"box-value\"><strong id=\"varValue\">11</strong><span class=\"label-small\" id=\"varType\">тип: int</span></div>\n        </div>\n        <div class=\"interactive-row\" style=\"margin-top:14px\">\n          <input class=\"field\" id=\"varInput\" value=\"11\" aria-label=\"Новое значение переменной\" style=\"width:100%\">\n          <button class=\"btn\" id=\"saveVariable\">Сохранить</button>\n        </div>\n        <div class=\"label-small\" style=\"margin-top:8px\">Если ввести слово, оно будет текстом. Если ввести число с точкой — дробным числом.</div>\n      </div>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"type-check\">\n    <div class=\"section-head\"><div class=\"num\">5</div><div><h2>Как узнать тип данных?</h2><p class=\"sub\">В Python для этого есть команда <code>type()</code>.</p></div></div>\n    <div class=\"card\">\n      <div class=\"example\">print(type(10))<br>print(type(2.5))<br>print(type(\"Привет\"))</div>\n      <p>Результат показывает, какой тип у каждого значения: <b>int</b>, <b>float</b> или <b>str</b>.</p>\n      <h3>Проверь любое значение</h3>\n      <div class=\"interactive-row\">\n        <input class=\"field\" id=\"typeInput\" value=\"2.5\" aria-label=\"Значение для определения типа\">\n        <button class=\"btn\" id=\"checkType\">Узнать тип</button>\n      </div>\n      <div class=\"type-output\" id=\"typeResult\" aria-live=\"polite\"><span class=\"chip green\">float</span><span>2.5 — дробное число</span></div>\n      <p class=\"label-small\">Подсказка: текст нужно взять в кавычки, например \"кот\". Десятичная часть числа отделяется точкой.</p>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"operations\">\n    <div class=\"section-head\"><div class=\"num\">6</div><div><h2>Действия с данными</h2><p class=\"sub\">С числами Python считает, а строки может соединять.</p></div></div>\n    <div class=\"grid\">\n      <div class=\"card\">\n        <h3>Математические знаки</h3>\n        <div class=\"example\">10 + 5  →  15<br>10 - 5  →  5<br>10 * 5  →  50<br>10 / 5  →  2.0</div>\n        <p class=\"label-small\">В Python для умножения используют *, а для деления — /.</p>\n      </div>\n      <div class=\"card\">\n        <h3>Соединение текста</h3>\n        <div class=\"example\">\"Привет, \" + \"мир!\"<br>→ \"Привет, мир!\"</div>\n        <p>Знак <b>+</b> соединяет строки. Но число и текст нельзя просто так складывать:</p>\n        <div class=\"example\">5 + \"3\"  →  ошибка</div>\n      </div>\n    </div>\n  </section>\n\n  <section class=\"section\" id=\"convert\">\n    <div class=\"section-head\"><div class=\"num\">7</div><div><h2>Как превратить текст в число?</h2><p class=\"sub\">Для этого используют команды преобразования типов.</p></div></div>\n    <div class=\"card\">\n      <div class=\"grid three\">\n        <div><span class=\"type-name\" style=\"color:#2449b8;background:var(--blue-soft)\">int()</span><p>Преобразует подходящее значение в целое число.</p><div class=\"example\">int(\"5\") → 5</div></div>\n        <div><span class=\"type-name\" style=\"color:#116c49;background:var(--green-soft)\">float()</span><p>Преобразует подходящее значение в дробное число.</p><div class=\"example\">float(\"2.5\") → 2.5</div></div>\n        <div><span class=\"type-name\" style=\"color:#6d28d9;background:var(--purple-soft)\">str()</span><p>Превращает значение в текст.</p><div class=\"example\">str(123) → \"123\"</div></div>\n      </div>\n      <h3 style=\"margin-top:24px\">Посмотри, как работает преобразование</h3>\n      <div class=\"interactive-row\">\n        <select class=\"field\" id=\"convertMode\" aria-label=\"Выбери преобразование\">\n          <option value=\"int\">int(\"5\")</option>\n          <option value=\"float\">float(\"2.5\")</option>\n          <option value=\"str\">str(123)</option>\n        </select>\n        <button class=\"btn\" id=\"convertButton\">Преобразовать</button>\n      </div>\n      <div class=\"result\" id=\"convertResult\" aria-live=\"polite\">Нажми «Преобразовать», чтобы увидеть результат.</div>\n    </div>\n  </section>\n\n  <section class=\"section\">\n    <div class=\"section-head\"><div class=\"num\">✓</div><div><h2>Главное, что нужно запомнить</h2><p class=\"sub\">Короткая памятка по теме.</p></div></div>\n    <div class=\"card\">\n      <div class=\"grid\">\n        <div><span class=\"chip blue\">int</span> — целые числа: <code>15</code></div>\n        <div><span class=\"chip green\">float</span> — дробные числа: <code>2.5</code></div>\n        <div><span class=\"chip purple\">str</span> — текст в кавычках: <code>\"Привет\"</code></div>\n        <div><span class=\"chip\">type()</span> — узнаёт тип данных.</div>\n        <div><span class=\"chip\">name = value</span> — сохраняет значение в переменную.</div>\n        <div><span class=\"chip\">int(), float(), str()</span> — преобразуют тип данных.</div>\n      </div>\n    </div>\n  </section>\n  <div class=\"footer\">Интерактивный конспект · Python для начинающих</div>\n</main>\n\n<script>\n  const digitButtons = document.getElementById('digitButtons');\n  const digitInfo = document.getElementById('digitInfo');\n  for (let i = 0; i <= 9; i++) {\n    const button = document.createElement('button');\n    button.className = 'digit';\n    button.textContent = i;\n    button.setAttribute('aria-label', 'Цифра ' + i);\n    button.addEventListener('click', () => {\n      document.querySelectorAll('.digit').forEach(b => b.classList.remove('active'));\n      button.classList.add('active');\n      digitInfo.innerHTML = '<b>Цифра ' + i + '</b> — один из десяти знаков, из которых составляют числа. Например, число <b>' + i + '</b> записано одной цифрой.';\n    });\n    digitButtons.appendChild(button);\n  }\n\n  document.getElementById('analyzeNumber').addEventListener('click', () => {\n    const raw = document.getElementById('numberInput').value.trim();\n    const output = document.getElementById('numberResult');\n    if (!/^-?\\d+$/.test(raw)) {\n      output.textContent = 'Введи целое число, например 148 или -27. Не используй буквы и дробную точку.';\n      return;\n    }\n    const digits = raw.replace('-', '').split('');\n    const sign = raw.startsWith('-') ? 'Число отрицательное. ' : '';\n    output.innerHTML = sign + 'В числе <b>' + raw + '</b> ' + digits.length + ' ' +\n      (digits.length === 1 ? 'цифра' : (digits.length >= 2 && digits.length <= 4 ? 'цифры' : 'цифр')) +\n      ': <b>' + digits.join(', ') + '</b>.';\n  });\n\n  document.querySelectorAll('[data-demo]').forEach(button => {\n    button.addEventListener('click', () => {\n      const out = document.getElementById('additionResult');\n      if (button.dataset.demo === 'numbers') {\n        out.textContent = '123 + 7 = 130. Python складывает два числа.';\n      } else {\n        out.textContent = '\"123\" + \"7\" = \"1237\". Python соединяет две строки, а не складывает числа.';\n      }\n    });\n  });\n\n  function detectValue(raw) {\n    const value = raw.trim();\n    if (/^\".*\"$/.test(value) || /^'.*'$/.test(value)) return {type:'str', description:'текст в кавычках', value:value.slice(1,-1), color:'purple'};\n    if (/^-?\\d+$/.test(value)) return {type:'int', description:'целое число', value:value, color:'blue'};\n    if (/^-?\\d+\\.\\d+$/.test(value)) return {type:'float', description:'дробное число', value:value, color:'green'};\n    return {type:'str', description:'текст (если записан без кавычек в этом примере, считаем его текстом)', value:value, color:'purple'};\n  }\n\n  function updateVariable() {\n    const raw = document.getElementById('varInput').value.trim();\n    const detected = detectValue(raw);\n    document.getElementById('varValue').textContent = raw || '(пусто)';\n    document.getElementById('varType').textContent = 'тип: ' + detected.type;\n    document.getElementById('varLabel').textContent = 'my_variable';\n  }\n  document.getElementById('saveVariable').addEventListener('click', updateVariable);\n  document.getElementById('varInput').addEventListener('keydown', e => { if (e.key === 'Enter') updateVariable(); });\n\n  function showType() {\n    const raw = document.getElementById('typeInput').value.trim();\n    const out = document.getElementById('typeResult');\n    if (!raw) { out.textContent = 'Введи значение для проверки.'; return; }\n    const detected = detectValue(raw);\n    const shown = detected.type === 'str' && !(/^\".*\"$/.test(raw) || /^'.*'$/.test(raw)) ? '\"' + raw + '\"' : raw;\n    out.innerHTML = '<span class=\"chip ' + detected.color + '\">' + detected.type + '</span><span><b>' + escapeHtml(shown) + '</b> — ' + detected.description + '</span>';\n  }\n  function escapeHtml(s) {\n    return s.replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]));\n  }\n  document.getElementById('checkType').addEventListener('click', showType);\n  document.getElementById('typeInput').addEventListener('keydown', e => { if (e.key === 'Enter') showType(); });\n\n  document.getElementById('convertButton').addEventListener('click', () => {\n    const mode = document.getElementById('convertMode').value;\n    const out = document.getElementById('convertResult');\n    const messages = {\n      int: '<b>int(\"5\") → 5</b><br>Текст \"5\" превратился в целое число 5.',\n      float: '<b>float(\"2.5\") → 2.5</b><br>Текст \"2.5\" превратился в дробное число.',\n      str: '<b>str(123) → \"123\"</b><br>Число 123 превратилось в текст.'\n    };\n    out.innerHTML = messages[mode];\n  });\n<\/script>\n</body>\n</html>\n";
+// Занятие 8. Единственный источник карточек и проверок — утверждённый технический реестр.
+const lesson8Tasks=[
+  {
+    "id": 1,
+    "title": "Задача 1. Сколько чисел пришло до нуля? (диагностика)",
+    "level": "base",
+    "stars": "★",
+    "short": "Диагностика: определите количество чисел до завершающего нуля.",
+    "problem": "Поступают целые числа по одному в строке. Первое 0 завершает ввод и не учитывается. Выведите, сколько чисел было до нуля. Гарантируется, что 0 встретится; значения до него лежат в диапазоне от −1000 до 1000, кроме 0.",
+    "examples": "Ввод:\n0\nВывод:\n0\nВвод:\n5\n-3\n0\nВывод:\n2",
+    "starter": "",
+    "hint": "Назови значение, на котором чтение прекращается.\n\nСчётчик меняется только для обычного числа.\n\nЧитай, проверяй x == 0, иначе count += 1.",
+    "theory": "Диагностика: раньше вы уже считали элементы до стоп-значения. Сначала проверьте завершение, только потом прибавляйте единицу. Ноль в ответ не входит.",
+    "tests": [
+      {
+        "input": [
+          "0"
+        ],
+        "expected": "0"
+      },
+      {
+        "input": [
+          "5",
+          "-3",
+          "0"
+        ],
+        "expected": "2"
+      },
+      {
+        "input": [
+          "1",
+          "0"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "-7",
+          "9",
+          "3",
+          "0"
+        ],
+        "expected": "3"
+      },
+      {
+        "input": [
+          "1000",
+          "-1000",
+          "0"
+        ],
+        "expected": "2"
+      },
+      {
+        "input": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "0"
+        ],
+        "expected": "4"
+      }
+    ],
+    "methodSource": "Развитие идеи занятия 6 (не новая тема)",
+    "methodKey": "D0",
+    "methodRoute": "Общая диагностика"
+  },
+  {
+    "id": 2,
+    "title": "Задача 2. Средний балл: целая часть",
+    "level": "base",
+    "stars": "★★",
+    "short": "Обработайте последовательность баллов и учтите отсутствие данных.",
+    "problem": "Вводятся целые баллы от 0 до 100, по одному в строке. Число −1 завершает ввод и не учитывается. Если баллов не было, выведите ровно «Нет данных». Иначе выведите целую часть среднего арифметического баллов (без округления вверх). Баллов может быть от 0 до 100.",
+    "examples": "Ввод:\n-1\nВывод:\nНет данных\nВвод:\n10\n20\n25\n-1\nВывод:\n18",
+    "starter": "",
+    "hint": "Две вещи надо помнить одновременно: сколько чисел и какова их сумма.\n\nСначала исключи −1, потом обновляй переменные.\n\nПосле цикла: если count == 0, сообщение; иначе total // count.",
+    "theory": "Состояние цикла — пара (total, count). После цикла сначала проверьте count == 0. При count > 0 выведите total // count. Ноль — допустимый балл, а −1 — только сигнал конца.",
+    "tests": [
+      {
+        "input": [
+          "-1"
+        ],
+        "expected": "Нет данных"
+      },
+      {
+        "input": [
+          "0",
+          "-1"
+        ],
+        "expected": "0"
+      },
+      {
+        "input": [
+          "10",
+          "20",
+          "25",
+          "-1"
+        ],
+        "expected": "18"
+      },
+      {
+        "input": [
+          "100",
+          "100",
+          "-1"
+        ],
+        "expected": "100"
+      },
+      {
+        "input": [
+          "1",
+          "2",
+          "-1"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "40",
+          "70",
+          "70",
+          "-1"
+        ],
+        "expected": "60"
+      },
+      {
+        "input": [
+          "99",
+          "0",
+          "0",
+          "-1"
+        ],
+        "expected": "33"
+      },
+      {
+        "input": [
+          "5",
+          "-1"
+        ],
+        "expected": "5"
+      }
+    ],
+    "methodSource": "Педагогическая адаптация Б. Стивенсон, 2021, №63 «Среднее значение»",
+    "methodKey": "A63",
+    "methodRoute": "Основной"
+  },
+  {
+    "id": 3,
+    "title": "Задача 3. Семейный билет в зоопарк",
+    "level": "medium",
+    "stars": "★★",
+    "short": "Рассчитайте стоимость группы по возрастным категориям.",
+    "problem": "Группа посетителей приходит в зоопарк. Возраст каждого посетителя вводится отдельной строкой (целое от 0 до 120). Пустая строка означает конец группы, она не содержит возраста. Стоимость билета: 0–2 года — 0; 3–12 лет — 14; 13–64 года — 23; 65–120 лет — 18 условных единиц. Выведите общую стоимость как одно целое число. Если никого нет, выведите 0. Пустая строка гарантирована.",
+    "examples": "Ввод:\n\nВывод:\n0\nВвод:\n2\n3\n12\n65\n\nВывод:\n46",
+    "starter": "",
+    "hint": "Какая строка здесь завершает ввод? Это не число.\n\nПроверяй line == \"\" до int(line).\n\nСначала вход, затем проверка пустой строки, затем тариф и total.",
+    "theory": "Прочитайте строку. Если она пустая — завершите цикл, иначе преобразуйте её в int и проверьте возрастные интервалы. В этой адаптации двухлетние дети проходят бесплатно.",
+    "tests": [
+      {
+        "input": [
+          ""
+        ],
+        "expected": "0"
+      },
+      {
+        "input": [
+          "0",
+          ""
+        ],
+        "expected": "0"
+      },
+      {
+        "input": [
+          "1",
+          "2",
+          ""
+        ],
+        "expected": "0"
+      },
+      {
+        "input": [
+          "2",
+          "3",
+          "12",
+          "65",
+          ""
+        ],
+        "expected": "46"
+      },
+      {
+        "input": [
+          "13",
+          "64",
+          ""
+        ],
+        "expected": "46"
+      },
+      {
+        "input": [
+          "65",
+          "120",
+          ""
+        ],
+        "expected": "36"
+      },
+      {
+        "input": [
+          "3",
+          "13",
+          "65",
+          ""
+        ],
+        "expected": "55"
+      },
+      {
+        "input": [
+          "2",
+          "12",
+          "64",
+          "65",
+          ""
+        ],
+        "expected": "55"
+      },
+      {
+        "input": [
+          "10",
+          "10",
+          "10",
+          ""
+        ],
+        "expected": "42"
+      },
+      {
+        "input": [
+          "120",
+          ""
+        ],
+        "expected": "18"
+      }
+    ],
+    "methodSource": "Педагогическая адаптация Б. Стивенсон, 2021, №69 «Билеты в зоопарк»",
+    "methodKey": "A69",
+    "methodRoute": "Основной / альтернативная задача"
+  },
+  {
+    "id": 4,
+    "title": "Задача 4. Табло соревнования: лидер и сумма",
+    "level": "medium",
+    "stars": "★★",
+    "short": "Мини-проект: количество, сумма и максимум в потоке результатов.",
+    "problem": "На табло поступают результаты участников — целые от 0 до 100 включительно, каждый с новой строки. −1 завершает ввод. Если результатов нет, выведите «Нет результатов». Иначе выведите ровно три строки: количество результатов, сумма баллов, максимальный балл. Повторы учитываются, порядок сохраняется. Списки не нужны.",
+    "examples": "Ввод:\n-1\nВывод:\nНет результатов\nВвод:\n40\n70\n70\n-1\nВывод:\n3\n180\n70",
+    "starter": "",
+    "hint": "Что нужно помнить помимо суммы?\n\nЛучший результат сравнивай с каждым новым баллом.\n\nПосле чтения до −1 выведи count, total, best; для count == 0 — сообщение.",
+    "theory": "Одновременно храните count, total и best. Максимум обновляется по первому элементу или по улучшению результата; при пустом вводе укажите отсутствие результатов.",
+    "tests": [
+      {
+        "input": [
+          "-1"
+        ],
+        "expected": "Нет результатов"
+      },
+      {
+        "input": [
+          "0",
+          "-1"
+        ],
+        "expected": "1\n0\n0"
+      },
+      {
+        "input": [
+          "40",
+          "70",
+          "70",
+          "-1"
+        ],
+        "expected": "3\n180\n70"
+      },
+      {
+        "input": [
+          "100",
+          "-1"
+        ],
+        "expected": "1\n100\n100"
+      },
+      {
+        "input": [
+          "5",
+          "3",
+          "9",
+          "-1"
+        ],
+        "expected": "3\n17\n9"
+      },
+      {
+        "input": [
+          "0",
+          "0",
+          "0",
+          "-1"
+        ],
+        "expected": "3\n0\n0"
+      },
+      {
+        "input": [
+          "42",
+          "42",
+          "-1"
+        ],
+        "expected": "2\n84\n42"
+      },
+      {
+        "input": [
+          "80",
+          "20",
+          "90",
+          "10",
+          "-1"
+        ],
+        "expected": "4\n200\n90"
+      }
+    ],
+    "methodSource": "Доработка проекта из методического комплекта, версия 3",
+    "methodKey": "P",
+    "methodRoute": "Общий мини-проект"
+  },
+  {
+    "id": 5,
+    "title": "Задача 5. Наибольший общий делитель: два алгоритма",
+    "level": "hard",
+    "stars": "★★★",
+    "short": "Сравните перебор и алгоритм Евклида для нахождения НОД.",
+    "problem": "Даны два натуральных числа a и b (каждое от 1 до 1000000), по одному в строке. Выведите их наибольший общий делитель одним целым числом. Для исследования решите задачу двумя способами: перебором делителя от min(a,b) вниз и алгоритмом Евклида. Основная автоматическая проверка сравнивает только НОД. Число повторений каждого алгоритма и объяснение перехода (a,b) → (b,a % b) обсуждаются с педагогом отдельно.",
+    "examples": "Ввод:\n24\n36\nВывод:\n12\nВвод:\n17\n19\nВывод:\n1",
+    "starter": "",
+    "hint": "Какое свойство общего делителя сохраняется при вычитании кратных?\n\nНОД(a,b) равен НОД(b,a % b).\n\nПока b != 0: заменить пару (a,b) на (b,a%b); вывести a.",
+    "theory": "Перебор делителей ищет число, подходящее обоим. Алгоритм Евклида многократно переходит от (a, b) к (b, a % b). Попробуйте объяснить, почему НОД сохраняется.",
+    "tests": [
+      {
+        "input": [
+          "24",
+          "36"
+        ],
+        "expected": "12"
+      },
+      {
+        "input": [
+          "17",
+          "19"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "8",
+          "8"
+        ],
+        "expected": "8"
+      },
+      {
+        "input": [
+          "1",
+          "99"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "1000000",
+          "1"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "1000000",
+          "999999"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "48",
+          "180"
+        ],
+        "expected": "12"
+      },
+      {
+        "input": [
+          "462",
+          "1071"
+        ],
+        "expected": "21"
+      },
+      {
+        "input": [
+          "270",
+          "192"
+        ],
+        "expected": "6"
+      },
+      {
+        "input": [
+          "12",
+          "18"
+        ],
+        "expected": "6"
+      }
+    ],
+    "methodSource": "Педагогическая адаптация Б. Стивенсон, 2021, №79 «Наибольший общий делитель»",
+    "methodKey": "V79",
+    "methodRoute": "Сложный / математический"
+  },
+  {
+    "id": 6,
+    "title": "Задача 6. Простые множители без лишнего перебора",
+    "level": "hard",
+    "stars": "★★★",
+    "short": "Найдите простые множители и обоснуйте эффективность поиска.",
+    "problem": "Дано целое n в диапазоне от −100 до 1000000 включительно. Если n меньше 2, выведите ровно «Ошибка». Иначе выведите простые множители числа n, каждый на отдельной строке, в неубывающем порядке, с учётом повторений. Например, 12 → 2, 2, 3. Нельзя пользоваться готовой функцией факторизации.",
+    "examples": "Ввод:\n1\nВывод:\nОшибка\nВвод:\n72\nВывод:\n2\n2\n2\n3\n3",
+    "starter": "",
+    "hint": "Проверь сначала самый маленький возможный делитель.\n\nПосле успешного деления число n уменьшается, но d может встретиться ещё раз.\n\nПока d*d <= n: если делится, выведи d и сократи n; иначе d += 1. В конце выведи n, если больше 1.",
+    "theory": "После нахождения простого делителя делите n на него, не обязательно увеличивая d: один множитель может повториться. Как только d*d > n, оставшееся n > 1 — простое.",
+    "tests": [
+      {
+        "input": [
+          "-3"
+        ],
+        "expected": "Ошибка"
+      },
+      {
+        "input": [
+          "0"
+        ],
+        "expected": "Ошибка"
+      },
+      {
+        "input": [
+          "1"
+        ],
+        "expected": "Ошибка"
+      },
+      {
+        "input": [
+          "2"
+        ],
+        "expected": "2"
+      },
+      {
+        "input": [
+          "13"
+        ],
+        "expected": "13"
+      },
+      {
+        "input": [
+          "72"
+        ],
+        "expected": "2\n2\n2\n3\n3"
+      },
+      {
+        "input": [
+          "49"
+        ],
+        "expected": "7\n7"
+      },
+      {
+        "input": [
+          "1024"
+        ],
+        "expected": "2\n2\n2\n2\n2\n2\n2\n2\n2\n2"
+      },
+      {
+        "input": [
+          "30"
+        ],
+        "expected": "2\n3\n5"
+      },
+      {
+        "input": [
+          "999983"
+        ],
+        "expected": "999983"
+      },
+      {
+        "input": [
+          "84"
+        ],
+        "expected": "2\n2\n3\n7"
+      },
+      {
+        "input": [
+          "999999"
+        ],
+        "expected": "3\n3\n3\n7\n11\n13\n37"
+      }
+    ],
+    "methodSource": "Педагогическая адаптация Б. Стивенсон, 2021, №80 «Простые множители»",
+    "methodKey": "V80",
+    "methodRoute": "Сложный / математический"
+  },
+  {
+    "id": 7,
+    "title": "Задача 7. Три одинаковых подряд: контрольная последовательность",
+    "level": "hard",
+    "stars": "★★★",
+    "short": "По фиксированным броскам найдите первую серию из трёх совпадений.",
+    "problem": "Поступают результаты бросков монеты: на каждой строке ровно H (орёл) или T (решка). Строка END обозначает окончание всей последовательности и не является броском. Выведите номер броска, на котором ВПЕРВЫЕ появилась серия из трёх одинаковых результатов подряд. Если до END такой серии не было, выведите ровно «Нет серии». Бросков может быть от 0 до 10000.",
+    "examples": "Ввод:\nH\nH\nH\nEND\nВывод:\n3\nВвод:\nH\nT\nH\nT\nEND\nВывод:\nНет серии",
+    "starter": "",
+    "hint": "Какие сведения о предыдущем броске помогут?\n\nПри смене стороны серия становится длиной 1, а не 0.\n\nХрани previous, streak и throws; после третьего совпадения сразу заверши цикл.",
+    "theory": "Храните предыдущую сторону, длину текущей серии и номер броска. В автоматической проверке ввод фиксирован: H, T и END. Никакой случайной последовательности для сравнения нет.",
+    "tests": [
+      {
+        "input": [
+          "END"
+        ],
+        "expected": "Нет серии"
+      },
+      {
+        "input": [
+          "H",
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "3"
+      },
+      {
+        "input": [
+          "H",
+          "T",
+          "T",
+          "T",
+          "END"
+        ],
+        "expected": "4"
+      },
+      {
+        "input": [
+          "H",
+          "T",
+          "H",
+          "T",
+          "END"
+        ],
+        "expected": "Нет серии"
+      },
+      {
+        "input": [
+          "T",
+          "T",
+          "H",
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "5"
+      },
+      {
+        "input": [
+          "H",
+          "H",
+          "T",
+          "T",
+          "H",
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "7"
+      },
+      {
+        "input": [
+          "T",
+          "T",
+          "T",
+          "H",
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "3"
+      },
+      {
+        "input": [
+          "T",
+          "END"
+        ],
+        "expected": "Нет серии"
+      },
+      {
+        "input": [
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "Нет серии"
+      },
+      {
+        "input": [
+          "H",
+          "T",
+          "H",
+          "T",
+          "H",
+          "H",
+          "H",
+          "END"
+        ],
+        "expected": "7"
+      }
+    ],
+    "methodSource": "Педагогическая адаптация Б. Стивенсон, 2021, №84 «Подбрасываем монетку»",
+    "methodKey": "V84D",
+    "methodRoute": "Сложный / детерминированная проверка"
+  },
+  {
+    "id": 8,
+    "title": "Задача 8. Монеты: когда жадность подводит? (резерв)",
+    "level": "hard",
+    "stars": "★★★",
+    "short": "Резерв: оптимальная сдача монетами и контрпример к жадному методу.",
+    "problem": "Дано одно целое S от 1 до 100000. В распоряжении монеты номиналов 1, 5, 10 и 25 (неограниченное количество). Выведите минимальное количество монет для суммы S. Для исследования объясните, почему выбор самой крупной подходящей монеты даёт оптимум для этого набора; проверьте, почему при номиналах 1, 3, 4 и S = 6 такой способ НЕ подходит.",
+    "examples": "Ввод:\n30\nВывод:\n2\nВвод:\n49\nВывод:\n7",
+    "starter": "",
+    "hint": "Попробуй обменять пять единиц на одну пятёрку.\n\nПосмотри, выгодно ли использовать более четырёх монет по 5.\n\nВычитай по очереди 25, 10 и 5; остаток добери единицами.",
+    "theory": "Исследуйте достоинства 1, 5, 10, 25: пока можно, используйте старшую монету. Проверьте отдельно достоинства 1, 3, 4 и сумму 6: жадный выбор даёт не лучший результат.",
+    "tests": [
+      {
+        "input": [
+          "1"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "5"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "10"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "25"
+        ],
+        "expected": "1"
+      },
+      {
+        "input": [
+          "30"
+        ],
+        "expected": "2"
+      },
+      {
+        "input": [
+          "49"
+        ],
+        "expected": "7"
+      },
+      {
+        "input": [
+          "99"
+        ],
+        "expected": "9"
+      },
+      {
+        "input": [
+          "100"
+        ],
+        "expected": "4"
+      },
+      {
+        "input": [
+          "6"
+        ],
+        "expected": "2"
+      },
+      {
+        "input": [
+          "31"
+        ],
+        "expected": "3"
+      }
+    ],
+    "methodSource": "Развитие исследовательского задания из комплекта версии 3",
+    "methodKey": "RCOIN",
+    "methodRoute": "Математический резерв"
+  }
+];
 const lessons=[
 {id:1,title:'Занятие 1',subtitle:'Ввод-вывод данных и переменные',tasks:lesson1Tasks,theory:[['Вывод данных: print()','Команда print() выводит информацию на экран. Текст заключают в одинарные или двойные кавычки.'],['Аргументы print()','Несколько аргументов разделяются запятыми. Например, print() может получить несколько значений и вывести их через пробел.'],['Кавычки внутри текста','Если в тексте есть апостроф, используй двойные кавычки снаружи.'],['Ввод данных: input()','input() считывает одну строку, введённую пользователем.'],['Переменные и присваивание','Переменная хранит значение. В записи name = Гвидо имя слева, значение справа.'],['Имена переменных','Используй латинские буквы, цифры и подчёркивание. Нельзя начинать имя с цифры или использовать пробелы.'],['Частые ошибки','Проверяй кавычки, круглые скобки, запятые, регистр команды print и вывод переменных без кавычек.']]},
 {id:2,title:'Занятие 2',subtitle:'Цифры, числа + типы данных',tasks:lesson2Tasks,theory:[
@@ -1417,6 +2115,14 @@ const lessons=[
 ,
 {id:6,title:'Занятие 6',subtitle:'Цикл while',tasks:lesson6Tasks,theory:[["1. Как работает while","Цикл while повторяет команды, пока условие истинно (True). Перед каждым повторением Python проверяет условие. Если оно ложно (False), тело цикла не запускается или цикл завершается.<pre><code>while условие:\n    команды</code></pre><strong>Запомни.</strong> Двоеточие : начинает тело цикла, а отступ показывает, какие команды относятся к циклу."],["2. Условие проверяется до выполнения тела","<pre><code>i = 5\nwhile i &lt; 5:\n    print(i)\n    i += 1</code></pre>Что выведет программа? Ничего: уже при первой проверке условие 5 &lt; 5 ложно. Поэтому цикл выполнится 0 раз. Сравни с условием i &lt;= 5: в таком случае цикл выполнится один раз и выведет 5."],["3. Как не получить бесконечный цикл","<pre><code>i = 0\nwhile i &lt; 3:\n    print(i)\n    i += 1</code></pre>Переменная i меняется на каждом повторении. После вывода 0, 1 и 2 она станет равна 3, условие i &lt; 3 станет ложным, и цикл завершится.<p><strong>Опасная ошибка.</strong> Если забыть изменить переменную, от которой зависит условие, цикл может не завершиться.</p><pre><code>i = 0\nwhile i &lt; 3:\n    print(i)  # i не меняется — цикл бесконечный</code></pre>"],["4. for или while?","Если заранее известно точное количество повторений, часто удобнее for. Если нужно повторять действия до события или до появления стоп-значения, удобен while.<pre><code>for i in range(3):\n    print(i)</code></pre><pre><code>num = int(input())\nwhile num != -1:\n    print('Получено:', num)\n    num = int(input())</code></pre>Во втором примере число -1 — стоп-значение. Оно завершает цикл и не обрабатывается телом цикла."]]},
 {id:7,title:'Занятие 7',subtitle:'Цикл while: обработка цифр и условия',tasks:homeworkTasks,theory:[["1. Как получить последнюю цифру","Оператор % (остаток от деления) помогает получить последнюю цифру целого неотрицательного числа: <code>n % 10</code>.<pre><code>n = 583\nprint(n % 10)  # 3</code></pre>Почему? При делении 583 на 10 остаток равен 3."],["2. Как убрать последнюю цифру","Оператор // выполняет целочисленное деление. Если разделить неотрицательное целое число на 10 с помощью <code>//</code>, последняя цифра исчезнет.<pre><code>n = 583\nn = n // 10\nprint(n)  # 58</code></pre><strong>Главная пара.</strong> <code>n % 10</code> — взять последнюю цифру. <code>n // 10</code> — убрать последнюю цифру."],["3. Как пройти по всем цифрам числа","Каждый проход цикла обрабатывает последнюю цифру. Затем число уменьшается в 10 раз (целочисленно), чтобы следующей стала предыдущая цифра.<pre><code>n = int(input())\nwhile n &gt; 0:\n    digit = n % 10\n    print(digit)\n    n //= 10</code></pre>Если ввести 583, программа выведет цифры в обратном порядке: 3, затем 8, затем 5. Это нормально: мы начинаем с последней цифры. <strong>Важно:</strong> в каждой итерации нужно убрать последнюю цифру. Иначе значение n не изменится и цикл может стать бесконечным."],["4. Как применить if к каждой цифре","Внутри цикла можно проверить каждую извлечённую цифру. Например, посчитать, сколько цифр чётные.<pre><code>n = int(input())\ncount = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit % 2 == 0:\n        count += 1\n    n //= 10\nprint(count)</code></pre>Здесь два разных действия с %: <code>n % 10</code> получает последнюю цифру числа, а <code>digit % 2</code> проверяет, делится ли эта цифра на 2 без остатка."],["5. Сумма, количество, максимум и произведение","<table><thead><tr><th>Что ищем</th><th>Начальное значение</th><th>Действие внутри цикла</th></tr></thead><tbody><tr><td>Количество цифр с нужным свойством</td><td><code>count = 0</code></td><td>Если условие выполнено: <code>count += 1</code></td></tr><tr><td>Сумму выбранных цифр</td><td><code>total = 0</code></td><td>Если условие выполнено: <code>total += digit</code></td></tr><tr><td>Максимальную цифру</td><td><code>max_digit = 0</code></td><td>Если <code>digit &gt; max_digit</code>: сохранить digit</td></tr><tr><td>Произведение выбранных ненулевых цифр</td><td><code>product = 1</code></td><td>Если цифра подходит: <code>product *= digit</code></td></tr></tbody></table><p>Почему для суммы берём 0, а для произведения — 1? Ноль не меняет сумму, а единица не меняет произведение. Если начать произведение с нуля, оно останется нулём при любом умножении.</p>"],["6. Пример","<pre><code>n = int(input())\nmax_digit = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit &gt; max_digit:\n        max_digit = digit\n    n //= 10\nprint(max_digit)</code></pre>Пример: для числа 48271 цифры рассматриваются так: 1, 7, 2, 8, 4. Переменная <code>max_digit</code> хранит наибольшую цифру, найденную к текущему моменту. Ответ — 8."]],tasks:homeworkTasks}
+,{id:8,title:'Занятие 8',subtitle:'Цикл while: потоки, состояние и математические алгоритмы',tasks:lesson8Tasks,theory:[
+["Что новое в занятии 8","Вы уже умеете использовать while и break. Теперь задача — хранить сразу несколько сведений о потоке, учитывать пустой ввод и не забывать прежнее состояние."],
+["Сигнал завершения и данные","Завершающее значение не является обычным элементом. Условие выхода должно проверяться до обновления счётчика, суммы или лучшего результата. Пустая строка и число 0 — разные сигналы."],
+["Пустой поток и первое значение","Для среднего арифметического количество не должно быть равно нулю при делении. Максимум и лучший результат обрабатывайте отдельно, если ни одного результата нет."],
+["Алгоритмический выбор","Одну задачу иногда можно решить несколькими способами. Для НОД сравните поиск делителей и метод Евклида; для простых множителей объясните, зачем сокращать верхнюю границу перебора."],
+["Серия бросков монеты","Сохраняйте предыдущий символ, текущую длину серии и номер хода. На сайте используется фиксированный ввод H/T/END для проверки программы; моделирование случайных бросков — исследование с преподавателем."],
+["Как выбирать задания","Сначала общая диагностика. Затем основной маршрут: среднее и зоопарк (вторая задача альтернативная); общий мини-проект — табло. Сложные задачи — по выбору. Монеты — резерв. Нет требования решить все 8 за 75 учебных минут."]
+]}
 ];
 let allTasks=[]; lessons.forEach(l=>l.tasks.forEach(t=>{t.lessonId=l.id;t.key=`${l.id}-${t.id}`;if(l.id===4)t.theory=lesson4Theory[t.id]||'Используй теорию занятия и быстрый маршрут решения.';if(l.id===7)t.starter='';allTasks.push(t)}));
 const saved=readLocalJSON(ACTIVE_STORAGE_KEY)||{};
@@ -1424,13 +2130,14 @@ const saved=readLocalJSON(ACTIVE_STORAGE_KEY)||{};
 // При первом открытии сайта все занятия свернуты. Если ученик уже пользовался сайтом раньше,
 // один раз исправляем старое состояние, в котором Занятие 2 могло сохраняться открытым.
 if(!saved.__collapsedLessonsInitialized){
-  saved.openLessons={1:false,2:false,3:false,4:false,5:false,6:false,7:false};
+  saved.openLessons={1:false,2:false,3:false,4:false,5:false,6:false,7:false,8:false};
   saved.__collapsedLessonsInitialized=true;
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
 const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},solved:saved.solved||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},taskSubmissionIds:saved.taskSubmissionIds||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
 if(String(state.currentKey).startsWith('6-'))state.openLessons[6]=true;
 if(String(state.currentKey).startsWith('7-'))state.openLessons[7]=true;
+if(String(state.currentKey).startsWith('8-'))state.openLessons[8]=true;
 // Remove old prefilled input-variable scaffolds from lessons 3-5, but preserve any real student solution.
 for(const lesson of lessons.filter(l=>l.id>=3&&l.id<=5)){for(const task of lesson.tasks){const key=lesson.id+'-'+task.id;const code=saved.codes&&saved.codes[key];if(typeof code!=='string'||!code.trim())continue;const lines=code.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);const isOnlyStarter=lines.length>0&&lines.every(line=>line.startsWith('#')||/^[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?:int\s*\(\s*)?input\s*\(\s*\)\s*\)?(?:\s*#.*)?$/.test(line));if(isOnlyStarter){const comments=lines.filter(line=>line.startsWith('#'));state.codes[key]=comments.length?comments.join('\n'):'# Напиши программу';}}}
 
@@ -1535,7 +2242,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobileMenu()});
 closeMobileMenu();
 
 function saveState(){localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(state))}
-function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:{1:false,2:false,3:false,4:false,5:false,6:false,7:false},codes:{},attempts:{},failedCodes:{},hints:{},solved:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},taskSubmissionIds:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
+function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:{1:false,2:false,3:false,4:false,5:false,6:false,7:false,8:false},codes:{},attempts:{},failedCodes:{},hints:{},solved:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},taskSubmissionIds:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
 function currentTask(){return allTasks.find(t=>t.key===state.currentKey)||allTasks[0]}
 function getLesson(id){return lessons.find(l=>l.id===id)}
 function levelOrder(level){return {past:1,pro:2,boss:3,hard:4}[level]||1}
@@ -1756,7 +2463,7 @@ function renderNav(){
     wrap.className='lesson '+(state.openLessons[l.id]?'open':'');
     const head=document.createElement('button');
     head.className='lesson-head';
-    const navTitles={1:'Ввод-вывод данных и переменные',2:'Цифры, числа + тип данных',3:'Условные операторы',4:'Условные операторы',5:'Вложенные и каскадные условия',6:'Цикл while',7:'Цикл while: обработка цифр и условия'};
+    const navTitles={1:'Ввод-вывод данных и переменные',2:'Цифры, числа + тип данных',3:'Условные операторы',4:'Условные операторы',5:'Вложенные и каскадные условия',6:'Цикл while',7:'Цикл while: обработка цифр и условия',8:'Цикл while: потоки и состояние'};
      head.innerHTML=`<span>▸</span><span class="lesson-head-title"><strong>${l.title}.</strong> <span>${navTitles[l.id]||l.subtitle}</span></span><span class="lesson-head-arrow">›</span>`;
     head.onclick=()=>{state.openLessons[l.id]=!state.openLessons[l.id];saveState();renderNav()};
     wrap.appendChild(head);
@@ -2197,7 +2904,7 @@ function normalizeTeacherRow(row){
 }
 
 function buildTeacherOverview(rows){
-  const lessonIds=[1,2,3,4,5,6,7];
+  const lessonIds=lessons.map(lesson=>lesson.id);
   const cards=lessonIds.map(id=>{
     const info=teacherLessonInfo(id);
     const tasks=teacherDashboardTaskList(id);
