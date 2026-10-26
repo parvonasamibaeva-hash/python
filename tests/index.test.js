@@ -50,3 +50,11 @@ test('offline task results remain visible for retry', () => {
   assert.match(functionBody('markResultSent'), /unsentResults/);
   assert.match(functionBody('updateSyncLine'), /Отправить ещё раз/);
 });
+
+test('solution passport is integrated without replacing the editor', () => {
+  assert.match(html, /src="passport\.js"/);
+  assert.match(html, /id="passportContent"/);
+  assert.match(html, /SolutionPassport\.recordEvent/);
+  assert.match(html, /SolutionPassport\.saveVersion/);
+  assert.match(html, /before_restore/);
+});
