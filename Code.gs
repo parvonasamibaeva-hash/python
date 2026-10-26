@@ -7,8 +7,12 @@ const ACCOUNT_HEADERS = ['ID аккаунта','Имя','Логин','Хеш к�
 const ACCESS_SHEET_NAME = 'Доступ к занятиям';
 const ACCESS_HEADERS = ['Занятие','Группа','Открыто','Обновлено','ID аккаунта'];
 const REVIEW_SHEET_NAME = 'Проверка преподавателя';
-const REVIEW_HEADERS = ['Дата','ID аккаунта','Имя ученика','Занятие','№ задачи','Название задачи','Вариант А','Вариант Б','Объяснение ученика','Статус проверки','Комментарий преподавателя'];
+const REVIEW_HEADERS = ['Дата','ID аккаунта','Имя ученика','Занятие','№ задачи','Название задачи','Вариант А','Вариант Б','Объяснение ученика','Статус проверки','Комментарий преподавателя','ID проверки','Код решения','ID попытки','Категория ошибки','Версия проверки'];
 const SESSION_TTL_SECONDS = 21600; // 6 часов
+const COURSE_MAX_LESSON_NUMBER = 36;
+// Однократная совместимая миграция: эти уже существовавшие занятия сохраняют прежний доступ.
+// Новые занятия не входят в список и по умолчанию закрыты до решения преподавателя.
+const LEGACY_PUBLISHED_LESSON_IDS = [1,2,3,4,5,6,7,8];
 
 /** Запусти вручную один раз из редактора Apps Script. Создаст лист аккаунтов и код преподавателя. */
 function setupAuth() {
@@ -21,6 +25,7 @@ function setupAuth() {
   let accessSheet = ss.getSheetByName(ACCESS_SHEET_NAME);
   if (!accessSheet) accessSheet = ss.insertSheet(ACCESS_SHEET_NAME);
   ensureHeaders_(accessSheet, ACCESS_HEADERS);
+  ensureLegacyLessonAccess_();
   const props = PropertiesService.getScriptProperties();
   if (!props.getProperty('HASH_PEPPER')) props.setProperty('HASH_PEPPER', Utilities.getUuid() + Utilities.getUuid());
   let teacherCode = props.getProperty('TEACHER_CODE');
@@ -125,16 +130,17 @@ function handleAction_(data) {
     return {success:true, group};
   }
   if (data.action === 'getLessonAccess') {
+    ensureLegacyLessonAccess_();
     const access=readLessonAccess_();
     if(session.role==='student'){
       const account=findAccountById_(session.accountId);
       const group=account?account.group:(session.group||'individual');
       const own={};
       Object.keys(access).forEach(key=>{if(key.startsWith(group+':')||key.startsWith('student:'+session.accountId+':'))own[key]=access[key]});
-      return {success:true,accessVersion:2,group,access:own};
+      return {success:true,accessVersion:2,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,group,access:own};
     }
     requireRole_(session,'teacher');
-    return {success:true,accessVersion:2,access};
+    return {success:true,accessVersion:2,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,access};
   }
   if (data.action === 'setLessonAccess') {
     requireRole_(session,'teacher');
@@ -169,6 +175,26 @@ function handleAction_(data) {
     requireRole_(session, 'teacher');
     return {success:true, stuck:getStuckStudents_(data)};
   }
+  if (data.action === 'getManualReviews') {
+    requireRole_(session, 'teacher');
+    return {success:true, reviews:readManualReviews_()};
+  }
+  if (data.action === 'getStudentManualReviews') {
+    requireRole_(session, 'student');
+    const reviews=readManualReviews_().filter(r=>String(r['ID аккаунта']||'')===session.accountId);
+    return {success:true, reviews:reviews.map(r=>({reviewId:r.reviewId, lesson:String(r['Занятие']||''), taskId:String(r['№ задачи']||''), title:String(r['Название задачи']||''), status:String(r['Статус проверки']||''), comment:String(r['Комментарий преподавателя']||''), date:r['Дата']||''}))};
+  }
+  if (data.action === 'setManualReviewStatus') {
+    requireRole_(session, 'teacher');
+    return setManualReviewStatus_(data, session);
+  }
+  if (data.action === 'savePassportBatch') {
+    requireRole_(session, 'student');
+    return savePassportBatch_(data, session);
+  }
+  if (data.action === 'getPassport') {
+    return getPassport_(data, session);
+  }
   if (data.action === 'getStudentTasks') {
     requireRole_(session, 'student');
     return {success:true, tasks:readTaskObjects_().filter(r => String(r['ID аккаунта'] || '') === session.accountId)};
@@ -187,6 +213,10 @@ function handleAction_(data) {
 function saveTask_(data) {
   const session = requireSession_(data.token);
   requireRole_(session, 'student');
+  const lessonId=parseLessonNumber_(data.lesson),taskId=Number(data.taskId);
+  if(!lessonId||!Number.isInteger(taskId)||taskId<1)throw new Error('Некорректная задача.');
+  assertStudentLessonAccess_(session,lessonId);
+  if(String(data.result||'Решена')!=='Решена')throw new Error('На сервер можно сохранить только подтверждённый успешный результат.');
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(TASKS_SHEET_NAME);
   if (!sheet) throw new Error('Лист «Задачи» не найден.');
@@ -204,15 +234,17 @@ function saveTask_(data) {
       );
       if (duplicate) return {success:true, type:'task', duplicate:true};
     }
+    // Последовательность проверяется по серверным записям, а не по параметрам интерфейса.
+    assertPreviousTaskCompleted_(session,lessonId,taskId);
     // Всегда берём ID и имя из проверенной сессии, а не из клиентского запроса.
     const row = headers.map(header => {
       const values = {
         'Имя': session.name,
         'Дата': data.date || new Date(),
-        'Занятие': data.lesson || '',
-        '№ задачи': data.taskId || '',
+        'Занятие': 'Занятие '+lessonId,
+        '№ задачи': taskId,
         'Название задачи': data.taskTitle || '',
-        'Результат': data.result || 'Решена',
+        'Результат': 'Решена',
         'Неудачных проверок': Number(data.failedAttempts || 0),
         'Сложность': data.rating || '',
         'Решение': String(data.solution || ''),
@@ -239,63 +271,106 @@ function saveTask_(data) {
 function saveManualReview_(data) {
   const session = requireSession_(data.token);
   requireRole_(session, 'student');
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(REVIEW_SHEET_NAME);
-  if (!sheet) {
-    sheet = ss.insertSheet(REVIEW_SHEET_NAME);
-    sheet.getRange(1, 1, 1, REVIEW_HEADERS.length).setValues([REVIEW_HEADERS]);
-    sheet.setFrozenRows(1);
-  } else {
-    ensureHeaders_(sheet, REVIEW_HEADERS);
-  }
-  const taskTitle = String(data.taskTitle || '').trim();
+  const lessonId=parseLessonNumber_(data.lesson),taskId=Number(data.taskId);
+  if(!lessonId||!Number.isInteger(taskId)||taskId<1)throw new Error('Некорректная задача для ручной проверки.');
+  assertStudentLessonAccess_(session,lessonId);
+  assertPreviousTaskCompleted_(session,lessonId,taskId);
+  const taskTitle = String(data.taskTitle || '').trim().slice(0,200);
+  const code = String(data.code || '').slice(0,45000);
+  const attemptId=String(data.attemptId||'').slice(0,100);
   if (!taskTitle) throw new Error('Не указано название задачи.');
-  const row = [
-    data.date || new Date(),
-    session.accountId,
-    session.name,
-    String(data.lesson || ''),
-    String(data.taskId || ''),
-    taskTitle,
-    String(data.variantA || ''),
-    String(data.variantB || ''),
-    String(data.explanation || ''),
-    'Ожидает проверки',
-    ''
-  ];
-  sheet.appendRow(row);
-  return {success:true, type:'manualReview', status:'Ожидает проверки'};
+  if (!code.trim()) throw new Error('Нельзя отправить на ручную проверку пустой код.');
+  const lock=LockService.getScriptLock();lock.waitLock(20000);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(REVIEW_SHEET_NAME);
+    if (!sheet) { sheet = ss.insertSheet(REVIEW_SHEET_NAME); sheet.getRange(1, 1, 1, REVIEW_HEADERS.length).setValues([REVIEW_HEADERS]); sheet.setFrozenRows(1); }
+    else ensureHeaders_(sheet, REVIEW_HEADERS);
+    const values=sheet.getDataRange().getValues(),headers=values[0].map(String);
+    const accountCol=headers.indexOf('ID аккаунта'),attemptCol=headers.indexOf('ID попытки');
+    if(attemptId&&accountCol>=0&&attemptCol>=0){
+      const duplicate=values.slice(1).find(row=>String(row[accountCol]||'')===session.accountId&&String(row[attemptCol]||'')===attemptId);
+      if(duplicate){const idCol=headers.indexOf('ID проверки'),statusCol=headers.indexOf('Статус проверки');return {success:true,type:'manualReview',duplicate:true,reviewId:String(duplicate[idCol]||''),status:String(duplicate[statusCol]||'Ожидает проверки')};}
+    }
+    const reviewId=Utilities.getUuid();
+    const record={'Дата':data.date||new Date(),'ID аккаунта':session.accountId,'Имя ученика':session.name,'Занятие':'Занятие '+lessonId,'№ задачи':taskId,'Название задачи':taskTitle,'Вариант А':String(data.variantA||''),'Вариант Б':String(data.variantB||''),'Объяснение ученика':String(data.explanation||''),'Статус проверки':'Ожидает проверки','Комментарий преподавателя':'','ID проверки':reviewId,'Код решения':code,'ID попытки':attemptId,'Категория ошибки':String(data.errorCategory||'manual_review').slice(0,100),'Версия проверки':String(data.checkerVersion||'').slice(0,100)};
+    sheet.appendRow(headers.map(h=>sheetText_(Object.prototype.hasOwnProperty.call(record,h)?record[h]:'')));
+    SpreadsheetApp.flush();
+    return {success:true,type:'manualReview',status:'Ожидает проверки',reviewId};
+  } finally { lock.releaseLock(); }
 }
 
 function readManualReviews_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(REVIEW_SHEET_NAME);
   if (!sheet || sheet.getLastRow() < 2) return [];
+  ensureHeaders_(sheet, REVIEW_HEADERS);
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(String);
   return values.slice(1).filter(row => row.some(v => v !== '' && v != null)).map((row, index) => {
     const obj = {};
     headers.forEach((h, i) => obj[h] = row[i] instanceof Date ? row[i].toISOString() : row[i]);
     obj._row = index + 2;
+    obj.reviewId=String(obj['ID проверки']||('legacy-row-'+obj._row));
     return obj;
   });
 }
 
-function setManualReviewStatus_(data) {
-  const rowNumber = Number(data.row);
-  if (!Number.isInteger(rowNumber) || rowNumber < 2) throw new Error('Некорректный номер записи.');
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEW_SHEET_NAME);
-  if (!sheet || rowNumber > sheet.getLastRow()) throw new Error('Запись проверки не найдена.');
-  const status = String(data.status || '');
-  if (!['Принято', 'Нужно исправить'].includes(status)) throw new Error('Неизвестный статус проверки.');
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
-  const statusCol = headers.indexOf('Статус проверки') + 1;
-  const commentCol = headers.indexOf('Комментарий преподавателя') + 1;
-  if (!statusCol || !commentCol) throw new Error('В листе проверки отсутствуют нужные столбцы.');
-  sheet.getRange(rowNumber, statusCol).setValue(status);
-  sheet.getRange(rowNumber, commentCol).setValue(String(data.comment || '').slice(0, 1000));
-  return {success:true, status};
+function setManualReviewStatus_(data, session) {
+  requireRole_(session,'teacher');
+  const reviewId=String(data.reviewId||'');
+  let rowNumber=Number(data.row);
+  if(reviewId.startsWith('legacy-row-'))rowNumber=Number(reviewId.slice('legacy-row-'.length));
+  const lock=LockService.getScriptLock();lock.waitLock(20000);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(REVIEW_SHEET_NAME);
+    if (!sheet) throw new Error('Лист проверки не найден.');
+    ensureHeaders_(sheet, REVIEW_HEADERS);
+    const values=sheet.getDataRange().getValues(),headers=values[0].map(String);
+    const idCol=headers.indexOf('ID проверки'),statusCol=headers.indexOf('Статус проверки'),commentCol=headers.indexOf('Комментарий преподавателя');
+    if(idCol<0||statusCol<0||commentCol<0)throw new Error('В листе проверки отсутствуют нужные столбцы.');
+    if(reviewId&&!reviewId.startsWith('legacy-row-')){
+      const found=values.findIndex((row,i)=>i>0&&String(row[idCol]||'')===reviewId);
+      if(found>=1)rowNumber=found+1;
+    }
+    if(!Number.isInteger(rowNumber)||rowNumber<2||rowNumber>sheet.getLastRow())throw new Error('Запись проверки не найдена. Обнови очередь и попробуй снова.');
+    const row=sheet.getRange(rowNumber,1,1,sheet.getLastColumn()).getValues()[0];
+    const previousStatus=String(row[statusCol]||'Ожидает проверки');
+    const status = String(data.status || '');
+    const comment=String(data.comment||'').slice(0,1000);
+    if (!['Принято', 'Нужно исправить'].includes(status)) throw new Error('Неизвестный статус проверки.');
+    if(status==='Нужно исправить'&&!comment.trim())throw new Error('Добавь комментарий с тем, что ученику нужно исправить.');
+    if(!String(row[idCol]||''))sheet.getRange(rowNumber,idCol+1).setValue(reviewId||('legacy-row-'+rowNumber));
+    sheet.getRange(rowNumber,statusCol+1).setValue(status);
+    sheet.getRange(rowNumber,commentCol+1).setValue(comment);
+    try {
+      if(status==='Принято')recordManualReviewCompletion_(row,headers,reviewId||String(row[idCol]||('legacy-row-'+rowNumber)));
+      SpreadsheetApp.flush();
+    } catch(error) {
+      sheet.getRange(rowNumber,statusCol+1).setValue(previousStatus==='Принято'?'Ожидает проверки':previousStatus);
+      sheet.getRange(rowNumber,commentCol+1).setValue(String(row[commentCol]||''));
+      SpreadsheetApp.flush();
+      throw error;
+    }
+    return {success:true,status,reviewId:reviewId||String(row[idCol]||('legacy-row-'+rowNumber))};
+  } finally { lock.releaseLock(); }
+}
+
+function recordManualReviewCompletion_(reviewRow, reviewHeaders, reviewId) {
+  const get=(name)=>reviewRow[reviewHeaders.indexOf(name)];
+  const accountId=String(get('ID аккаунта')||''),name=String(get('Имя ученика')||''),lesson=String(get('Занятие')||''),taskId=Number(get('№ задачи'));
+  const lessonId=parseLessonNumber_(lesson);
+  if(!accountId||!lessonId||!Number.isInteger(taskId)||taskId<1)throw new Error('В записи ручной проверки отсутствуют данные ученика или задачи.');
+  const ss=SpreadsheetApp.getActiveSpreadsheet(),sheet=ss.getSheetByName(TASKS_SHEET_NAME);
+  if(!sheet)throw new Error('Лист «Задачи» не найден.');
+  ensureHeaders_(sheet,TASK_HEADERS);
+  const values=sheet.getDataRange().getValues(),headers=values[0].map(String),idCol=headers.indexOf('ID отправки'),accountCol=headers.indexOf('ID аккаунта');
+  const submissionId=('manual-review:'+reviewId).slice(0,100);
+  if(values.slice(1).some(row=>String(row[idCol]||'')===submissionId&&String(row[accountCol]||'')===accountId))return;
+  const record={'Имя':name,'Дата':new Date(),'Занятие':'Занятие '+lessonId,'№ задачи':taskId,'Название задачи':String(get('Название задачи')||''),'Результат':'Решена','Неудачных проверок':0,'Сложность':'','Решение':String(get('Код решения')||get('Объяснение ученика')||''),'ID аккаунта':accountId,'ID отправки':submissionId,'ID попытки':String(get('ID попытки')||''),'Пройдено тестов':0,'Всего тестов':0,'Категория ошибки':'manual_review_accepted','Версия проверки':'manual-review-v1','Время проверки':new Date()};
+  sheet.appendRow(headers.map(h=>sheetText_(Object.prototype.hasOwnProperty.call(record,h)?record[h]:'')));
+  SpreadsheetApp.flush();
 }
 
 function saveQuiz_(data) {
@@ -334,8 +409,10 @@ function readDrafts_(){
   });
 }
 function saveDraft_(data,session){
-  const lesson=String(data.lesson||''),taskId=Number(data.taskId),code=String(data.code||'');
-  if(!/^Занятие [1-7]$/.test(lesson)||!Number.isInteger(taskId)||taskId<1)throw new Error('Некорректная задача.');
+  const lesson=String(data.lesson||''),lessonId=parseLessonNumber_(lesson),taskId=Number(data.taskId),code=String(data.code||'');
+  if(!lessonId||!Number.isInteger(taskId)||taskId<1)throw new Error('Некорректная задача.');
+  assertStudentLessonAccess_(session,lessonId);
+  assertPreviousTaskCompleted_(session,lessonId,taskId);
   if(code.length>45000)throw new Error('Черновик слишком большой.');
   const lock=LockService.getScriptLock();lock.waitLock(20000);
   try{
@@ -380,6 +457,71 @@ function findAccountById_(accountId) {
   for (let i=1;i<rows.length;i++) if (String(rows[i][0]) === String(accountId)) return {id:String(rows[i][0]),name:String(rows[i][1]),login:String(rows[i][2]),group:groupCol >= 0 ? String(rows[i][groupCol] || 'individual') : 'individual'};
   return null;
 }
+function parseLessonNumber_(value) {
+  const match=String(value||'').trim().match(/^Занятие\s+(\d+)$/);
+  if(!match)return null;
+  const id=Number(match[1]);
+  return Number.isInteger(id)&&id>=1&&id<=COURSE_MAX_LESSON_NUMBER?id:null;
+}
+
+function ensureLegacyLessonAccess_() {
+  const props=PropertiesService.getScriptProperties();
+  if(props.getProperty('LEGACY_LESSON_ACCESS_MIGRATED_V1')==='true')return;
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  let sheet=ss.getSheetByName(ACCESS_SHEET_NAME);
+  if(!sheet)sheet=ss.insertSheet(ACCESS_SHEET_NAME);
+  ensureHeaders_(sheet,ACCESS_HEADERS);
+  let values=sheet.getDataRange().getValues(),headers=values[0].map(String);
+  const li=headers.indexOf('Занятие'),gi=headers.indexOf('Группа'),ai=headers.indexOf('ID аккаунта'),oi=headers.indexOf('Открыто'),ui=headers.indexOf('Обновлено');
+  ['individual','thursday'].forEach(group=>LEGACY_PUBLISHED_LESSON_IDS.forEach(lessonId=>{
+    values=sheet.getDataRange().getValues();
+    const index=values.findIndex((row,i)=>i>0&&Number(row[li])===lessonId&&!String(row[ai]||'').trim()&&String(row[gi]||'')===group);
+    if(index<1){const record={'Занятие':lessonId,'Группа':group,'Открыто':true,'Обновлено':new Date(),'ID аккаунта':''};sheet.appendRow(headers.map(h=>Object.prototype.hasOwnProperty.call(record,h)?record[h]:''));}
+    else if(values[index][oi]===''||values[index][oi]==null){sheet.getRange(index+1,oi+1).setValue(true);sheet.getRange(index+1,ui+1).setValue(new Date());}
+  }));
+  SpreadsheetApp.flush();
+  props.setProperty('LEGACY_LESSON_ACCESS_MIGRATED_V1','true');
+}
+
+function assertStudentLessonAccess_(session,lessonId) {
+  if(!session||session.role!=='student')throw new Error('Недостаточно прав для доступа к занятию.');
+  if(!Number.isInteger(lessonId)||lessonId<1||lessonId>COURSE_MAX_LESSON_NUMBER)throw new Error('Некорректный номер занятия.');
+  ensureLegacyLessonAccess_();
+  const account=findAccountById_(session.accountId),group=account?account.group:(session.group||'individual');
+  const access=readLessonAccess_(),personal='student:'+session.accountId+':'+lessonId,common=group+':'+lessonId;
+  const open=Object.prototype.hasOwnProperty.call(access,personal)?access[personal]:Object.prototype.hasOwnProperty.call(access,common)?access[common]:false;
+  if(!open)throw new Error('Преподаватель пока не открыл это занятие.');
+}
+
+// Ветки доступа для дополнительных этапов проекта «Угадай число 2.0».
+// Каждая внутренняя группа — набор обязательных завершённых задач; достаточно выполнить одну из групп.
+// Это позволяет продолжить старую игру после подтверждённой задачи 5-13, не засчитывая новый этап автоматически.
+function taskPrerequisiteGroups_(lessonId,taskId) {
+  if(Number(lessonId)===8&&Number(taskId)===9)return [[]];
+  // Первая задача занятия 8 — базовая игра (8-9). Подтверждённая старая запись (5-13)
+  // удовлетворяет этому условию без создания дублирующей исторической записи.
+  if(Number(lessonId)===8&&Number(taskId)===1)return [[{lessonId:8,taskId:9}],[{lessonId:5,taskId:13}]];
+  // Дополнительные этапы и исследовательский вызов открываются от подтверждённой базовой игры.
+  if(Number(lessonId)===8&&(Number(taskId)===10||Number(taskId)===15))return [[{lessonId:8,taskId:9}],[{lessonId:5,taskId:13}]];
+  if(Number(taskId)<=1)return [[]];
+  return [[{lessonId:Number(lessonId),taskId:Number(taskId)-1}]];
+}
+function assertPreviousTaskCompleted_(session,lessonId,taskId) {
+  const groups=taskPrerequisiteGroups_(lessonId,taskId);
+  if(!groups.length)return;
+  const accountId=String(session.accountId||'');
+  const rows=readTaskObjects_().filter(row=>String(row['ID аккаунта']||'')===accountId&&String(row['Результат']||'').trim().toLowerCase()==='решена');
+  if(Number(lessonId)===8&&Number(taskId)===9&&rows.some(row=>String(row['Занятие']||'')==='Занятие 5'&&Number(row['№ задачи'])===13)){
+    throw new Error('Базовая игра уже подтверждена в занятии 5. Продолжи проект с этапа 2.');
+  }
+  const completed=new Set(rows.map(row=>String(row['Занятие']||'')+'::'+Number(row['№ задачи'])));
+  const allowed=groups.some(group=>group.every(required=>completed.has('Занятие '+required.lessonId+'::'+required.taskId)));
+  if(!allowed){
+    if(Number(lessonId)===8&&(Number(taskId)===10||Number(taskId)===15))throw new Error('Сначала выполни необходимые предыдущие шаги и дождись подтверждения сохранения результата.');
+    throw new Error('Сначала выполни предыдущую задачу и дождись подтверждения сохранения результата.');
+  }
+}
+
 function readLessonAccess_() {
   const ss=SpreadsheetApp.getActiveSpreadsheet();
   const sheet=ss.getSheetByName(ACCESS_SHEET_NAME);
@@ -396,8 +538,9 @@ function readLessonAccess_() {
   return access;
 }
 function setLessonAccess_(data){
+  ensureLegacyLessonAccess_();
   const lessonId=Number(data.lessonId),studentId=String(data.studentId||'');
-  if(!Number.isInteger(lessonId)||lessonId<1||lessonId>7)throw new Error('Некорректный номер занятия.');
+  if(!Number.isInteger(lessonId)||lessonId<1||lessonId>COURSE_MAX_LESSON_NUMBER)throw new Error('Некорректный номер занятия.');
   if(data.open!==true&&data.open!==false&&data.open!==null)throw new Error('Некорректное состояние доступа.');
   const account=studentId?findAccountById_(studentId):null;
   if(studentId&&!account)throw new Error('Ученик не найден.');
@@ -486,3 +629,63 @@ function recordFailedAttempt_(key, ttl) {
 }
 function clearFailedAttempts_(key) { CacheService.getScriptCache().remove('attempts:' + key); }
 function json_(value) { return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON); }
+
+// ===== История решений («Паспорт решения») =====
+const PASSPORT_SHEET_NAME = 'История решений';
+const PASSPORT_HEADERS = ['ID события','ID аккаунта','Имя','Занятие','№ задачи','Тип события','Время события','Принято сервером','Код','ID попытки','Причина','Результат проверки'];
+const PASSPORT_BATCH_MAX = 25;
+const PASSPORT_CODE_MAX = 45000;
+function passportText_(value) { const s = String(value == null ? '' : value); return /^[=+\-@]/.test(s) ? "'" + s : s; }
+
+// Ученик отправляет пакет событий. ID аккаунта и имя берутся из сессии, а не из запроса.
+// Повторная отправка того же события безопасна: оно подтверждается, но не дублируется.
+function savePassportBatch_(data, session) {
+  const events = Array.isArray(data.events) ? data.events : null;
+  if (!events) throw new Error('Не переданы события.');
+  if (events.length > PASSPORT_BATCH_MAX) throw new Error('Слишком много событий в одном пакете.');
+  const accepted = [], rejected = [], rows = [], now = new Date();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(PASSPORT_SHEET_NAME) || ss.insertSheet(PASSPORT_SHEET_NAME);
+    ensureHeaders_(sheet, PASSPORT_HEADERS);
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(String), idCol = headers.indexOf('ID события'), accCol = headers.indexOf('ID аккаунта');
+    const known = new Set();
+    values.slice(1).forEach(r => { if (String(r[accCol]) === session.accountId) known.add(String(r[idCol])); });
+    events.forEach(e => {
+      const id = String(e && e.id || '');
+      if (!/^[A-Za-z0-9_.:\-]{4,100}$/.test(id)) { rejected.push({id, reason:'bad_id'}); return; }
+      if (known.has(id)) { accepted.push(id); return; }
+      const m = /^(\d{1,2})-(\d{1,3})$/.exec(String(e.taskId || '')), type = String(e.type || ''), code = String(e.code || ''), time = new Date(e.time);
+      if (!m || !/^[A-Za-z0-9_\-]{1,40}$/.test(type) || code.length > PASSPORT_CODE_MAX || !Number.isFinite(time.getTime())) { rejected.push({id, reason:'invalid'}); return; }
+      const eventLessonId=Number(m[1]),eventTaskId=Number(m[2]);
+      try { if(eventLessonId>COURSE_MAX_LESSON_NUMBER)throw new Error('invalid_lesson'); assertStudentLessonAccess_(session,eventLessonId); assertPreviousTaskCompleted_(session,eventLessonId,eventTaskId); }
+      catch (_) { rejected.push({id, reason:'lesson_or_task_locked'}); return; }
+      known.add(id); accepted.push(id);
+      const rec = {'ID события':id, 'ID аккаунта':session.accountId, 'Имя':session.name, 'Занятие':'Занятие ' + Number(m[1]), '№ задачи':Number(m[2]), 'Тип события':type, 'Время события':time, 'Принято сервером':now,
+        'Код':passportText_(code), 'ID попытки':passportText_(String(e.attemptId || '').slice(0, 100)), 'Причина':passportText_(String(e.reason || '').slice(0, 200)), 'Результат проверки':passportText_(String(e.verification || '').slice(0, 2000))};
+      rows.push(headers.map(h => Object.prototype.hasOwnProperty.call(rec, h) ? rec[h] : ''));
+    });
+    if (rows.length) { sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, headers.length).setValues(rows); SpreadsheetApp.flush(); }
+  } finally { lock.releaseLock(); }
+  return {success:true, accepted, rejected};
+}
+
+// Учитель получает историю выбранного ученика. Ученик получает только свою: переданный studentId игнорируется.
+function getPassport_(data, session) {
+  if(!session||!['teacher','student'].includes(session.role))throw new Error('Недостаточно прав для просмотра истории решений.');
+  const studentId = session.role === 'teacher' ? String(data.studentId || '') : String(session.accountId || '');
+  if (!studentId) throw new Error('Не указан ученик.');
+  const limit = Math.min(500, Math.max(1, Math.floor(Number(data.limit)) || 200));
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PASSPORT_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) return {success:true, events:[]};
+  const values = sheet.getDataRange().getValues(), h = values[0].map(String), get = (r, n) => r[h.indexOf(n)];
+  const iso = v => v instanceof Date ? v.toISOString() : String(v || '');
+  const events = values.slice(1)
+    .filter(r => String(get(r, 'ID аккаунта')) === studentId && (!data.lesson || String(get(r, 'Занятие')) === String(data.lesson)) && (!data.taskId || String(get(r, '№ задачи')) === String(data.taskId)))
+    .map(r => ({id:String(get(r, 'ID события')), lesson:String(get(r, 'Занятие')), taskId:String(get(r, '№ задачи')), type:String(get(r, 'Тип события')), time:iso(get(r, 'Время события')), received:iso(get(r, 'Принято сервером')), code:String(get(r, 'Код') || ''), attemptId:String(get(r, 'ID попытки') || ''), reason:String(get(r, 'Причина') || ''), verification:String(get(r, 'Результат проверки') || '')}));
+  events.sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+  return {success:true, events:events.slice(-limit)};
+}

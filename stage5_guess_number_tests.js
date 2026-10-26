@@ -51,10 +51,15 @@ async function testAsync(name, fn) {
 
 const catalog = lesson8Catalog();
 const project = catalog.filter(t => t.id >= 9 && t.id <= 15);
-test('lesson 8 has seven unique project stages after its original eight tasks', () => {
-  assert.deepStrictEqual(catalog.map(t => t.id), Array.from({length:15}, (_,i)=>i+1));
+test('the original 5-13 game is the first task in lesson 8 and all lesson-8 keys stay stable', () => {
+  assert.strictEqual(catalog[0].id, 9);
+  assert.strictEqual(catalog[0].legacyAliasKey, '5-13');
+  assert.match(catalog[0].title, /5–13/);
+  assert.deepStrictEqual(catalog.slice(1,9).map(t => t.id), Array.from({length:8}, (_,i)=>i+1));
+  assert.deepStrictEqual(catalog.slice(9).map(t => t.id), [10,11,12,13,14,15]);
   assert.strictEqual(project.length, 7);
   assert.strictEqual(new Set(catalog.map(t => `8-${t.id}`)).size, 15);
+  assert.match(fnSrc(html,'renderNav'), /l\.id===8\?\['project','past','pro','base','medium','hard','boss','homework'\]/);
 });
 test('each project stage has conditions, criteria, examples, hints and learning explanation', () => {
   project.forEach(t => {
@@ -76,17 +81,17 @@ test('optional extensions do not count against the mandatory student progress to
   assert.match(fnSrc(html, 'updateStats'), /visibleTasks\.filter\(t=>t\.optional!==true\)/);
   assert.match(fnSrc(html, 'buildStudentDashboard'), /Дополнительные этапы/);
 });
-test('mandatory progress omits the duplicate base stage only when the old result is confirmed', () => {
+test('mandatory progress omits the aliased base stage from the denominator only when the old result is confirmed', () => {
   const ctx={
     allTasks:[
       {key:'8-8',lessonId:8,id:8,title:'Предыдущая задача'},
-      {key:'8-9',lessonId:8,id:9,title:'Базовая игра',skipIfConfirmedKey:'5-13'},
+      {key:'8-9',lessonId:8,id:9,title:'Базовая игра',legacyAliasKey:'5-13'},
       {key:'8-10',lessonId:8,id:10,title:'Дополнительный этап',optional:true},
       {key:'1-1',lessonId:1,id:1,title:'Другая обязательная задача'}
     ],COURSE_CONFIG:{maxLessonNumber:36},authSession:{role:'student'},
     state:{confirmedSolved:{'5-13':true,'8-8':true},solved:{},ratings:{}},
     lessonIsVisibleForCurrentStudent:()=>true,lessonWithinCourseLimit:id=>Number(id)<=36,
-    taskCompletionConfirmed:t=>!!ctx.state.confirmedSolved[t.key],getLesson:id=>({title:'Занятие '+id}),
+    taskCompletionConfirmed:t=>!!ctx.state.confirmedSolved[t.key]||!!(t.legacyAliasKey&&ctx.state.confirmedSolved[t.legacyAliasKey]),getLesson:id=>({title:'Занятие '+id}),
     solvedCount:{textContent:''},hardestTask:{textContent:''},hardestList:{innerHTML:''}
   };
   vm.createContext(ctx);vm.runInContext(fnSrc(html,'updateStats'),ctx);ctx.updateStats();
@@ -94,24 +99,33 @@ test('mandatory progress omits the duplicate base stage only when the old result
   ctx.state.confirmedSolved['5-13']=false;ctx.updateStats();
   assert.strictEqual(ctx.solvedCount.textContent,'1 / 3');
 });
-test('old completed game skips the duplicate base step but code alone does not', () => {
+test('base game is the first available lesson-8 task; confirmed 5-13 completes the alias but code alone does not', () => {
   const lesson = {id:8,tasks:catalog.map(t=>({...t,lessonId:8,key:`8-${t.id}`}))};
-  const ctx = {state:{confirmedSolved:{},solved:{},unsentResults:{}},authSession:{role:'student'},lessonIsVisibleForCurrentStudent:()=>true,getLesson:id=>Number(id)===8?lesson:null};
-  vm.createContext(ctx); vm.runInContext(fnSrc(html,'taskIsAvailable'),ctx);
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[8]), false); // not yet completed task 8-8
-  ctx.state.confirmedSolved['8-8']=true;
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[8]), true); // base step visible without a legacy completion
+  const ctx = {state:{confirmedSolved:{},solved:{},codes:{'5-13':'print(1)'},unsentResults:{}},authSession:{role:'student'},lessonIsVisibleForCurrentStudent:()=>true,getLesson:id=>Number(id)===8?lesson:null};
+  vm.createContext(ctx); vm.runInContext([fnSrc(html,'taskCompletionConfirmed'),fnSrc(html,'taskIsAvailable')].join('\n'),ctx);
+  const base=lesson.tasks.find(t=>t.id===9), firstCore=lesson.tasks.find(t=>t.id===1), attempts=lesson.tasks.find(t=>t.id===10), research=lesson.tasks.find(t=>t.id===15);
+  assert.strictEqual(ctx.taskIsAvailable(base), true); // base is the first task in lesson 8
+  assert.strictEqual(ctx.taskCompletionConfirmed(base), false); // saved code is not confirmation
+  assert.strictEqual(ctx.taskIsAvailable(firstCore), false); // normal route follows the base task
+  assert.strictEqual(ctx.taskIsAvailable(attempts), false);
+  assert.strictEqual(ctx.taskIsAvailable(research), false);
   ctx.state.confirmedSolved['5-13']=true;
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[8]), false); // old task is server-confirmed, not merely saved code
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[9]), true); // continue at counter/limit
+  assert.strictEqual(ctx.taskIsAvailable(base), true); // alias remains visible, not hidden
+  assert.strictEqual(ctx.taskCompletionConfirmed(base), true); // confirmed legacy completion satisfies it
+  assert.strictEqual(ctx.taskIsAvailable(firstCore), true); // core route can continue
+  assert.strictEqual(ctx.taskIsAvailable(attempts), true); // optional project path can continue immediately
+  assert.strictEqual(ctx.taskIsAvailable(research), true); // research challenge branches from base
+  assert.match(fnSrc(html,'updateSubmitButton'), /t\.legacyAliasKey&&taskCompletionConfirmed\(t\)/);
+  assert.match(fnSrc(html,'runPython'), /t\.legacyAliasKey&&taskCompletionConfirmed\(t\)/);
 });
-test('optional project branch unlocks after the shared core, not after every extension', () => {
+test('project extensions unlock sequentially, while research branches directly from the base stage', () => {
   const lesson = {id:8,tasks:catalog.map(t=>({...t,lessonId:8,key:`8-${t.id}`}))};
-  const ctx = {state:{confirmedSolved:{'8-8':true,'8-9':true,'8-10':true,'8-11':true},solved:{},unsentResults:{}},authSession:{role:'student'},lessonIsVisibleForCurrentStudent:()=>true,getLesson:id=>Number(id)===8?lesson:null};
-  vm.createContext(ctx); vm.runInContext(fnSrc(html,'taskIsAvailable'),ctx);
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[11]), true); // optional difficulty follows task 11
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[12]), false); // hot/cold waits for difficulty
-  assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[14]), true); // research challenge bypasses optional 12–14
+  const ctx = {state:{confirmedSolved:{'8-9':true,'8-10':true,'8-11':true},solved:{},unsentResults:{}},authSession:{role:'student'},lessonIsVisibleForCurrentStudent:()=>true,getLesson:id=>Number(id)===8?lesson:null};
+  vm.createContext(ctx); vm.runInContext([fnSrc(html,'taskCompletionConfirmed'),fnSrc(html,'taskIsAvailable')].join('\n'),ctx);
+  const byId=id=>lesson.tasks.find(t=>t.id===id);
+  assert.strictEqual(ctx.taskIsAvailable(byId(12)), true); // difficulty follows replay stage
+  assert.strictEqual(ctx.taskIsAvailable(byId(13)), false); // hot/cold waits for difficulty
+  assert.strictEqual(ctx.taskIsAvailable(byId(15)), true); // research challenge branches from base without all add-ons
   ctx.authSession={role:'teacher'};
   assert.strictEqual(ctx.taskIsAvailable(lesson.tasks[12]), true); // teacher sees all stages
 });
@@ -123,21 +137,21 @@ test('manual review stores the submitted code and creates a confirmed task row o
   assert.match(fnSrc(html,'submitManualReview'),/type:'manualReview'/);
   assert.match(fnSrc(html,'restoreStudentProgress'),/state\.confirmedSolved\[match\.key\]=true/);
 });
-test('server prerequisites mirror the legacy route and research branch', () => {
-  let rows = [
-    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':8,'Результат':'Решена'},
-    {'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}
-  ];
+test('server prerequisites allow the first task and mirror the legacy alias without duplicate history', () => {
+  let rows = [];
   const ctx={readTaskObjects_:()=>rows}; vm.createContext(ctx);
   vm.runInContext([fnSrc(codeGs,'taskPrerequisiteGroups_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),ctx);
-  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,9),/уже подтверждена/);
+  assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,9)); // base is first
+  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/); // core route waits for base
+  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,10),/необходимые предыдущие шаги|базовую игру/);
+  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,15),/базовую игру|предыдущие шаги/);
+  rows=[{'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}];
+  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,9),/уже подтверждена/); // don't duplicate legacy row
+  assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
   assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
-  assert.throws(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,15),/предыдущие шаги/);
-  rows=rows.concat([
-    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'},
-    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':11,'Результат':'Решена'}
-  ]);
-  assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,15));
+  assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,15)); // research branches from base
+  rows=rows.concat([{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'}]);
+  assert.doesNotThrow(()=>ctx.assertPreviousTaskCompleted_({accountId:'a'},8,11));
 });
 
 test('deterministic random/time harness is limited to test runs and checks exact ranges', () => {
