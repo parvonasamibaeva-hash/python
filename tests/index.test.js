@@ -60,4 +60,5 @@ test('solution passport is integrated without replacing the editor', () => {
   assert.match(html, /stdinInput\.hidden=false/);
   assert.match(html, /presetValue=Array\.isArray\(selectedTestInputs\)/);
   assert.match(html, /Тестовые данные подставлены/);
+  assert.match(html, /pendingTerminalInput&&\!pendingTerminalInput\.submitted/);
 });

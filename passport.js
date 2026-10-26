@@ -9,7 +9,7 @@
     try {
       const data = JSON.parse(storage().getItem(key(accountId, taskId)) || '{"versions":[],"events":[]}');
       const seen = new Set();
-      data.versions = (Array.isArray(data.versions) ? data.versions : []).filter(version => { if (seen.has(version.code)) return false; seen.add(version.code); return true; });
+      data.versions = (Array.isArray(data.versions) ? data.versions : []).filter(version => version.reason !== 'before_restore').filter(version => { if (seen.has(version.code)) return false; seen.add(version.code); return true; });
       data.events = Array.isArray(data.events) ? data.events : [];
       storage().setItem(key(accountId, taskId), JSON.stringify(data));
       return data;
