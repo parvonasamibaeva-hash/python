@@ -38,3 +38,9 @@ test('free terminal opens the editor and terminal cards', () => {
   assert.match(index, /if\(editorCard\)editorCard\.hidden=false/);
   assert.match(index, /if\(editorWrap\)editorWrap\.hidden=false/);
 });
+
+test('autocomplete includes variables and functions from the current Python code', () => {
+  assert.match(index, /function pythonUserSymbols\(cm\)/);
+  assert.match(index, /const assignment=\/\^/);
+  assert.match(index, /pythonUserSymbols\(cm\)\.map\(name=>\[name,'переменная из программы'\]\)/);
+});

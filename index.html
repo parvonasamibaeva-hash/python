@@ -2135,12 +2135,28 @@ editor.setOption('extraKeys',Object.assign({},editor.getOption('extraKeys')||{},
 const PYTHON_SUGGESTIONS=[
  ['print','функция вывода'],['input','ввод с клавиатуры'],['int','целое число'],['float','дробное число'],['str','строка'],['len','длина строки или списка'],['range','последовательность чисел'],['sum','сумма элементов'],['min','минимум'],['max','максимум'],['abs','модуль числа'],['round','округление'],['type','тип данных'],['if','условие'],['elif','иначе если'],['else','иначе'],['for','цикл for'],['while','цикл while'],['in','проверка принадлежности'],['and','логическое И'],['or','логическое ИЛИ'],['not','логическое НЕ'],['True','истина'],['False','ложь'],['None','отсутствие значения'],['import','подключить модуль'],['random','модуль случайных чисел'],['time','модуль времени'],['break','прервать цикл'],['continue','перейти к следующей итерации'],['def','объявить функцию'],['return','вернуть результат']
 ];
+function pythonUserSymbols(cm){
+  const source=String(cm.getValue()||''),names=[],seen=new Set();
+  const add=name=>{const value=String(name||'').trim();if(!/^[A-Za-z_]\w*$/.test(value)||seen.has(value))return;seen.add(value);names.push(value)};
+  const assignment=/^\s*([A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*)*)\s*(?:=|\+=|-=|\*=|\/=|%=)/gm;
+  let match;
+  while((match=assignment.exec(source)))match[1].split(',').forEach(add);
+  const loop=/^\s*for\s+([A-Za-z_]\w*)\s+in\b/gm;
+  while((match=loop.exec(source)))add(match[1]);
+  const functions=/^\s*def\s+([A-Za-z_]\w*)\s*\(([^)]*)\)/gm;
+  while((match=functions.exec(source))){add(match[1]);String(match[2]).split(',').forEach(param=>add(param.split('=')[0]))}
+  const imported=/^\s*import\s+([A-Za-z_]\w*)|^\s*from\s+\S+\s+import\s+([A-Za-z_]\w*)/gm;
+  while((match=imported.exec(source)))add(match[1]||match[2]);
+  return names;
+}
 if(CodeMirror.showHint){
   CodeMirror.registerHelper('hint','python',function(cm){
     const cur=cm.getCursor(),line=cm.getLine(cur.line),before=line.slice(0,cur.ch),m=before.match(/[A-Za-z_][A-Za-z0-9_]*$/);
     if(!m)return {list:[],from:CodeMirror.Pos(cur.line,cur.ch),to:CodeMirror.Pos(cur.line,cur.ch)};
     const word=m[0].toLowerCase(),from=CodeMirror.Pos(cur.line,cur.ch-word.length),to=CodeMirror.Pos(cur.line,cur.ch);
-    const list=PYTHON_SUGGESTIONS.filter(([name])=>name.toLowerCase().startsWith(word)&&name.toLowerCase()!==word).map(([name,desc])=>({text:name,displayText:name+'   '+desc}));
+    const suggestions=pythonUserSymbols(cm).map(name=>[name,'переменная из программы']).concat(PYTHON_SUGGESTIONS);
+    const seen=new Set();
+    const list=suggestions.filter(([name])=>name.toLowerCase().startsWith(word)&&name.toLowerCase()!==word&&!seen.has(name.toLowerCase())&&seen.add(name.toLowerCase())).map(([name,desc])=>({text:name,displayText:name+'   '+desc}));
     return {list,from,to};
   });
   editor.on('keyup',(cm,e)=>{
