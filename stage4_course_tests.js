@@ -60,7 +60,7 @@ test('task IDs remain stable; lesson 8 contains the nine document tasks', () => 
     const end=i+1<starts.length?starts[i+1].index:html.indexOf('const COURSE_CONFIG',m.index);
     const chunk=html.slice(m.index,end);
     const ids=[...chunk.matchAll(/\bid\s*:\s*(\d+)\s*,\s*title\s*:|"id"\s*:\s*(\d+)\s*,\s*"title"\s*:/g)].map(x=>Number(x[1]||x[2]));
-    if(ids.length){arrays++;if(m[1]==='lesson8Tasks')assert.deepStrictEqual(ids,[1,2,3,4,5,6,7,8,9],m[1]+' order');else if(m[1]==='lesson5Tasks')assert.deepStrictEqual([...ids].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9,10,11,12,14],m[1]+' removed task 13');else assert.deepStrictEqual([...ids].sort((a,b)=>a-b),Array.from({length:ids.length},(_,j)=>j+1),m[1]+' stable IDs');}
+    if(ids.length){arrays++;if(m[1]==='lesson8Tasks')assert.deepStrictEqual(ids,[10,11,12,13,14,1,2,3,4,5,6,7,8,9],m[1]+' project then document order');else if(m[1]==='lesson5Tasks')assert.deepStrictEqual([...ids].sort((a,b)=>a-b),[1,2,3,4,5,6,7,8,9,10,11,12,14],m[1]+' removed task 13');else assert.deepStrictEqual([...ids].sort((a,b)=>a-b),Array.from({length:ids.length},(_,j)=>j+1),m[1]+' stable IDs');}
   });
   assert.ok(arrays>=8);
 });
@@ -199,19 +199,22 @@ test('server rejects a closed lesson and allows explicit group access', () => {
   assert.doesNotThrow(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},8));
   assert.throws(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},9),/не открыл/);
 });
-test('server opens task 8-1 immediately and then requires the previous document task', () => {
+test('server opens project stage 1, then the project and document routes in order', () => {
   serverCtx.readTaskObjects_=()=>[];
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11),/предыдущую задачу/);
+  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'}];
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
+  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':14,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2),/предыдущую задачу/);
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':1,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2));
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':8,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,9));
 });
-test('historical task 5-13 does not replace the new lesson-8 route', () => {
+test('historical task 5-13 does not replace the project route', () => {
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2),/предыдущую задачу/);
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
 });
 
 const checkerCtx={console,Date,Set,Map,Number,String,Object,Array,JSON,Math};

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Маршрутные листы — Python</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css"><style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#20242c}.app{display:flex;min-height:100vh}.sidebar{width:330px;background:#1f2430;color:white;padding:20px 14px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:auto}.sidebar h1{font-size:21px;margin:0 8px 4px}.teacher-name{color:#fff;font-size:13px;font-weight:600;line-height:1.35;margin:0 8px 4px}.sidebar-subtitle{color:#aeb6c5;font-size:12px;line-height:1.4;margin:0 8px 16px}.result-card{background:#2b3241;border-radius:12px;padding:14px;margin:0 4px 16px}.result-title{font-size:11px;font-weight:bold;color:#aeb6c5;text-transform:uppercase;letter-spacing:.5px}.result-number{font-size:22px;font-weight:bold;margin-top:5px}.result-small{margin-top:5px;color:#aeb6c5;font-size:12px}.lesson{margin:8px 0;border:1px solid #303747;border-radius:12px;overflow:hidden}.lesson-head{width:100%;border:0;background:#252b39;color:#fff;padding:13px 12px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:9px;font-weight:bold}.lesson-head:hover{background:#2b3241}.lesson-head-title{flex:1;line-height:1.35}.lesson-head-title strong{font-weight:800}.lesson-head-title span{font-weight:600;color:#d9deea}.lesson-head-arrow{flex-shrink:0;margin-left:auto;transition:.2s}.lesson.open .lesson-head-arrow{transform:rotate(90deg)}.lesson-arrow{margin-left:auto;transition:.2s}.lesson-body{display:none;padding:6px}.lesson.open .lesson-body{display:block}.lesson-theory-link{width:100%;border:0;background:#303747;color:#d9deea;text-align:left;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin:2px 0 6px}.level-title{color:#778196;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.8px;margin:10px 6px 5px}.task-button{width:100%;border:0;background:transparent;color:#d9deea;text-align:left;padding:8px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px;font-size:12px;display:flex;align-items:center;gap:7px}.task-button:hover{background:#2b3241}.task-button.active{background:#4d65d9;color:white}.task-button.solved{color:#83e39b}.task-button.active.solved{color:white}.task-stars{width:32px;flex-shrink:0;color:#f0b429;font-size:10px;letter-spacing:-2px}.task-check{margin-left:auto;font-size:13px}.main{flex:1;min-width:0;padding:28px}.top{max-width:1100px;margin:0 auto 18px}.badge{display:inline-block;background:#e7ebff;color:#4458c5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:bold;margin-bottom:8px}h2{margin:0 0 8px;font-size:30px}.description{margin:0;line-height:1.6;color:#555d6d}.card{max-width:1100px;margin:0 auto 18px;background:white;border-radius:16px;padding:22px;box-shadow:0 8px 30px rgba(28,36,54,.07)}.card h3{margin-top:0}.problem{white-space:pre-line;line-height:1.65;font-size:15px}.theory{background:#f8f9fd;border-left:4px solid #596fe4;padding:14px 16px;border-radius:8px;line-height:1.55;white-space:pre-line}.theory code{background:#e9ecf5;padding:2px 5px;border-radius:4px}.editor-wrap{border:1px solid #dce1eb;border-radius:10px;overflow:hidden}.CodeMirror{height:330px;font-size:15px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;margin-bottom:22px}button.action{border:0;border-radius:9px;padding:11px 16px;cursor:pointer;font-size:14px;font-weight:bold}.run{background:#4d65d9;color:white}.run:hover{background:#4056c7}.hint{background:#f0b429;color:#241b00}.hint:disabled{opacity:.45;cursor:not-allowed}.clear{background:#edf0f5;color:#343b49}.theory-button{background:#eef1f8;color:#3b4352}.status{margin-top:15px;padding:14px 16px;border-radius:10px;display:none;line-height:1.5;white-space:pre-wrap}.status.show{display:block}.status.info{background:#eef3ff;color:#354c9f}.status.success{background:#e9f8ed;color:#23723a}.status.error{background:#fff0f0;color:#a52c2c}.status.warning{background:#fff8df;color:#805e00}.progress{margin-top:12px;font-size:13px;color:#656d7c}.hint-box{margin-top:14px;padding:14px 16px;background:#fff8df;border-radius:10px;border:1px solid #f0d36d;display:none;line-height:1.55}.hint-box.show{display:block}.small{color:#727a88;font-size:12px;margin-top:9px}.examples{margin-top:14px;padding:13px 15px;background:#f8f9fd;border-radius:10px;font-size:13px;line-height:1.55}.examples strong{color:#404857}.modal{position:fixed;inset:0;background:rgba(20,25,35,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}body.modal-open{overflow:hidden!important}.modal-card{width:min(900px,100%);max-height:85vh;overflow:auto;background:white;border-radius:18px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:15px}.modal-head h3{margin:0}.close{border:0;background:#edf0f5;border-radius:9px;width:36px;height:36px;cursor:pointer;font-size:18px}.theory-block{margin-top:18px;line-height:1.6}.theory-block h4{margin-bottom:6px}.lesson-intro{padding:10px 10px 4px;color:#aeb6c5;font-size:11px;line-height:1.45}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6fb;color:#20242c}.app{display:flex;min-height:100vh}.sidebar{width:330px;background:#1f2430;color:white;padding:20px 14px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow:auto}.sidebar h1{font-size:21px;margin:0 8px 4px}.teacher-name{color:#fff;font-size:13px;font-weight:600;line-height:1.35;margin:0 8px 4px}.sidebar-subtitle{color:#aeb6c5;font-size:12px;line-height:1.4;margin:0 8px 16px}.result-card{background:#2b3241;border-radius:12px;padding:14px;margin:0 4px 16px}.result-title{font-size:11px;font-weight:bold;color:#aeb6c5;text-transform:uppercase;letter-spacing:.5px}.result-number{font-size:22px;font-weight:bold;margin-top:5px}.result-small{margin-top:5px;color:#aeb6c5;font-size:12px}.lesson{margin:8px 0;border:1px solid #303747;border-radius:12px;overflow:hidden}.lesson-head{width:100%;border:0;background:#252b39;color:#fff;padding:13px 12px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:9px;font-weight:bold}.lesson-head:hover{background:#2b3241}.lesson-head-title{flex:1;line-height:1.35}.lesson-head-title strong{font-weight:800}.lesson-head-title span{font-weight:600;color:#d9deea}.lesson-head-arrow{flex-shrink:0;margin-left:auto;transition:.2s}.lesson.open .lesson-head-arrow{transform:rotate(90deg)}.lesson-arrow{margin-left:auto;transition:.2s}.lesson-body{display:none;padding:6px}.lesson.open .lesson-body{display:block}.lesson-theory-link{width:100%;border:0;background:#303747;color:#d9deea;text-align:left;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:12px;margin:2px 0 6px}.project-nav-link{background:#485fce;color:#fff;font-weight:800}.project-nav-link:hover{background:#3e54b9}.level-title{color:#778196;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.8px;margin:10px 6px 5px}.task-button{width:100%;border:0;background:transparent;color:#d9deea;text-align:left;padding:8px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px;font-size:12px;display:flex;align-items:center;gap:7px}.task-button:hover{background:#2b3241}.task-button.active{background:#4d65d9;color:white}.task-button.solved{color:#83e39b}.task-button.active.solved{color:white}.task-stars{width:32px;flex-shrink:0;color:#f0b429;font-size:10px;letter-spacing:-2px}.task-check{margin-left:auto;font-size:13px}.main{flex:1;min-width:0;padding:28px}.top{max-width:1100px;margin:0 auto 18px}.badge{display:inline-block;background:#e7ebff;color:#4458c5;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:bold;margin-bottom:8px}h2{margin:0 0 8px;font-size:30px}.description{margin:0;line-height:1.6;color:#555d6d}.card{max-width:1100px;margin:0 auto 18px;background:white;border-radius:16px;padding:22px;box-shadow:0 8px 30px rgba(28,36,54,.07)}.card h3{margin-top:0}.problem{white-space:pre-line;line-height:1.65;font-size:15px}.theory{background:#f8f9fd;border-left:4px solid #596fe4;padding:14px 16px;border-radius:8px;line-height:1.55;white-space:pre-line}.theory code{background:#e9ecf5;padding:2px 5px;border-radius:4px}.editor-wrap{border:1px solid #dce1eb;border-radius:10px;overflow:hidden}.CodeMirror{height:330px;font-size:15px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;margin-bottom:22px}button.action{border:0;border-radius:9px;padding:11px 16px;cursor:pointer;font-size:14px;font-weight:bold}.run{background:#4d65d9;color:white}.run:hover{background:#4056c7}.hint{background:#f0b429;color:#241b00}.hint:disabled{opacity:.45;cursor:not-allowed}.clear{background:#edf0f5;color:#343b49}.theory-button{background:#eef1f8;color:#3b4352}.status{margin-top:15px;padding:14px 16px;border-radius:10px;display:none;line-height:1.5;white-space:pre-wrap}.status.show{display:block}.status.info{background:#eef3ff;color:#354c9f}.status.success{background:#e9f8ed;color:#23723a}.status.error{background:#fff0f0;color:#a52c2c}.status.warning{background:#fff8df;color:#805e00}.progress{margin-top:12px;font-size:13px;color:#656d7c}.hint-box{margin-top:14px;padding:14px 16px;background:#fff8df;border-radius:10px;border:1px solid #f0d36d;display:none;line-height:1.55}.hint-box.show{display:block}.small{color:#727a88;font-size:12px;margin-top:9px}.examples{margin-top:14px;padding:13px 15px;background:#f8f9fd;border-radius:10px;font-size:13px;line-height:1.55}.examples strong{color:#404857}.modal{position:fixed;inset:0;background:rgba(20,25,35,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}body.modal-open{overflow:hidden!important}.modal-card{width:min(900px,100%);max-height:85vh;overflow:auto;background:white;border-radius:18px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:15px}.modal-head h3{margin:0}.close{border:0;background:#edf0f5;border-radius:9px;width:36px;height:36px;cursor:pointer;font-size:18px}.theory-block{margin-top:18px;line-height:1.6}.theory-block h4{margin-bottom:6px}.lesson-intro{padding:10px 10px 4px;color:#aeb6c5;font-size:11px;line-height:1.45}
 .test-data{margin-top:0}.test-data-empty{padding:14px 16px;background:#f8f9fd;border-radius:10px;color:#697284;font-size:13px;line-height:1.55}.test-table{width:100%;border-collapse:collapse;font-size:13px}.test-table th{background:#f5f6f9;color:#525b6b;text-align:left;font-weight:bold;padding:10px;border-bottom:1px solid #e0e4ec}.test-table td{padding:10px;border-bottom:1px solid #e7eaf0;vertical-align:top}.test-table tr:last-child td{border-bottom:0}.test-number{width:52px;color:#707887}.test-code{display:block;background:#f5f6f9;border-radius:7px;padding:8px 10px;font-family:Consolas,monospace;white-space:pre-wrap;color:#222936}.test-use{border:0;background:#eef1f8;color:#3b4352;border-radius:7px;padding:7px 9px;cursor:pointer;font-size:12px;font-weight:bold;margin-top:7px}.test-use:hover{background:#e2e6f1}.interactive-run{background:#2eaa72;color:white}.interactive-run:hover{background:#238c5c}.io-block{margin-top:18px;padding:16px;background:#f8f9fd;border:1px solid #e1e5ee;border-radius:12px}.io-title{font-weight:bold;font-size:15px}.io-subtitle{font-size:12px;color:#707887;margin-top:4px;line-height:1.45}.stdin-input[hidden]{display:none!important}.stdin-input{display:block;width:100%;min-height:110px;resize:vertical;margin-top:12px;border:1px solid #cfd5e1;border-radius:9px;padding:11px 12px;font-family:Consolas,monospace;font-size:14px;line-height:1.5;background:white;color:#20242c;outline:none}.stdin-input:focus{border-color:#596fe4;box-shadow:0 0 0 3px rgba(89,111,228,.1)}.terminal-input-row{display:flex;gap:8px;padding:0 12px 12px;background:#151a25}.terminal-input-row[hidden]{display:none!important}.terminal-input-row input{flex:1;min-width:0;padding:10px 12px;border:1px solid #596579;border-radius:7px;background:#0f1420;color:#f7f9ff;font:14px Consolas,monospace;outline:none}.terminal-input-row input:focus{border-color:#8798ff;box-shadow:0 0 0 2px rgba(135,152,255,.2)}.terminal-input-row button{border:0;border-radius:7px;padding:9px 12px;background:#5268df;color:#fff;font-weight:700;cursor:pointer}.terminal-input-row button:disabled{opacity:.5;cursor:wait}.terminal-input-row #terminalContinueButton{background:#2eaa72}.terminal-prompt{color:#f4d58d}.terminal-echo{color:#f7f9ff}.terminal-line{white-space:pre-wrap}.CodeMirror-linebackground.cm-runtime-line{background:rgba(76,175,125,.18)}.CodeMirror-linebackground.cm-error-line{background:rgba(235,82,82,.18)}.CodeMirror-gutter-elt.cm-runtime-gutter{background:#dff7e9;color:#17633b!important;font-weight:bold}.CodeMirror-gutter-elt.cm-error-gutter{background:#ffe1e1;color:#a12626!important;font-weight:bold}.terminal-status-line{padding:0 12px 10px;background:#151a25;color:#aebbd2;font:12px Arial,sans-serif}.terminal-status-line[hidden]{display:none!important}.stop-run{background:#b93838;color:#fff;position:static;z-index:auto;display:inline-flex;align-items:center;justify-content:center;padding:6px 11px!important;box-shadow:none;border:0!important;border-radius:7px;font-size:12px!important;line-height:1.2;white-space:nowrap}.stop-run[hidden]{display:none!important}.io-note{margin-top:8px;color:#707887;font-size:11px;line-height:1.45}.console{margin-top:12px;border-radius:10px;overflow:hidden;background:#151a25;color:#e9edf5;display:none}.console.show{display:block}.console-head{padding:9px 12px;background:#202738;font-size:12px;font-weight:bold;color:#bfc7d7}.console-output{padding:14px;min-height:70px;white-space:pre-wrap;font-family:Consolas,monospace;font-size:13px;line-height:1.55}.console-output.empty{color:#7f899c}.console-output.error{color:#ffb8b8}.result-label{display:flex;align-items:center;gap:14px;font-size:13px;font-weight:bold;color:#525b6b;margin-top:14px}.stop-run{position:static;z-index:auto;display:inline-flex;align-items:center;justify-content:center;padding:6px 11px!important;box-shadow:none;border:0!important;border-radius:7px;font-size:12px!important;line-height:1.2;white-space:nowrap}.stop-run[hidden]{display:none!important}@media(max-width:900px){.app{display:block}.sidebar{width:100%;height:auto;position:relative}.main{padding:16px}h2{font-size:24px}}
 
 .task-bottom-panel{margin-top:18px;padding:18px 20px;background:linear-gradient(135deg,#f8f9ff 0%,#f5f7fc 100%);border:1px solid #e3e7f0;border-radius:16px}.attempt-panel{padding-bottom:17px}.attempt-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.attempt-value{margin-left:10px}.attempt-title{font-size:13px;font-weight:800;color:#343b49}.attempt-value{font-size:12px;font-weight:700;color:#6b7484;white-space:nowrap}.attempt-bar{height:7px;margin-top:10px;background:#e7eaf1;border-radius:999px;overflow:hidden}.attempt-fill{height:100%;width:0;background:linear-gradient(90deg,#596fe4,#4d65d9);border-radius:999px;transition:width .25s ease}.rating-card{margin-top:0;padding:17px 0 0;border:0;border-top:1px solid #e2e6ef;border-radius:0;background:transparent}.rating-head{display:flex;align-items:flex-start;gap:12px}.rating-icon{width:38px;height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;border-radius:11px;background:#fff1c7;color:#d79a13;font-size:18px;box-shadow:inset 0 0 0 1px #f2dfab}.rating-title{font-weight:800;font-size:15px;color:#303746;line-height:1.25}.rating-subtitle{font-size:12px;color:#707887;margin-top:4px;line-height:1.45}.rating-stars{display:flex;gap:7px;margin-top:13px}.rating-star{width:42px;height:38px;border:1px solid #d9deea;background:white;border-radius:9px;padding:0;cursor:pointer;font-size:20px;line-height:1;color:#c6ccd7;transition:transform .15s ease,background .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease}.rating-star:hover:not(:disabled){color:#e3a51a;border-color:#efcf76;background:#fffaf0;transform:translateY(-2px);box-shadow:0 5px 12px rgba(45,54,75,.08)}.rating-star.selected{color:#e3a51a;border-color:#edcf7d;background:#fff8e6}.rating-star:disabled{cursor:not-allowed;opacity:.55;background:#f1f3f7}.rating-label{margin-top:9px;font-size:12px;color:#656d7c;min-height:17px}.hardest-details{margin-top:10px;color:#d9deea;font-size:11px}.hardest-details summary{cursor:pointer;color:#fff;font-weight:bold}.hardest-list-item{margin:8px 0;color:#d9deea;line-height:1.4}.hardest-list-empty{margin-top:8px;color:#aeb6c5}.hardest-details[open]{background:#252b39;padding:8px;border-radius:8px}.hardest-details summary::marker{color:#aeb6c5}.result-card .hardest-details{color:#d9deea}
@@ -1446,6 +1446,111 @@ const lesson2TheoryHtml = "<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n<meta ch
 // Занятие 8. Единственный источник карточек и проверок — утверждённый технический реестр.
 const lesson8Tasks=[
   {
+    "id": 10,
+    "title": "Проект. Этап 1 — режимы и базовая игра",
+    "level": "project",
+    "stars": "⭐",
+    "short": "Выбери сложность и собери основную игру «Угадай число». ",
+    "problem": "Начни общий проект «Угадай число». Перед раундом игрок вводит режим: «лёгкий», «средний» или «тяжёлый» (можно также принять Easy, Medium, Hard).\n\nПараметры режима:\n• лёгкий: числа от 1 до 50;\n• средний: числа от 1 до 100;\n• тяжёлый: числа от 1 до 500.\n\nКомпьютер загадывает число через random.randint(). Игрок вводит предположения, а программа отвечает «Моё число больше!», «Моё число меньше!» или «Угадал!». После победы раунд завершается. Сделай так, чтобы код был понятен и его можно было продолжить на следующих этапах.",
+    "criteria": "• Режим выбирается до начала раунда.\n• Диапазон зависит от режима.\n• Используется random.randint() с правильными границами.\n• Ввод повторяется до правильного ответа.\n• Для каждого неверного предположения выводится правильная подсказка.",
+    "examples": "Для среднего режима при загаданном числе 73 ввод 80 → «Моё число меньше!», затем 73 → «Угадал!».",
+    "starter": "import random\n\n# Этап 1. Выбери режим и загадай число.\n# Затем повторяй ввод предположения до победы.\n",
+    "hint": "Сначала прочитай режим и выбери low и high. Затем secret = random.randint(low, high). В цикле сравни guess с secret через if / elif / else.",
+    "theory": "Проект начинается с трёх идей: выбор параметров, случайное число и цикл до победы. Сохраняй low и high отдельно, чтобы следующие этапы могли использовать их.",
+    "checker": "project_stage1",
+    "tests": [],
+    "projectStage": "base",
+    "unlockAfterKeys": []
+  },
+  {
+    "id": 11,
+    "title": "Проект. Этап 2 — кошелёк и удвоение ставки",
+    "level": "project",
+    "stars": "⭐⭐",
+    "short": "Добавь баланс монет, стоимость попытки и ставку раунда.",
+    "problem": "Продолжи код этапа 1. Добавь кошелёк игрока со стартовым балансом 100 монет. Перед раундом игрок вводит ставку и отвечает, удваивать ли её («да»/«нет»).\n\nПравила этого этапа:\n• перед раундом из баланса вычитается ставка, умноженная на 2 при удвоении;\n• каждая попытка числа стоит 1 монету;\n• при победе игрок получает обратно удвоенную ставку при выборе «да» или обычную ставку при выборе «нет»;\n• после раунда выведи текущий баланс.\n\nСохрани баланс в переменной так, чтобы его можно было переносить между раундами на следующем этапе.",
+    "criteria": "• Есть переменная баланса со стартом 100.\n• Ставка и выбор удвоения считываются до игры.\n• Стоимость ставки и попыток списывается.\n• Победа возвращает ставку с правильным множителем.\n• Текущий баланс выводится после раунда.",
+    "examples": "При балансе 100, ставке 10, без удвоения и двух попытках до победы: 100 − 10 − 2 + 20 = 108 монет. При удвоении и победе с первой попытки: 100 − 20 − 1 + 40 = 119 монет.",
+    "starter": "# Продолжи код этапа 1.\n# Добавь balance = 100, ставку, списание монет и награду за победу.\n",
+    "hint": "Сделай multiplier = 2, если игрок выбрал «да», иначе 1. Сначала вычти stake * multiplier, затем при каждой попытке вычитай 1, а при победе прибавь stake * multiplier * 2.",
+    "theory": "Баланс — состояние всей игры, а ставка — состояние одного раунда. Не создавай баланс заново внутри цикла раунда.",
+    "checker": "project_stage2",
+    "tests": [],
+    "projectStage": "economy",
+    "unlockAfterKeys": [
+      "8-10"
+    ],
+    "starterSourceKeys": [
+      "8-10"
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Проект. Этап 3 — время и заморозка",
+    "level": "project",
+    "stars": "⭐⭐⭐",
+    "short": "Добавь ограничение времени и способность заморозить его.",
+    "problem": "Продолжи игру с балансом. На весь раунд установи лимит 45 секунд. Для обычного Python можно использовать time.time() и отдельную логику контроля времени. Для учебной версии разрешён пошаговый вариант: после каждой попытки отнимай 5 секунд из time_left.\n\nДобавь команду «заморозка» в меню подсказок. Она стоит 20 монет и один раз за раунд добавляет 15 секунд к time_left (или временно останавливает реальный таймер). Если время закончилось до победы, раунд завершается поражением и ставка не возвращается.",
+    "criteria": "• Ограничение времени действует на весь раунд.\n• В коде есть понятное состояние оставшегося времени или измерение time.time().\n• Заморозка доступна не более одного раза и стоит 20 монет.\n• После окончания времени раунд завершается.\n• Победа и поражение обновляют баланс по правилам этапа 2.",
+    "examples": "В пошаговом варианте 45 секунд дают 9 ходов. После покупки заморозки остаётся на 3 хода больше, но баланс уменьшается ещё на 20 монет.",
+    "starter": "# Продолжи код этапа 2.\n# Добавь time_left = 45 и одноразовую заморозку за 20 монет.\n",
+    "hint": "Для простой версии заведи time_left и уменьши его после попытки. Флаг freeze_used не даёт купить заморозку второй раз.",
+    "theory": "Параллельный таймер и input() сложны для начинающих, поэтому пошаговое время — честная учебная альтернатива. Главное — отделить состояние времени от состояния ставки.",
+    "checker": "project_stage3",
+    "tests": [],
+    "projectStage": "time",
+    "unlockAfterKeys": [
+      "8-11"
+    ],
+    "starterSourceKeys": [
+      "8-11"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Проект. Этап 4 — умные подсказки",
+    "level": "project",
+    "stars": "⭐⭐⭐",
+    "short": "Добавь меню динамических и математических подсказок.",
+    "problem": "Продолжи игру. Перед очередной попыткой игрок может выбрать подсказку.\n\nДинамическая подсказка сравнивает расстояние abs(secret − guess):\n• меньше 5 — «Горячо»;\n• от 5 до 25 — «Тепло»;\n• больше 25 — «Холодно».\n\nДобавь платные математические подсказки: чётность числа, делимость на 3/5/10 и проверку, является ли число простым. Каждая покупка списывает монеты и не должна раскрывать само число.",
+    "criteria": "• Есть меню выбора подсказки.\n• Используется abs() для оценки расстояния.\n• Покупки списывают монеты.\n• Проверки используют %, а проверка простоты работает для диапазона режима.\n• Подсказки не ломают основной цикл игры.",
+    "examples": "Если secret = 40 и guess = 50, расстояние 10: динамическая подсказка — «Тепло». Для secret = 40 проверка чётности сообщает «чётное».",
+    "starter": "# Продолжи код этапа 3.\n# Добавь меню подсказок и функции для математических свойств.\n",
+    "hint": "Вынеси подсказки в функции. Сначала выведи меню, затем обработай выбор. Для простоты используй отдельную функцию is_prime(n).",
+    "theory": "Функции помогают не смешивать экономику, ввод и вычисления. abs() даёт расстояние, % — остаток и проверку делимости.",
+    "checker": "project_stage4",
+    "tests": [],
+    "projectStage": "hints",
+    "unlockAfterKeys": [
+      "8-12"
+    ],
+    "starterSourceKeys": [
+      "8-12"
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Проект. Этап 5 — блеф компьютера",
+    "level": "project",
+    "stars": "⭐⭐⭐⭐",
+    "short": "Добавь ложную подсказку только на тяжёлом режиме и заверши проект.",
+    "problem": "Заверши проект. Только в тяжёлом режиме компьютер один раз за игру может специально заменить динамическую подсказку на противоположную. Например, вместо «Моё число меньше!» сказать «Моё число больше!».\n\nСоздай скрытый флаг has_lied = False и включай ложь не более одного раза. Игрок должен иметь возможность проверить свойства числа математической подсказкой и заметить несоответствие. В лёгком и среднем режиме блефа быть не должно.",
+    "criteria": "• Блеф включается только в тяжёлом режиме.\n• За игру ложная динамическая подсказка появляется не более одного раза.\n• После блефа обычные подсказки возвращаются.\n• Математическая подсказка проверяет истинное свойство числа.\n• Лёгкий и средний режимы работают без блефа.\n• Баланс, время, заморозка и подсказки из предыдущих этапов сохранены.",
+    "examples": "В тяжёлом режиме компьютер может один раз дать неверное «больше/меньше», но проверка чётности или делимости показывает правду. В среднем режиме все динамические подсказки честные.",
+    "starter": "# Продолжи код этапа 4.\n# Добавь has_lied = False и одноразовый блеф только для тяжёлого режима.\n",
+    "hint": "Проверяй режим до изменения текста подсказки. После использования блефа сразу установи has_lied = True.",
+    "theory": "Блеф — это отдельное состояние игры. Не меняй secret: изменяй только текст одной подсказки и сохраняй флаг, чтобы не повторить обман.",
+    "checker": "project_stage5",
+    "tests": [],
+    "projectStage": "final",
+    "unlockAfterKeys": [
+      "8-13"
+    ],
+    "starterSourceKeys": [
+      "8-13"
+    ]
+  },
+  {
     "id": 1,
     "title": "Задача 1. Сумма чисел",
     "level": "base",
@@ -1480,6 +1585,9 @@ const lesson8Tasks=[
         ],
         "expected": "5"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1518,6 +1626,9 @@ const lesson8Tasks=[
         ],
         "expected": ""
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1554,6 +1665,9 @@ const lesson8Tasks=[
         ],
         "expected": "2"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1592,6 +1706,9 @@ const lesson8Tasks=[
         ],
         "expected": "1"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1627,6 +1744,9 @@ const lesson8Tasks=[
         ],
         "expected": "27"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1659,6 +1779,9 @@ const lesson8Tasks=[
         ],
         "expected": "2"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1697,6 +1820,9 @@ const lesson8Tasks=[
         ],
         "expected": "Ошибка"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1751,6 +1877,9 @@ const lesson8Tasks=[
         ],
         "expected": "Периметр многоугольника равен 10.0"
       }
+    ],
+    "unlockAfterKeys": [
+      "8-14"
     ]
   },
   {
@@ -1765,7 +1894,10 @@ const lesson8Tasks=[
     "hint": "Храни предыдущий результат и длину текущей серии. После каждого броска добавляй букву в строку; остановись, когда длина серии станет 3.",
     "theory": "Случайный результат можно получить через random.choice(['О', 'Р']) или другой честный способ. Для серии нужны предыдущий результат и счётчик одинаковых бросков.",
     "checker": "coin_flip",
-    "tests": []
+    "tests": [],
+    "unlockAfterKeys": [
+      "8-14"
+    ]
   }
 ];
 const COURSE_CONFIG={maxLessonNumber:null,lessons:[
@@ -1803,12 +1935,12 @@ const COURSE_CONFIG={maxLessonNumber:null,lessons:[
 ,
 {id:6,title:'Занятие 6',status:'published',subtitle:'Цикл while',tasks:lesson6Tasks,theory:[["1. Как работает while","Цикл while повторяет команды, пока условие истинно (True). Перед каждым повторением Python проверяет условие. Если оно ложно (False), тело цикла не запускается или цикл завершается.<pre><code>while условие:\n    команды</code></pre><strong>Запомни.</strong> Двоеточие : начинает тело цикла, а отступ показывает, какие команды относятся к циклу."],["2. Условие проверяется до выполнения тела","<pre><code>i = 5\nwhile i &lt; 5:\n    print(i)\n    i += 1</code></pre>Что выведет программа? Ничего: уже при первой проверке условие 5 &lt; 5 ложно. Поэтому цикл выполнится 0 раз. Сравни с условием i &lt;= 5: в таком случае цикл выполнится один раз и выведет 5."],["3. Как не получить бесконечный цикл","<pre><code>i = 0\nwhile i &lt; 3:\n    print(i)\n    i += 1</code></pre>Переменная i меняется на каждом повторении. После вывода 0, 1 и 2 она станет равна 3, условие i &lt; 3 станет ложным, и цикл завершится.<p><strong>Опасная ошибка.</strong> Если забыть изменить переменную, от которой зависит условие, цикл может не завершиться.</p><pre><code>i = 0\nwhile i &lt; 3:\n    print(i)  # i не меняется — цикл бесконечный</code></pre>"],["4. for или while?","Если заранее известно точное количество повторений, часто удобнее for. Если нужно повторять действия до события или до появления стоп-значения, удобен while.<pre><code>for i in range(3):\n    print(i)</code></pre><pre><code>num = int(input())\nwhile num != -1:\n    print('Получено:', num)\n    num = int(input())</code></pre>Во втором примере число -1 — стоп-значение. Оно завершает цикл и не обрабатывается телом цикла."]]},
 {id:7,title:'Занятие 7',status:'published',subtitle:'Цикл while: обработка цифр и условия',tasks:homeworkTasks,theory:[["1. Как получить последнюю цифру","Оператор % (остаток от деления) помогает получить последнюю цифру целого неотрицательного числа: <code>n % 10</code>.<pre><code>n = 583\nprint(n % 10)  # 3</code></pre>Почему? При делении 583 на 10 остаток равен 3."],["2. Как убрать последнюю цифру","Оператор // выполняет целочисленное деление. Если разделить неотрицательное целое число на 10 с помощью <code>//</code>, последняя цифра исчезнет.<pre><code>n = 583\nn = n // 10\nprint(n)  # 58</code></pre><strong>Главная пара.</strong> <code>n % 10</code> — взять последнюю цифру. <code>n // 10</code> — убрать последнюю цифру."],["3. Как пройти по всем цифрам числа","Каждый проход цикла обрабатывает последнюю цифру. Затем число уменьшается в 10 раз (целочисленно), чтобы следующей стала предыдущая цифра.<pre><code>n = int(input())\nwhile n &gt; 0:\n    digit = n % 10\n    print(digit)\n    n //= 10</code></pre>Если ввести 583, программа выведет цифры в обратном порядке: 3, затем 8, затем 5. Это нормально: мы начинаем с последней цифры. <strong>Важно:</strong> в каждой итерации нужно убрать последнюю цифру. Иначе значение n не изменится и цикл может стать бесконечным."],["4. Как применить if к каждой цифре","Внутри цикла можно проверить каждую извлечённую цифру. Например, посчитать, сколько цифр чётные.<pre><code>n = int(input())\ncount = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit % 2 == 0:\n        count += 1\n    n //= 10\nprint(count)</code></pre>Здесь два разных действия с %: <code>n % 10</code> получает последнюю цифру числа, а <code>digit % 2</code> проверяет, делится ли эта цифра на 2 без остатка."],["5. Сумма, количество, максимум и произведение","<table><thead><tr><th>Что ищем</th><th>Начальное значение</th><th>Действие внутри цикла</th></tr></thead><tbody><tr><td>Количество цифр с нужным свойством</td><td><code>count = 0</code></td><td>Если условие выполнено: <code>count += 1</code></td></tr><tr><td>Сумму выбранных цифр</td><td><code>total = 0</code></td><td>Если условие выполнено: <code>total += digit</code></td></tr><tr><td>Максимальную цифру</td><td><code>max_digit = 0</code></td><td>Если <code>digit &gt; max_digit</code>: сохранить digit</td></tr><tr><td>Произведение выбранных ненулевых цифр</td><td><code>product = 1</code></td><td>Если цифра подходит: <code>product *= digit</code></td></tr></tbody></table><p>Почему для суммы берём 0, а для произведения — 1? Ноль не меняет сумму, а единица не меняет произведение. Если начать произведение с нуля, оно останется нулём при любом умножении.</p>"],["6. Пример","<pre><code>n = int(input())\nmax_digit = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit &gt; max_digit:\n        max_digit = digit\n    n //= 10\nprint(max_digit)</code></pre>Пример: для числа 48271 цифры рассматриваются так: 1, 7, 2, 8, 4. Переменная <code>max_digit</code> хранит наибольшую цифру, найденную к текущему моменту. Ответ — 8."]],tasks:homeworkTasks}
-,{id:8,title:'Занятие 8',status:'published',subtitle:'Цикл while: последовательности, алгоритмы и случайность',tasks:lesson8Tasks,theory:[
-['Стоп-значение','Последовательность читается в цикле до специального значения. Сначала проверь, не является ли ввод признаком окончания, и только потом обрабатывай его.'],
-['Счётчики и суммы','Счётчик начинают с 0 и увеличивают только для обычных элементов. Стоп-значение не входит в сумму или количество.'],
-['Поиск делителей','Для НОД и разложения на множители используй остаток от деления %. После успешного деления внимательно решай, нужно ли увеличить делитель.'],
-['Расстояние между точками','Расстояние между точками вычисляется по теореме Пифагора. Периметр замыкается последним отрезком от последней вершины к первой.'],
-['Случайность и серия','При моделировании монетки сохраняй предыдущий результат и длину серии. Условие завершения проверяй после каждого броска.']
+,{id:8,title:'Занятие 8',status:'published',subtitle:'Проект «Угадай число» и задачи после проекта',tasks:lesson8Tasks,theory:[
+['Как устроен проект','Сначала собери основную игру, затем добавляй улучшения по одному. После каждого принятого этапа код автоматически переносится в следующий редактор.'],
+['Режимы сложности','Лёгкий режим использует диапазон 1–50, средний — 1–100, тяжёлый — 1–500. Параметры режима удобно хранить в переменных low и high.'],
+['Состояние игры','Баланс, ставка, время, использованная заморозка и флаг блефа — это состояние. Разделяй состояние всего проекта и локальные данные одного раунда.'],
+['Подсказки и функции','Функции помогают отдельно описать динамическую подсказку, математическую проверку и покупку способности. abs() даёт расстояние, % — остаток.'],
+['Проверка этапов','После каждого этапа система запускает контрольные сценарии. Следующий этап открывается только после успешной проверки и подтверждённого сохранения результата.']
 ]}
 ]};
 const lessons=COURSE_CONFIG.lessons;
@@ -1823,7 +1955,7 @@ if(!saved.__collapsedLessonsInitialized){
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
 const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||Object.fromEntries(lessons.map(lesson=>[lesson.id,false])),codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},hintDiagnostics:saved.hintDiagnostics||{},solved:saved.solved||{},confirmedSolved:saved.confirmedSolved||{},manualReviewStatus:saved.manualReviewStatus||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},taskSubmissionIds:saved.taskSubmissionIds||{},verificationResults:saved.verificationResults||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
-const LESSON8_CONTENT_VERSION='document-tasks-v1';
+const LESSON8_CONTENT_VERSION='project-game-v1';
 if(saved.lesson8ContentVersion!==LESSON8_CONTENT_VERSION){
   const legacyLesson8State={};
   ['codes','attempts','failedCodes','hints','hintDiagnostics','solved','confirmedSolved','manualReviewStatus','ratings','inputs','manualRunPassed','unsentResults','taskSubmissionIds','verificationResults'].forEach(field=>{
@@ -2275,6 +2407,18 @@ function renderNav(){
     freeBtn.title='Открыть чистый редактор без условия и проверки задачи';
     freeBtn.onclick=()=>openFreeTerminal(l.id);
     body.appendChild(freeBtn);
+    if(l.id===8){
+      const projectTask=l.tasks.find(task=>task.projectStage==='base');
+      if(projectTask){
+        const projectBtn=document.createElement('button');
+        projectBtn.type='button';
+        projectBtn.className='lesson-theory-link project-nav-link';
+        projectBtn.textContent='🎮 Проект «Угадай число»';
+        projectBtn.title='Открыть поэтапный проект';
+        projectBtn.onclick=()=>selectTask(projectTask.key);
+        body.appendChild(projectBtn);
+      }
+    }
     if(l.id===1||l.id===5||l.id===6||l.id===7){
       const quizBtn=document.createElement('button');
       quizBtn.type='button';
@@ -3091,8 +3235,36 @@ function diagnoseFailure(task,result,code){
 function expectedPhoneOutput(minutes,sms){const base=15,em=minutes>50?(minutes-50)*.25:0,es=sms>50?(sms-50)*.15:0,fee=.44,sub=base+em+es+fee,tax=sub*.05,total=sub+tax;const lines=[`Базовая сумма: $${base.toFixed(2)}`];if(minutes>50)lines.push(`Дополнительные минуты: $${em.toFixed(2)}`);if(sms>50)lines.push(`Дополнительные SMS: $${es.toFixed(2)}`);lines.push(`Сбор emergency services: $${fee.toFixed(2)}`,`Налог: $${tax.toFixed(2)}`,`Итого: $${total.toFixed(2)}`);return lines.join('\n')}
 async function checkPhone(code){const cases=[['50','50'],['60','55'],['40','70']];let passedTests=0;for(const input of cases){const r=await runOneTest(code,input);if(!r.ok)return {type:'execution_error',category:PythonTaskChecker.errorCategory(r.error),passedTests,totalTests:cases.length,error:r.error};const expected=expectedPhoneOutput(Number(input[0]),Number(input[1]));if(normalizeOutput(r.output)!==normalizeOutput(expected))return {type:'wrong_answer',category:'wrong_output',passedTests,totalTests:cases.length,expected,actual:r.output};passedTests++;}return {type:'success',category:'all_tests_passed',passedTests,totalTests:cases.length}}
 function checkRouletteOutput(output){const lines=normalizeOutput(output).split('\n').map(x=>x.trim()).filter(Boolean);if(!lines.length)return false;const m=lines[0].match(/^Выпавший номер:\s*(0|00|[1-9]|[1-2][0-9]|3[0-6])$/);if(!m)return false;const v=m[1];if(v==='0'||v==='00')return lines.length===2&&lines[1]===`Выигравшая ставка: ${v}`;const n=Number(v);if(lines.length!==5)return false;const red=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);const color=red.has(n)?'красное':'черное';const parity=n%2===0?'четное':'нечетное';const range=n<=18?'от 1 до 18':'от 19 до 36';return lines[1]===`Выигравшая ставка: ${n}`&&lines[2]===`Выигравшая ставка: ${color}`&&lines[3]===`Выигравшая ставка: ${parity}`&&lines[4]===`Выигравшая ставка: ${range}`}
+function projectStageOutput(result){return String(result&&result.output||'').toLowerCase().replace(/ё/g,'е')}
+async function runProjectStageCases(code,cases,validator){
+  let passed=0;
+  for(let i=0;i<cases.length;i++){
+    const test=cases[i],result=await runOneTest(code,test.input,{randomRange:test.range,randomValues:[test.secret]});
+    if(!result||!result.ok)return {type:'execution_error',category:PythonTaskChecker.errorCategory(result&&result.error),passedTests:passed,totalTests:cases.length,failedTest:i+1,error:String(result&&result.error||'Программа завершилась с ошибкой.')};
+    if(!Array.isArray(result.randomCalls)||result.randomCalls.length!==1||result.randomCalls[0][0]!==test.range[0]||result.randomCalls[0][1]!==test.range[1]||!validator(result,test))return {type:'wrong_answer',category:'project_stage_contract',passedTests:passed,totalTests:cases.length,failedTest:i+1,expected:test.description,actual:result.output};
+    passed++;
+  }
+  return {type:'success',category:'all_tests_passed',passedTests:passed,totalTests:cases.length};
+}
+async function checkProjectStage1(code){return runProjectStageCases(code,[
+  {input:['легкий','20','37'],range:[1,50],secret:37,description:'Лёгкий режим: диапазон 1–50 и победа после подсказки «больше»'},
+  {input:['средний','80','73'],range:[1,100],secret:73,description:'Средний режим: диапазон 1–100 и подсказка «меньше»'},
+  {input:['тяжелый','400','420'],range:[1,500],secret:420,description:'Тяжёлый режим: диапазон 1–500'}
+],(result,test)=>{const out=projectStageOutput(result);return out.includes('угадал')&&((test.secret===37||test.secret===420)?out.includes('больше'):out.includes('меньше'));})}
+async function checkProjectStage2(code){
+  const source=String(code||'').toLowerCase();
+  if(!/balance|баланс/.test(source)||!/(stake|ставк)/.test(source)||!/(double|удво|множител)/.test(source))return {type:'wrong_answer',category:'project_economy_contract',passedTests:0,totalTests:2,expected:'Баланс, ставка и удвоение ставки должны быть в коде.',actual:'Не найдены обязательные переменные или логика.'};
+  return runProjectStageCases(code,[
+    {input:['средний','10','нет','30','42'],range:[1,100],secret:42,expectedBalance:'108',description:'Без удвоения баланс после двух попыток равен 108'},
+    {input:['средний','10','да','42'],range:[1,100],secret:42,expectedBalance:'119',description:'С удвоением и победой с первой попытки баланс равен 119'}
+  ],(result,test)=>{const out=projectStageOutput(result);return out.includes('баланс')&&out.includes(test.expectedBalance);});
+}
+function projectStaticContract(code,patterns,category){const source=String(code||'').toLowerCase();const missing=patterns.filter(pattern=>!pattern.test(source));return missing.length?{type:'wrong_answer',category,passedTests:0,totalTests:1,expected:'Выполни все требования текущего этапа.',actual:'Не найдены обязательные элементы: '+missing.map(pattern=>pattern.source).join(', ')}:{type:'success',category:'project_contract_passed',passedTests:1,totalTests:1}}
+async function checkProjectStage3(code){return projectStaticContract(code,[/time_left|time\.time|время/,/freeze|замороз/,/45/,/15/],'project_time_contract')}
+async function checkProjectStage4(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
+async function checkProjectStage5(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
 async function checkCoinFlip(code){return {type:'manual_review',category:'randomized_coin_sequence',passedTests:0,totalTests:2,reviewCriteria:'Проверь вручную: используется генератор случайных результатов, вывод строится одной строкой из О и Р, программа останавливается после трёх одинаковых результатов подряд и сообщает количество бросков.'}}
-async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip}})}
+async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,project_stage1:checkProjectStage1,project_stage2:checkProjectStage2,project_stage3:checkProjectStage3,project_stage4:checkProjectStage4,project_stage5:checkProjectStage5}})}
 function getStdinValues(){const raw=String(stdinInput.value||'').replace(/\r\n/g,'\n');if(raw==='')return [];const values=raw.split('\n');if(values.length&&values[values.length-1]==='')values.pop();return values}
 function showConsoleOutput(text,ok=true){consoleBox.classList.add('show');consoleOutput.className='console-output'+(ok?'':' error');consoleOutput.textContent=text||'(программа ничего не вывела)';consoleOutput.scrollTop=consoleOutput.scrollHeight}
 function appendTerminalLine(text,className=''){const value=String(text);terminalTranscript+=(terminalTranscript&&!terminalTranscript.endsWith('\n')?'\n':'')+value+'\n';consoleOutput.textContent=terminalTranscript;consoleOutput.classList.remove('empty','error');consoleOutput.scrollTop=consoleOutput.scrollHeight;}
