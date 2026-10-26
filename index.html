@@ -95,7 +95,7 @@ body.quiz-mode .quiz-view{display:block}
 
 
 .lesson-access-manager{margin-top:20px;padding:16px;border:1px solid #e0e5ef;border-radius:14px;background:#fbfcfe}.lesson-access-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.lesson-access-head h3{margin:0!important}.lesson-access-head p{font-size:12px;color:#737d8d;margin:5px 0 0}.lesson-access-head label{font-size:12px;font-weight:700;color:#596273}.lesson-access-head select{display:block;margin-top:5px;padding:9px;border:1px solid #d7ddea;border-radius:8px;background:#fff}.lesson-access-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}.lesson-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e4e8f0;border-radius:10px;padding:11px;background:#fff}.lesson-access-row strong{font-size:13px;color:#303746}.lesson-access-row small{display:block;color:#737d8d;font-size:11px;margin-top:3px}.lesson-access-toggle{border:0;border-radius:8px;padding:8px 10px;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap}.lesson-access-toggle.is-open{background:#e8f7ed;color:#187344}.lesson-access-toggle.is-closed{background:#edf0f5;color:#596273}.lesson-access-message{font-size:12px;color:#187344;margin-top:10px;min-height:15px}.lesson-locked-note{font-size:11px;color:#aeb6c5;padding:8px 9px}.lesson-head-locked{opacity:.7}@media(max-width:600px){.lesson-access-rows{grid-template-columns:1fr}.lesson-access-head{display:block}.lesson-access-head label{display:block;margin-top:12px}}
-.lesson2-theory-open{padding:12px!important;align-items:center;justify-content:center}.lesson2-theory-open .modal-card{width:min(1400px,100%)!important;max-width:none!important;height:calc(100vh - 24px);height:calc(100dvh - 24px);max-height:none!important;padding:14px 16px!important;overflow:hidden;display:flex;flex-direction:column}.lesson2-theory-open .modal-head{flex:0 0 auto;margin-bottom:10px}.lesson2-theory-open #modalBody{display:flex!important;flex:1 1 auto;min-width:0;min-height:0;width:100%!important;max-width:none!important;margin-top:0;overflow:hidden}.lesson2-theory-frame{display:block!important;flex:1 1 auto;width:100%!important;max-width:none!important;min-width:0!important;height:100%!important;min-height:0;border:0;border-radius:10px;background:#f5f7fb}@media(max-width:700px){.lesson2-theory-open{padding:0!important}.lesson2-theory-open .modal-card{width:100vw!important;height:100vh;height:100dvh;padding:8px 10px!important;border-radius:0}}.sync-line{font-size:13px;margin:6px 0;color:#4b5565}.sync-line.bad{color:#b45309}.sync-line button{margin-left:8px;padding:4px 10px;border:1px solid #b45309;border-radius:8px;background:#fff;color:#b45309;cursor:pointer}</style>
+.lesson2-theory-open{padding:12px!important;align-items:center;justify-content:center}.lesson2-theory-open .modal-card{width:min(1400px,100%)!important;max-width:none!important;height:calc(100vh - 24px);height:calc(100dvh - 24px);max-height:none!important;padding:14px 16px!important;overflow:hidden;display:flex;flex-direction:column}.lesson2-theory-open .modal-head{flex:0 0 auto;margin-bottom:10px}.lesson2-theory-open #modalBody{display:flex!important;flex:1 1 auto;min-width:0;min-height:0;width:100%!important;max-width:none!important;margin-top:0;overflow:hidden}.lesson2-theory-frame{display:block!important;flex:1 1 auto;width:100%!important;max-width:none!important;min-width:0!important;height:100%!important;min-height:0;border:0;border-radius:10px;background:#f5f7fb}@media(max-width:700px){.lesson2-theory-open{padding:0!important}.lesson2-theory-open .modal-card{width:100vw!important;height:100vh;height:100dvh;padding:8px 10px!important;border-radius:0}}.sync-line{font-size:13px;margin:6px 0;color:#4b5565}.sync-line.bad{color:#b45309}.sync-line button{margin-left:8px;padding:4px 10px;border:1px solid #b45309;border-radius:8px;background:#fff;color:#b45309;cursor:pointer}.teacher-report-view{position:fixed;inset:0;z-index:3000;background:#fff;color:#111;overflow:auto;padding:20px}.teacher-report-view[hidden]{display:none}.report-page{max-width:980px;margin:0 auto}.report-page h1{font-size:24px}.report-page h2{font-size:17px;margin:18px 0 6px}.report-page table{border-collapse:collapse;width:100%;font-size:13px}.report-page th,.report-page td{border:1px solid #bbb;padding:5px 8px;text-align:left}.report-sub,.report-filters,.report-limits{font-size:13px;color:#444;margin:6px 0}.report-limits{border-top:1px solid #bbb;margin-top:18px;padding-top:8px}.report-bar{max-width:980px;margin:0 auto 12px;display:flex;gap:8px}.report-bar button{padding:8px 14px;border:1px solid #888;border-radius:8px;background:#fff;cursor:pointer}@media print{body>*:not(#teacherReportView){display:none!important}.teacher-report-view{position:static!important;overflow:visible!important;padding:0!important}.no-print{display:none!important}.report-page tr{break-inside:avoid}.report-page thead{display:table-header-group}}</style>
 <style id="quiz-design-fix">
 /* ===== ВИКТОРИНА — ЕДИНЫЙ СТИЛЬ С САЙТОМ ===== */
 body{background:#f4f6fb;color:#20242c;font-family:Arial,sans-serif}
@@ -550,6 +550,8 @@ body.auth-required #mainApp { visibility:hidden !important; pointer-events:none 
           <button type="button" class="teacher-dashboard-action primary" id="teacherDashboardRefresh">↻ Обновить данные</button>
           <button type="button" class="teacher-dashboard-action" id="teacherExportCsv">⬇ Скачать CSV</button>
           <button type="button" class="teacher-dashboard-action" id="teacherStuckButton">⚠ Кто застрял</button>
+          <button type="button" class="teacher-dashboard-action" id="teacherGroupReport">📄 Отчёт по группе</button>
+          <button type="button" class="teacher-dashboard-action" id="teacherStudentReport">👤 Отчёт по ученику</button>
         </div>
       </div>
       <div id="teacherDashboardStatus" class="teacher-dashboard-status"></div>
@@ -2914,11 +2916,66 @@ function normalizeTeacherRow(row){
     result:String(row['Результат']||'').trim(),
     failed:Number(row['Неудачных проверок']||0),
     rating:Number(row['Сложность']||0),
+    accountId:String(row['ID аккаунта']||''),
+    checkedAt:String(row['Время проверки']||''),
+    errorCategory:String(row['Категория ошибки']||''),
     solution:String(row['Решение']||row['Код решения']||'')
   };
 }
 
-function teacherRowDate(row){const value=String(row.date||row.checkedAt||'');const time=Date.parse(value);return Number.isNaN(time)?null:time}
+// Время попытки: «Время проверки» (когда ученик реально проверил решение), иначе «Дата» записи. Время получения сервером не используется.
+function teacherRowDate(row){for(const v of [row.checkedAt,row.date]){const time=Date.parse(String(v||''));if(!Number.isNaN(time))return time}return null}
+/*T31-BEGIN*/
+function teacherRowKey(row){return (row.accountId||row.name)+'::'+row.lesson+'::'+row.taskId}
+// Последняя попытка выбирается по времени, а не по порядку строк. При равном времени — по порядку строки в таблице.
+function teacherLatestAttempts(rows){
+  const groups=new Map();
+  rows.forEach((row,idx)=>{const k=teacherRowKey(row);if(!groups.has(k))groups.set(k,[]);groups.get(k).push({row,idx,time:teacherRowDate(row)});});
+  const out=[];
+  groups.forEach(list=>{
+    const dated=list.filter(x=>x.time!==null).sort((a,b)=>a.time-b.time||a.idx-b.idx);
+    const base={attempts:list.length,orderUncertain:false,orderUnknown:false};
+    if(dated.length)out.push(Object.assign({},dated[dated.length-1].row,base,{orderUncertain:dated.length<list.length}));
+    else if(list.length===1)out.push(Object.assign({},list[0].row,base));
+    else out.push(Object.assign({},list[0].row,base,{orderUnknown:true,result:''}));
+  });
+  return out;
+}
+// Метрики считаются по уникальным заданиям и не используют неизвестное число назначенных задач.
+function teacherMetrics(latest){
+  const m={tasksWithActivity:latest.length,confirmed:0,knownFailed:0,unknown:0,uncertain:0};
+  latest.forEach(r=>{const res=String(r.result).toLowerCase();if(r.orderUnknown||!res)m.unknown++;else if(res==='решена')m.confirmed++;else m.knownFailed++;if(r.orderUncertain)m.uncertain++;});
+  return m;
+}
+function teacherCsvCell(v){let s=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function teacherCsv(rows){
+  const head=['Имя','Дата','Занятие','№ задачи','Название задачи','Результат','Неудачных проверок','Сложность','Решение'];
+  return '\uFEFF'+[head.map(teacherCsvCell).join(';')].concat(rows.map(r=>[r.name,r.date,r.lesson,r.taskId,r.title,r.result,r.failed,r.rating,r.solution].map(teacherCsvCell).join(';'))).join('\r\n');
+}
+// Один и тот же набор фильтров для таблицы на экране и для выгрузки.
+function teacherExportRows(){return teacherDashboardLessonId!==null?applyTeacherFilters(teacherDashboardRows,teacherDashboardLessonId):teacherDashboardRows}
+function teacherPeriodText(f){return (f.from||f.to)?((f.from||'…')+' — '+(f.to||'…')):'весь период'}
+function teacherReportShell(title,sub,f,body){return '<div class="report-page"><h1>'+title+'</h1><div class="report-sub">'+escapeHtml(sub)+'</div><div class="report-filters">Фильтры: ученик — '+escapeHtml(f.student||'все')+'; статус — '+escapeHtml(f.statusText||'все')+'; период — '+escapeHtml(teacherPeriodText(f))+'</div>'+body+'<div class="report-limits"><strong>Ограничения данных.</strong> Отчёт строится по листу «Задачи»: туда попадают принятые решения. Отдельные неудачные попытки на сервере не хранятся, есть только число неудач в принятой записи. История назначения заданий не ведётся, поэтому процент выполнения не вычисляется. Время попытки берётся с часов устройства ученика. Категории ошибок и результаты проверки понимания пока не записываются.</div></div>'}
+function teacherReportHtml(kind,rows,f){
+  const latest=teacherLatestAttempts(rows),mt=teacherMetrics(latest),sub='Сформирован '+new Date().toLocaleString('ru-RU'),td=x=>'<td>'+x+'</td>',E=escapeHtml;
+  const flag=r=>r.orderUnknown?'порядок попыток установить нельзя':r.orderUncertain?'у части попыток нет достоверного времени':'неудачных проверок до принятия: '+r.failed;
+  const att=latest.filter(r=>Number(r.failed)>=5||r.orderUnknown||r.orderUncertain);
+  if(kind==='group'){
+    const bs=new Map(),bt=new Map();
+    latest.forEach(r=>{const a=r.accountId||r.name;if(!bs.has(a))bs.set(a,{name:r.name,rows:[]});bs.get(a).rows.push(r);const k=r.lesson+'::'+r.taskId;if(!bt.has(k))bt.set(k,{lesson:r.lesson,id:r.taskId,title:r.title,rows:[]});bt.get(k).rows.push(r);});
+    const sr=[...bs.values()].sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(s=>{const m=teacherMetrics(s.rows);return '<tr>'+td(E(s.name))+td(m.tasksWithActivity)+td(m.confirmed)+td(m.knownFailed)+td(m.unknown)+'</tr>'}).join('');
+    const tr=[...bt.values()].map(x=>{const m=teacherMetrics(x.rows),fl=x.rows.filter(r=>String(r.result).toLowerCase()==='решена').map(r=>Number(r.failed)||0);return '<tr>'+td(E(x.lesson))+td(E(x.id)+'. '+E(x.title))+td(m.confirmed+' из '+m.tasksWithActivity)+td(fl.length?(fl.reduce((a,b)=>a+b,0)/fl.length).toFixed(1).replace('.',','):'—')+'</tr>'}).join('');
+    return teacherReportShell('Отчёт по группе',sub,f,'<h2>Сводка</h2><p>Учеников с данными: <b>'+bs.size+'</b>. Заданий с зарегистрированной активностью: <b>'+mt.tasksWithActivity+'</b>. Подтверждено успешно: <b>'+mt.confirmed+'</b>. Другой результат: <b>'+mt.knownFailed+'</b>. Статус неизвестен: <b>'+mt.unknown+'</b>.</p>'+(latest.length?'<h2>Ученики</h2><table><thead><tr><th>Ученик</th><th>Заданий с активностью</th><th>Подтверждено</th><th>Другой результат</th><th>Неизвестно</th></tr></thead><tbody>'+sr+'</tbody></table><h2>Задания</h2><table><thead><tr><th>Занятие</th><th>Задание</th><th>Подтверждено из имеющих активность</th><th>Среднее число неудач до принятия</th></tr></thead><tbody>'+tr+'</tbody></table><h2>Задания, требующие внимания</h2>'+(att.length?'<ul>'+att.map(r=>'<li>'+E(r.name)+' — '+E(r.lesson)+', задача '+E(r.taskId)+': '+flag(r)+'</li>').join('')+'</ul>':'<p>По текущим правилам таких записей нет.</p>'):'<p><b>Нет данных по выбранным фильтрам.</b> Это не означает, что задания не выполнялись.</p>')+'<h2>Типичные ошибки</h2><p>Данных нет: категории ошибок не записываются.</p>');
+  }
+  const hist=rows.slice().sort((a,b)=>(teacherRowDate(a)||0)-(teacherRowDate(b)||0)).map(r=>'<tr>'+td(E(String(r.date||'нет времени')))+td(E(r.lesson))+td(E(r.taskId)+'. '+E(r.title))+td(E(r.result||'—'))+td(Number(r.failed)||0)+'</tr>').join('');
+  const cur=latest.map(r=>'<tr>'+td(E(r.lesson))+td(E(r.taskId)+'. '+E(r.title))+td(r.orderUnknown?'порядок попыток неизвестен':E(r.result||'—'))+td(r.attempts)+td(Number(r.failed)||0)+td(r.rating||'—')+'</tr>').join('');
+  return teacherReportShell('Индивидуальный отчёт: '+E(f.student||'ученик не выбран'),sub,f,'<h2>Сводка</h2><p>Заданий с зарегистрированной активностью: <b>'+mt.tasksWithActivity+'</b>. Подтверждено успешно: <b>'+mt.confirmed+'</b>. Другой результат: <b>'+mt.knownFailed+'</b>. Статус неизвестен: <b>'+mt.unknown+'</b>.</p>'+(rows.length?'<h2>Задания и их статус</h2><table><thead><tr><th>Занятие</th><th>Задание</th><th>Статус по последней записи</th><th>Записей</th><th>Неудач до принятия</th><th>Сложность</th></tr></thead><tbody>'+cur+'</tbody></table><h2>История записей</h2><table><thead><tr><th>Время</th><th>Занятие</th><th>Задание</th><th>Результат</th><th>Неудач</th></tr></thead><tbody>'+hist+'</tbody></table><h2>Затруднения, подтверждённые данными</h2>'+(att.length?'<ul>'+att.map(r=>'<li>'+E(r.lesson)+', задача '+E(r.taskId)+': '+flag(r)+'</li>').join('')+'</ul>':'<p>Не выявлены.</p>')+'<h2>Рекомендации преподавателю</h2>'+(att.length?'<ul>'+att.map(r=>'<li>Обсудить с учеником задачу '+E(r.taskId)+' ('+E(r.lesson)+'): '+flag(r)+'. По одной записи нельзя судить о понимании темы.</li>').join('')+'</ul>':'<p>По имеющимся данным затруднений не видно. Это не доказывает усвоение темы: понимание проверяется отдельно (объяснение, доработка кода).</p>'):'<p><b>Нет данных по выбранному ученику и периоду.</b></p>')+'<h2>Проверка понимания</h2><p>Данных нет: результаты пока не записываются.</p>');
+}
+function teacherCurrentFilters(){const st=teacherFilterStatus&&teacherFilterStatus.value||'';return {student:teacherFilterStudent&&teacherFilterStudent.value||'',status:st,statusText:st==='success'?'только подтверждённые':st==='attention'?'требуют внимания':'все',from:teacherFilterFrom&&teacherFilterFrom.value||'',to:teacherFilterTo&&teacherFilterTo.value||''}}
+function teacherStudentRows(name,f){const from=f.from?Date.parse(f.from):null,to=f.to?Date.parse(f.to+'T23:59:59'):null;return teacherDashboardRows.filter(r=>{if(r.name!==name)return false;const tm=teacherRowDate(r);return (from===null||(tm!==null&&tm>=from))&&(to===null||(tm!==null&&tm<=to))})}
+function showTeacherReport(html){let v=document.getElementById('teacherReportView');if(!v){v=document.createElement('div');v.id='teacherReportView';v.className='teacher-report-view';document.body.appendChild(v)}v.innerHTML='<div class="no-print report-bar"><button type="button" id="reportPrint">🖨 Печать</button><button type="button" id="reportClose">✕ Закрыть</button></div>'+html;v.hidden=false;document.getElementById('reportPrint').onclick=()=>window.print();document.getElementById('reportClose').onclick=()=>{v.hidden=true}}
+/*T31-END*/
+
 function setupTeacherFilters(rows){if(!teacherReportFilters)return;const names=[...new Set(rows.map(r=>r.name))].sort((a,b)=>a.localeCompare(b,'ru'));teacherFilterStudent.innerHTML='<option value="">Все ученики</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');teacherReportFilters.hidden=false}
 function applyTeacherFilters(rows,lessonId){const lessonName='Занятие '+lessonId;const student=teacherFilterStudent&&teacherFilterStudent.value||'',status=teacherFilterStatus&&teacherFilterStatus.value||'',from=teacherFilterFrom&&teacherFilterFrom.value?Date.parse(teacherFilterFrom.value):null,to=teacherFilterTo&&teacherFilterTo.value?Date.parse(teacherFilterTo.value+'T23:59:59'):null;return rows.filter(row=>{if(row.lesson&&row.lesson!==lessonName)return false;if(student&&row.name!==student)return false;const time=teacherRowDate(row);if(from!==null&&(!time||time<from))return false;if(to!==null&&(!time||time>to))return false;const success=String(row.result).toLowerCase()==='решена';const attention=Number(row.failed)>=5||/manual|review|провер/i.test(row.errorCategory);return status==='success'?success:status==='attention'?attention:true})}
 function renderTeacherJournal(){if(teacherDashboardLessonId!==null)buildTeacherDashboard(teacherDashboardRows,teacherDashboardLessonId)}
@@ -2929,21 +2986,17 @@ function buildTeacherOverview(rows){
     const tasks=teacherDashboardTaskList(id);
     const lessonName='Занятие '+id;
     const relevant=rows.filter(r=>r.lesson===lessonName);
-    const latest=new Map();
-    relevant.forEach(row=>latest.set(row.name+'::'+row.taskId,row));
-    const unique=[...latest.values()];
-    const students=[...new Set(unique.map(r=>r.name))];
-    const solved=unique.filter(r=>String(r.result).toLowerCase()==='решена').length;
-    const possible=students.length*tasks.length;
-    const percent=possible?Math.round(solved/possible*100):0;
+    const unique=teacherLatestAttempts(relevant);
+    const students=[...new Set(unique.map(r=>r.accountId||r.name))];
+    const mt=teacherMetrics(unique);
     return `<button type="button" class="teacher-lesson-card" data-lesson-id="${id}">
       <div>
         <div class="teacher-lesson-number">ЗАНЯТИЕ ${id}</div>
         <div class="teacher-lesson-title">${escapeHtml(info.subtitle||info.title.replace(/^Занятие\s*\d+\.?\s*/i,''))}</div>
-        <div class="teacher-lesson-subtitle">${tasks.length} задач · ${students.length} ${students.length===1?'ученик':'учеников'}</div>
+        <div class="teacher-lesson-subtitle">${tasks.length} задач в листе · учеников с данными: ${students.length}</div>
       </div>
       <div class="teacher-lesson-bottom">
-        <span class="teacher-lesson-progress">${solved} решённых · ${percent}%</span>
+        <span class="teacher-lesson-progress">${mt.confirmed} подтверждено · ${mt.tasksWithActivity} с активностью</span>
         <span class="teacher-lesson-arrow">→</span>
       </div>
     </button>`;
@@ -2969,12 +3022,7 @@ function buildTeacherDashboard(rows,lessonId=5){
   const lessonName='Занятие '+lessonId;
   const relevant=applyTeacherFilters(rows,lessonId).filter(r=>String(r.lesson||'').trim()===lessonName || !r.lesson);
 
-  const latest=new Map();
-  relevant.forEach(row=>{
-    const key=row.name+'::'+row.taskId;
-    latest.set(key,row);
-  });
-  const unique=[...latest.values()];
+  const unique=teacherLatestAttempts(relevant);
   const solvedRows=unique.filter(r=>String(r.result).toLowerCase()==='решена');
   const students=[...new Set(unique.map(r=>r.name))].sort((a,b)=>a.localeCompare(b,'ru'));
 
@@ -2986,57 +3034,50 @@ function buildTeacherDashboard(rows,lessonId=5){
       task,
       count:solvedBy.size,
       total:students.length,
-      percent:students.length?Math.round(solvedBy.size/students.length*100):0,
+      active:new Set(unique.filter(r=>r.taskId===String(task.id)).map(r=>r.accountId||r.name)).size,
       avgFailed:failed.length?failed.reduce((a,b)=>a+b,0)/failed.length:0,
       avgRating:ratings.length?ratings.reduce((a,b)=>a+b,0)/ratings.length:0
     };
   });
 
   const studentStats=students.map(name=>{
-    const solved=new Set(solvedRows.filter(r=>r.name===name).map(r=>r.taskId));
-    return {name,count:solved.size,total:lessonTasks.length,percent:lessonTasks.length?Math.round(solved.size/lessonTasks.length*100):0};
+    const m=teacherMetrics(unique.filter(r=>r.name===name));
+    return {name,count:m.confirmed,active:m.tasksWithActivity,other:m.knownFailed,unknown:m.unknown};
   }).sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'ru'));
 
   const attentionRows=unique.filter(r=>Number(r.failed)>=5||/manual|review|провер/i.test(r.errorCategory));
   const attentionHtml=attentionRows.length?attentionRows.slice().sort((a,b)=>Number(b.failed)-Number(a.failed)).map(r=>`<div class="teacher-attention-row"><strong>${escapeHtml(r.name)}</strong><span>${escapeHtml(r.lesson||'Занятие не указано')} · задача ${escapeHtml(r.taskId||'—')}</span><span>${escapeHtml(r.errorCategory||('Неудачных проверок: '+r.failed))}</span></div>`).join(''):'<div class="teacher-dashboard-empty">Нет записей, требующих отдельного внимания по текущим правилам.</div>';
   const hardest=taskStats.filter(x=>x.count>0).sort((a,b)=>b.avgFailed-a.avgFailed).slice(0,3);
   const totalSolved=studentStats.reduce((sum,s)=>sum+s.count,0);
-  const averageProgress=students.length&&lessonTasks.length?Math.round(totalSolved/(students.length*lessonTasks.length)*100):0;
+  const activeTotal=unique.length;
 
-  const taskRows=taskStats.map(x=>{
-    const cls=x.percent>=70?'good':x.percent>=40?'mid':'low';
-    return `<div class="teacher-task-row">
+  const taskRows=taskStats.map(x=>`<div class="teacher-task-row">
       <div class="teacher-task-number">№ ${x.task.id}</div>
       <div class="teacher-task-name">${escapeHtml(x.task.title.replace(/^Задача\s*\d+\.\s*/,'')||x.task.title)}</div>
-      <div class="teacher-task-count">${x.count} / ${x.total}</div>
-      <div class="teacher-task-track"><div class="teacher-task-fill ${cls}" style="width:${x.percent}%"></div></div>
-      <div class="teacher-task-percent">${x.percent}%</div>
-    </div>`;
-  }).join('');
+      <div class="teacher-task-count">подтверждено ${x.count} · с активностью ${x.active}</div>
+    </div>`).join('');
 
   const studentRows=studentStats.length?studentStats.map(s=>`<tr>
     <td><span class="teacher-student-name">${escapeHtml(s.name)}</span></td>
-    <td><span class="teacher-student-progress">${s.count} / ${s.total}</span></td>
-    <td><div class="teacher-progress-track"><div class="teacher-progress-fill" style="width:${s.percent}%"></div></div></td>
-    <td>${s.percent}%</td>
-  </tr>`).join(''):'<tr><td colspan="4">Пока нет решённых задач.</td></tr>';
+    <td>${s.active}</td><td>${s.count}</td><td>${s.other}</td><td>${s.unknown}</td>
+  </tr>`).join(''):'<tr><td colspan="5">Нет записей по выбранным фильтрам.</td></tr>';
 
   const hardestHtml=hardest.length?hardest.map(x=>`<div class="teacher-hardest-item">
     <div class="teacher-hardest-title">№ ${x.task.id}. ${escapeHtml(x.task.title.replace(/^Задача\s*\d+\.\s*/,'')||x.task.title)}</div>
-    <div class="teacher-hardest-meta">Решили: ${x.count} из ${x.total}. Среднее число неудачных проверок: ${x.avgFailed.toFixed(1).replace('.',',')}.</div>
+    <div class="teacher-hardest-meta">Подтверждено: ${x.count} из ${x.active} с активностью. Среднее число неудачных проверок: ${x.avgFailed.toFixed(1).replace('.',',')}.</div>
   </div>`).join(''):'<div class="teacher-dashboard-empty">Пока недостаточно данных, чтобы определить самые трудные задачи.</div>';
 
   teacherDashboardContent.innerHTML=`
     <div class="teacher-stat-grid">
-      <div class="teacher-stat-card"><div class="teacher-stat-label">Учеников</div><div class="teacher-stat-value">${students.length}</div><div class="teacher-stat-note">решали задачи занятия ${lessonId}</div></div>
-      <div class="teacher-stat-card"><div class="teacher-stat-label">Задач</div><div class="teacher-stat-value">${lessonTasks.length}</div><div class="teacher-stat-note">в маршрутном листе</div></div>
-      <div class="teacher-stat-card"><div class="teacher-stat-label">Решений</div><div class="teacher-stat-value">${totalSolved}</div><div class="teacher-stat-note">уникальных ученик × задача</div></div>
-      <div class="teacher-stat-card"><div class="teacher-stat-label">Средний прогресс</div><div class="teacher-stat-value">${averageProgress}%</div><div class="teacher-stat-note">по группе</div></div>
+      <div class="teacher-stat-card"><div class="teacher-stat-label">Учеников с данными</div><div class="teacher-stat-value">${students.length}</div><div class="teacher-stat-note">есть записи по занятию ${lessonId}</div></div>
+      <div class="teacher-stat-card"><div class="teacher-stat-label">Заданий в листе</div><div class="teacher-stat-value">${lessonTasks.length}</div><div class="teacher-stat-note">назначение ученикам не учитывается</div></div>
+      <div class="teacher-stat-card"><div class="teacher-stat-label">Подтверждено</div><div class="teacher-stat-value">${totalSolved}</div><div class="teacher-stat-note">уникальных ученик × задание</div></div>
+      <div class="teacher-stat-card"><div class="teacher-stat-label">С активностью</div><div class="teacher-stat-value">${activeTotal}</div><div class="teacher-stat-note">уникальных ученик × задание</div></div>
     </div>
 
     <section class="teacher-dashboard-card">
       <h3>Задачи</h3>
-      <div class="teacher-dashboard-card-subtitle">Сколько учеников уже решили каждую задачу.</div>
+      <div class="teacher-dashboard-card-subtitle">Сколько учеников подтвердили решение и сколько имеют записи по заданию.</div>
       <div class="teacher-task-grid">${taskRows}</div>
     </section>
 
@@ -3048,9 +3089,9 @@ function buildTeacherDashboard(rows,lessonId=5){
 
     <section class="teacher-dashboard-card">
       <h3>Прогресс учеников</h3>
-      <div class="teacher-dashboard-card-subtitle">Количество решённых задач из ${lessonTasks.length}.</div>
+      <div class="teacher-dashboard-card-subtitle">Считаются только задания с зарегистрированной активностью. Процент не показывается: список назначенных ученику заданий не ведётся.</div>
       <table class="teacher-student-table">
-        <thead><tr><th>Ученик</th><th>Решено</th><th>Прогресс</th><th>%</th></tr></thead>
+        <thead><tr><th>Ученик</th><th>С активностью</th><th>Подтверждено</th><th>Другой результат</th><th>Неизвестно</th></tr></thead>
         <tbody>${studentRows}</tbody>
       </table>
     </section>
@@ -3096,13 +3137,14 @@ teacherDashboardRefresh.onclick=async()=>{
 
 document.getElementById('teacherExportCsv').onclick=()=>{
   if(!teacherDashboardRows||!teacherDashboardRows.length){showTeacherDashboardStatus('Сначала загрузи данные: нажми «Обновить данные».');return}
-  const head=['Имя','Дата','Занятие','№ задачи','Название задачи','Результат','Неудачных проверок','Сложность','Решение'];
-  const cell=v=>{let s=String(v==null?'':v);if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'};
-  const lines=[head.map(cell).join(';')].concat(teacherDashboardRows.map(r=>[r.name,r.date,r.lesson,r.taskId,r.title,r.result,r.failed,r.rating,r.solution].map(cell).join(';')));
-  const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  const rows=teacherExportRows();
+  if(!rows.length){showTeacherDashboardStatus('По выбранным фильтрам записей нет, выгружать нечего.');return}
+  const blob=new Blob([teacherCsv(rows)],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress_'+(teacherDashboardLessonId!==null?'zanyatie'+teacherDashboardLessonId+'_':'all_')+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  showTeacherDashboardStatus('Выгружено записей: '+rows.length+' (с учётом выбранных фильтров).');
 };
-
+document.getElementById('teacherGroupReport').onclick=()=>{if(!teacherDashboardRows||!teacherDashboardRows.length){showTeacherDashboardStatus('Сначала загрузи данные: нажми «Обновить данные».');return}showTeacherReport(teacherReportHtml('group',teacherExportRows(),teacherCurrentFilters()))};
+document.getElementById('teacherStudentReport').onclick=()=>{const f=teacherCurrentFilters();if(!f.student){showTeacherDashboardStatus('Выбери ученика в фильтре, чтобы сформировать индивидуальный отчёт.');return}showTeacherReport(teacherReportHtml('student',teacherStudentRows(f.student,f),f))};
 document.getElementById('teacherStuckButton').onclick=async()=>{
   try{
     showTeacherDashboardStatus('Загружаем…');
