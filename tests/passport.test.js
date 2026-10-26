@@ -16,6 +16,13 @@ test('stores versions without duplicating unchanged code and computes diff', () 
   assert.equal(a.versionId, same.versionId); assert.equal(p.listVersions('a', '1-1').length, 2);
   assert.equal(JSON.stringify(p.diff(a.code, b.code)), JSON.stringify([{ line: 1, before: 'print(1)', after: 'print(2)' }]));
 });
+test('does not create a duplicate version when restoring the same code', () => {
+  const p = load();
+  p.saveVersion({ accountId: 'a', taskId: '1-1', code: 'print(1)', reason: 'checkpoint' });
+  p.saveVersion({ accountId: 'a', taskId: '1-1', code: 'print(2)', reason: 'checkpoint' });
+  p.saveVersion({ accountId: 'a', taskId: '1-1', code: 'print(1)', reason: 'before_restore' });
+  assert.equal(p.listVersions('a', '1-1').length, 2);
+});
 test('coalesces rapid code-change events and keeps event metadata only', () => {
   const p = load(); p.recordEvent({ accountId: 'a', taskId: '1-1', type: 'code_changed', metadata: { length: 1 } }); p.recordEvent({ accountId: 'a', taskId: '1-1', type: 'code_changed', metadata: { length: 2 } });
   assert.equal(p.listEvents('a', '1-1').length, 1); assert.deepEqual(p.listEvents('a', '1-1')[0].metadata, { length: 2 });

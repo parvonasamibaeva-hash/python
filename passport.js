@@ -16,7 +16,7 @@
   function saveVersion(opts) {
     const c = context(opts), data = read(c.accountId, c.taskId), code = String(opts.code || '');
     const previous = data.versions[0];
-    if (previous && previous.code === code) return previous;
+    if (data.versions.some(version => version.code === code)) return data.versions.find(version => version.code === code);
     const version = { versionId: id('ver'), accountId: c.accountId, taskId: c.taskId, attemptId: String(opts.attemptId || ''), savedAt: now(), code, reason: String(opts.reason || 'checkpoint'), parentVersionId: previous ? previous.versionId : '', verification: opts.verification || null, passportVersion: VERSION };
     data.versions.unshift(version); data.versions = data.versions.slice(0, MAX_VERSIONS); write(c.accountId, c.taskId, data); return version;
   }
