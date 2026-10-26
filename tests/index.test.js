@@ -58,4 +58,6 @@ test('solution passport is integrated without replacing the editor', () => {
   assert.match(html, /SolutionPassport\.saveVersion/);
   assert.doesNotMatch(html, /passportCheckpoint\(task,'before_restore'\)/);
   assert.match(html, /stdinInput\.hidden=false/);
+  assert.match(html, /presetValue=Array\.isArray\(selectedTestInputs\)/);
+  assert.match(html, /Тестовые данные подставлены/);
 });
