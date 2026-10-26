@@ -53,14 +53,14 @@ test('lesson access UI iterates real lesson IDs, not index + 1', () => {
   assert.match(f, /const id=Number\(lesson\.id\)/);
   assert.doesNotMatch(f, /i\+1/);
 });
-test('task IDs remain stable; lesson 8 deliberately places project base 8-9 first', () => {
+test('task IDs remain stable; lesson 8 contains the nine document tasks', () => {
   const starts=[...html.matchAll(/const\s+([A-Za-z0-9_]+Tasks)\s*=\s*\[/g)];
   let arrays=0;
   starts.forEach((m,i)=>{
     const end=i+1<starts.length?starts[i+1].index:html.indexOf('const COURSE_CONFIG',m.index);
     const chunk=html.slice(m.index,end);
     const ids=[...chunk.matchAll(/\bid\s*:\s*(\d+)\s*,\s*title\s*:|"id"\s*:\s*(\d+)\s*,\s*"title"\s*:/g)].map(x=>Number(x[1]||x[2]));
-    if(ids.length){arrays++;if(m[1]==='lesson8Tasks')assert.deepStrictEqual(ids,[9,1,2,3,4,5,6,7,8,10,11,12,13,14,15],m[1]+' order');else assert.deepStrictEqual([...ids].sort((a,b)=>a-b),Array.from({length:ids.length},(_,j)=>j+1),m[1]+' stable IDs');}
+    if(ids.length){arrays++;if(m[1]==='lesson8Tasks')assert.deepStrictEqual(ids,[1,2,3,4,5,6,7,8,9],m[1]+' order');else assert.deepStrictEqual([...ids].sort((a,b)=>a-b),Array.from({length:ids.length},(_,j)=>j+1),m[1]+' stable IDs');}
   });
   assert.ok(arrays>=8);
 });
@@ -199,25 +199,19 @@ test('server rejects a closed lesson and allows explicit group access', () => {
   assert.doesNotThrow(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},8));
   assert.throws(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},9),/не открыл/);
 });
-test('server requires the lesson-8 base game before the regular route', () => {
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,9));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':9,'Результат':'Решена'}];
+test('server opens task 8-1 immediately and then requires the previous document task', () => {
+  serverCtx.readTaskObjects_=()=>[];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2),/предыдущую задачу/);
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':1,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2));
+  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':8,'Результат':'Решена'}];
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,9));
 });
-test('legacy guess-number completion unlocks the first lesson-8 route and extension branches', () => {
+test('historical task 5-13 does not replace the new lesson-8 route', () => {
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}];
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,9),/уже подтверждена/); // no duplicate historical row
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,15)); // research branches from base
-  serverCtx.readTaskObjects_=()=>[
-    {'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'},
-    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'}
-  ];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2),/предыдущую задачу/);
 });
 
 const checkerCtx={console,Date,Set,Map,Number,String,Object,Array,JSON,Math};
