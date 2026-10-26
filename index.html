@@ -3247,9 +3247,9 @@ async function runProjectStageCases(code,cases,validator){
   return {type:'success',category:'all_tests_passed',passedTests:passed,totalTests:cases.length};
 }
 async function checkProjectStage1(code){return runProjectStageCases(code,[
-  {input:['легкий','20','37'],range:[1,50],secret:37,description:'Лёгкий режим: диапазон 1–50 и победа после подсказки «больше»'},
+  {input:['лёгкий','20','37'],range:[1,50],secret:37,description:'Лёгкий режим: диапазон 1–50 и победа после подсказки «больше»'},
   {input:['средний','80','73'],range:[1,100],secret:73,description:'Средний режим: диапазон 1–100 и подсказка «меньше»'},
-  {input:['тяжелый','400','420'],range:[1,500],secret:420,description:'Тяжёлый режим: диапазон 1–500'}
+  {input:['тяжёлый','400','420'],range:[1,500],secret:420,description:'Тяжёлый режим: диапазон 1–500'}
 ],(result,test)=>{const out=projectStageOutput(result);return out.includes('угадал')&&((test.secret===37||test.secret===420)?out.includes('больше'):out.includes('меньше'));})}
 async function checkProjectStage2(code){
   const source=String(code||'').toLowerCase();
