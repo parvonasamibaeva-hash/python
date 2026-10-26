@@ -30,3 +30,11 @@ test('lesson 8 has its own ten-question quiz with two bonus questions', () => {
   assert.match(index, /lessonId===8\?lesson8QuizQuestions/);
   assert.match(index, /activeQuizLesson===8\?`\$\{quizState\.score\} \/ \$\{quizMainTotal\(\)\} баллов/);
 });
+
+test('free terminal opens the editor and terminal cards', () => {
+  assert.match(index, /<section class="card" id="passportCard">/);
+  assert.match(index, /<section class="card" id="editorCard">/);
+  assert.match(index, /const passportCard=document\.getElementById\('passportCard'\),editorCard=document\.getElementById\('editorCard'\)/);
+  assert.match(index, /if\(editorCard\)editorCard\.hidden=false/);
+  assert.match(index, /if\(editorWrap\)editorWrap\.hidden=false/);
+});
