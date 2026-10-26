@@ -11,6 +11,7 @@
       const seen = new Set();
       data.versions = (Array.isArray(data.versions) ? data.versions : []).filter(version => { if (seen.has(version.code)) return false; seen.add(version.code); return true; });
       data.events = Array.isArray(data.events) ? data.events : [];
+      storage().setItem(key(accountId, taskId), JSON.stringify(data));
       return data;
     } catch (_) { return { versions: [], events: [] }; }
   }
