@@ -667,7 +667,7 @@ body.auth-required #mainApp { visibility:hidden !important; pointer-events:none 
     <div class="quiz-hero"><button class="quiz-back" id="quizBackButton">← Вернуться к задачам</button>
       <div class="quiz-kicker">ЗАНЯТИЕ 5 · ПОВТОРЕНИЕ</div>
       <h2>Повторение изученного</h2>
-      <p>10 вопросов по материалам предыдущих занятий. Сначала выбери ответ самостоятельно, затем сразу увидишь результат и объяснение.</p>
+      <p>Вопросы по материалам предыдущих занятий. Сначала выбери ответ самостоятельно, затем сразу увидишь результат и объяснение.</p>
     </div>
     <div class="quiz-name-card">
       <div>
@@ -2463,7 +2463,7 @@ function renderNav(){
         body.appendChild(projectBtn);
       }
     }
-    if(l.id===1||l.id===5||l.id===6||l.id===7){
+    if(l.id===1||l.id===5||l.id===6||l.id===7||l.id===8){
       const quizBtn=document.createElement('button');
       quizBtn.type='button';
       quizBtn.className='lesson-theory-link quiz-nav-link';
@@ -3552,6 +3552,20 @@ const lesson6QuizQuestions=[
 {q:"Что выведет программа, если status = False?",code:'status = False\nif status:\n    print("Включено")\n    if 5 > 3:\n        print("Да")',options:["Да","Включено и Да","Ничего не выведет","Ошибка, так как у внутреннего if нет своего else"],correct:2,why:"Условие if status ложно, поэтому весь вложенный блок пропускается. Наличие else не обязательно."},
 {q:"Какой текст напечатает интерпретатор?",code:'x = 15\nif x % 3 == 0:\n    if x % 5 == 0:\n        if x % 2 == 0:\n            print("Делится на 2, 3 и 5")\n        else:\n            print("Делится на 3 и 5, но не на 2")\n    else:\n        print("Делится только на 3")',options:["Делится на 2, 3 и 5","Делится на 3 и 5, но не на 2","Делится только на 3","Ничего не выведет"],correct:1,why:"15 делится на 3 и на 5, но не делится на 2 без остатка. Поэтому выполняется самый глубокий else и выводится «Делится на 3 и 5, но не на 2»."}
 ];
+const lesson8QuizQuestions=[
+{q:'Что возвращает input()?',code:'value = input()',options:['Всегда целое число (int)','Текст (str)','Логическое значение (True или False)'],correct:1,why:'input() возвращает текст. Для арифметики его преобразуют, например, через int(input()).'},
+{q:'Что напечатает программа?',code:'print("10" + "20")',options:['30','1020','Произойдёт ошибка'],correct:1,why:'Обе величины являются строками, поэтому + соединяет текст.'},
+{q:'Какие результаты дадут выражения?',code:'17 // 5\n17 % 5',options:['17 // 5 = 2; 17 % 5 = 3','17 // 5 = 3; 17 % 5 = 2','Оба результата равны 3','Оба результата равны 2'],correct:1,why:'// даёт частное без дробной части: 17 // 5 = 3. % даёт остаток: 17 % 5 = 2.'},
+{q:'Какое слово напечатает программа?',code:'x = 14\nif x > 10 and x < 20:\n    print("ДА")\nelse:\n    print("НЕТ")',options:['ДА','НЕТ','Произойдёт ошибка'],correct:0,why:'14 одновременно больше 10 и меньше 20, поэтому оба условия истинны.'},
+{q:'Что напечатает программа, если age = 24?',code:'age = 24\nif age <= 13:\n    print("A")\nelif age <= 24:\n    print("B")\nelse:\n    print("C")',options:['A','B','C'],correct:1,why:'Первое условие ложно, а age <= 24 истинно. Граница 24 входит во второй диапазон.'},
+{q:'В каком порядке появятся числа?',code:'i = 1\nwhile i <= 3:\n    print(i)\n    i += 1',options:['1, 2, 3','0, 1, 2','1, 2, 3, 4','Ничего'],correct:0,why:'Цикл печатает 1, затем 2 и 3. После этого i становится 4, и условие становится ложным.'},
+{q:'Чего не хватает в программе, чтобы она напечатала 1, 2, 3 и остановилась?',code:'i = 1\nwhile i <= 3:\n    print(i)',options:['i += 1','i -= 1','break','input()'],correct:0,why:'После печати нужно изменить i, например написать i += 1. Иначе условие не изменится и цикл станет бесконечным.'},
+{q:'Для чего нужен break?',code:'',options:['Пропускает все проверки if','Немедленно завершает ближайший цикл','Увеличивает счётчик на 1'],correct:1,why:'break сразу завершает ближайший цикл while или for.'},
+{q:'Что делает выражение random.randint(1, 100)?',code:'random.randint(1, 100)',options:['Выбирает целое число от 1 до 100 включительно','Выбирает только числа от 1 до 99','Считает количество попыток'],correct:0,why:'random.randint(a, b) выбирает целое число от a до b, включая обе границы.'},
+{q:'Что будет напечатано?',code:'n = 472\nprint(n % 10)\nprint(n // 10)',options:['Сначала 2, затем 47','Сначала 47, затем 2','Сначала 7, затем 4','Две одинаковые строки'],correct:0,why:'n % 10 даёт последнюю цифру 2, а n // 10 убирает последнюю цифру и даёт 47.'},
+{q:'Бонус. Сколько чётных цифр в числе 1205?',code:'',options:['1','2','3','4'],correct:1,bonus:true,why:'Чётные цифры — 2 и 0. Ноль тоже является чётной цифрой.'},
+{q:'Бонус. Сколько цифр числа 1206 делятся на 3 без остатка?',code:'',options:['1','2','3','4'],correct:1,bonus:true,why:'На 3 делятся цифры 0 и 6. Ноль также делится на 3 без остатка.'}
+];
 const lesson7QuizQuestions=[{"q":"1. Что появится на экране?","code":"x = 10\nwhile x < 10:\n    print('Старт')\n    x -= 1","options":["Старт один раз","Ничего","Старт бесконечно","10"],"correct":1,"why":"10 < 10 — ложь, поэтому программа пропускает тело цикла. До изменения x дело не дойдёт, потому что цикл не начнётся."},{"q":"2. Что будет выведено?","code":"i = 2\nwhile i <= 6:\n    print(i)\n    i += 2","options":["2, 4","2, 4, 6","2, 4, 6, 8","4, 6"],"correct":1,"why":"Цикл запускается при i = 2, 4 и 6. После этого i становится 8, и условие 8 <= 6 ложно."},{"q":"3. Сколько чисел напечатает программа?","code":"i = 5\nwhile i < 8:\n    i += 1\n    print(i)","options":["2","3","4","Бесконечно много"],"correct":1,"why":"Значения 6, 7 и 8 будут напечатаны — три числа. При i = 8 условие i < 8 ложно, поэтому четвёртого прохода нет."},{"q":"4. Почему цикл не завершится сам?","code":"i = 5\nwhile i > 0:\n    print(i)\n    i += 1","options":["Потому что print стоит до изменения i","Потому что i увеличивается, и условие i > 0 остаётся истинным","Потому что while не умеет сравнивать числа","Потому что нужно использовать == вместо >"],"correct":1,"why":"Значения i становятся 5, 6, 7… и никогда не приближаются к нулю. Условие остаётся истинным."},{"q":"5. Пользователь вводит 4, затем 0, затем -1. Что выведет программа?","code":"num = int(input())\nwhile num != -1:\n    print(num * 2)\n    num = int(input())","options":["8, 0, -2","8, 0","8","4, 0, -1"],"correct":1,"why":"4 и 0 обрабатываются, а ввод -1 завершает цикл. Стоп-значение проверяется в условии и не попадает в тело цикла."},{"q":"6. Какой вывод получится?","code":"i = 0\nwhile i < 3:\n    i += 1\n    print(i)","options":["0, 1, 2","1, 2, 3","1, 2","Бесконечный цикл"],"correct":1,"why":"На каждом проходе i сначала увеличивается, затем выводится. После вывода 3 условие i < 3 становится ложным."},{"q":"7. Что будет напечатано?","code":"while False:\n    print('Да')\nprint('Нет')","options":["Да, затем Нет","Только Да","Только Нет","Ничего"],"correct":2,"why":"Условие False сразу пропускает тело цикла, затем выполняется print('Нет')."},{"q":"8. Сколько раз выполнится тело цикла?","code":"i = 5\nwhile i <= 11:\n    i += 1","options":["6","7","8","Бесконечно много"],"correct":1,"why":"Цикл начинается с i = 5 и условие истинно для значений от 5 до 11 включительно — это семь проходов."},{"q":"9. Какое число напечатает программа?","code":"x = 1\nwhile x < 10:\n    x *= 2\nprint(x)","options":["8","10","16","Бесконечно много"],"correct":2,"why":"Последовательность значений: 1, 2, 4, 8, 16. После удвоения 8 получается 16, а условие уже ложно."},{"q":"10. Найди ошибочное утверждение","code":"","options":["Условие проверяется перед каждым выполнением тела","Если условие изначально ложно, тело не выполнится","В каждом цикле while Python автоматически изменяет переменную-счётчик","Если условие всегда истинно, цикл может стать бесконечным"],"correct":2,"why":"Python не меняет переменную за программиста. Изменение счётчика или другой переменной, влияющей на условие, нужно написать самостоятельно."},{"q":"11. Что будет выведено?","code":"i = 1\nwhile i < 5:\n    print(i)\n    i = i + 2","options":["1, 2, 3, 4","1, 3","1, 3, 5","1, 2"],"correct":1,"why":"Сначала печатается 1, затем i становится 3. На следующем проходе печатается 3, i становится 5, и условие i < 5 уже ложно."}];
 const lesson1QuizQuestions=[
 {q:'Для чего нужна команда print()?',code:'',options:['Для вывода данных на экран','Для ввода данных с клавиатуры','Для создания переменной'],correct:0,why:'print() выводит данные на экран.'},
@@ -3566,12 +3580,16 @@ const lesson1QuizQuestions=[
 {q:'Как правильно назвать переменную из двух слов?',code:'',options:['my name','2name','my_name'],correct:2,why:'Пробелы запрещены; подчёркивание можно использовать.'}
 ];
 let activeQuizQuestions=lesson5QuizQuestions;let activeQuizLesson=5;
-const quizState={index:0,score:0,answered:false,name:'',answers:[]};
+const quizState={index:0,score:0,bonusScore:0,answered:false,name:'',answers:[]};
+function quizMainTotal(){return activeQuizQuestions.filter(q=>!q.bonus).length}
+function quizBonusTotal(){return activeQuizQuestions.filter(q=>q.bonus).length}
+function quizScoreLabel(){return activeQuizLesson===8?`${quizState.score} / ${quizMainTotal()} баллов · бонус: ${quizState.bonusScore} / ${quizBonusTotal()}`:`${quizState.score} правильных`}
+function quizResultScoreLabel(result){if(Number(result.lesson)!==8)return `${result.score} / ${result.total}`;return `${result.score} / ${result.total} · бонус: ${Number(result.bonusScore||0)} / ${Number(result.bonusTotal||2)}`}
 function openQuiz(e,lessonId=5){if(!lessonIsVisibleForCurrentStudent(lessonId)){showStatus('warning','Преподаватель пока не открыл это занятие.');return;}closeTeacherDashboard();
-  activeQuizLesson=lessonId;activeQuizQuestions=lessonId===1?lesson1QuizQuestions:(lessonId===6?lesson6QuizQuestions:(lessonId===7?lesson7QuizQuestions:lesson5QuizQuestions));
-  const quizKicker=document.querySelector(".quiz-kicker");if(quizKicker)quizKicker.textContent=lessonId===1?"ЗАНЯТИЕ 1 · ТЕОРИЯ":(lessonId===6?"ЗАНЯТИЕ 6 · ПОВТОРЕНИЕ":(lessonId===7?"ЗАНЯТИЕ 7 · ПОВТОРЕНИЕ":"ЗАНЯТИЕ 5 · ПОВТОРЕНИЕ"));
+  activeQuizLesson=lessonId;activeQuizQuestions=lessonId===1?lesson1QuizQuestions:(lessonId===6?lesson6QuizQuestions:(lessonId===7?lesson7QuizQuestions:(lessonId===8?lesson8QuizQuestions:lesson5QuizQuestions)));
+  const quizKicker=document.querySelector(".quiz-kicker");if(quizKicker)quizKicker.textContent=lessonId===1?"ЗАНЯТИЕ 1 · ТЕОРИЯ":(lessonId===6?"ЗАНЯТИЕ 6 · ПОВТОРЕНИЕ":(lessonId===7?"ЗАНЯТИЕ 7 · ПОВТОРЕНИЕ":(lessonId===8?"ЗАНЯТИЕ 8 · ПОВТОРЕНИЕ":"ЗАНЯТИЕ 5 · ПОВТОРЕНИЕ")));
   const quizHeading=document.querySelector("#quizView .quiz-hero h2");if(quizHeading)quizHeading.textContent=lessonId===1?"Викторина по теории":"Повторение изученного";
-  const quizIntro=document.querySelector("#quizView .quiz-hero p");if(quizIntro)quizIntro.textContent=lessonId===1?"Проверь, как ты понял(а) print(), input(), переменные и правила именования.":(lessonId===6?"10 вопросов по условным операторам if, elif, else и вложенным условиям. Сначала выбери ответ самостоятельно, затем увидишь объяснение.":(lessonId===7?"11 вопросов по циклу while, условиям и обработке кода. После выбора ты увидишь объяснение правильного ответа.":"10 вопросов по материалам предыдущих занятий. Сначала выбери ответ самостоятельно, затем сразу увидишь результат и объяснение."));
+  const quizIntro=document.querySelector("#quizView .quiz-hero p");if(quizIntro)quizIntro.textContent=lessonId===1?"Проверь, как ты понял(а) print(), input(), переменные и правила именования.":(lessonId===6?"10 вопросов по условным операторам if, elif, else и вложенным условиям. Сначала выбери ответ самостоятельно, затем увидишь объяснение.":(lessonId===7?"11 вопросов по циклу while, условиям и обработке кода. После выбора ты увидишь объяснение правильного ответа.":(lessonId===8?"10 основных вопросов и 2 бонусных по input(), условиям, циклам, break, random и цифрам числа. Не запускай код — попробуй рассуждать самостоятельно.":"10 вопросов по материалам предыдущих занятий. Сначала выбери ответ самостоятельно, затем сразу увидишь результат и объяснение.")));
   if(e){e.preventDefault();e.stopPropagation();}
   const quizView=document.getElementById('quizView');
   const taskView=document.getElementById('taskView');
@@ -3582,7 +3600,7 @@ function openQuiz(e,lessonId=5){if(!lessonIsVisibleForCurrentStudent(lessonId)){
   taskView.style.display='none';
   quizView.style.display='block';
   quizView.setAttribute('aria-hidden','false');
-  quizState.index=0;quizState.score=0;quizState.answered=false;quizState.name='';quizState.answers=[];quizState.finished=false;quizState.finishing=false;quizState.runId=(quizState.runId||0)+1;
+  quizState.index=0;quizState.score=0;quizState.bonusScore=0;quizState.answered=false;quizState.name='';quizState.answers=[];quizState.finished=false;quizState.finishing=false;quizState.runId=(quizState.runId||0)+1;
   const nameInput=document.getElementById('quizStudentName');
   if(nameInput)nameInput.value='';
   const result=document.getElementById('quizResult');
@@ -3608,7 +3626,7 @@ function renderQuizQuestion(){
   const q=activeQuizQuestions[quizState.index];
   quizState.answered=false;
   document.getElementById('quizProgressText').textContent=`Вопрос ${quizState.index+1} из ${activeQuizQuestions.length}`;
-  document.getElementById('quizScoreText').textContent=`${quizState.score} правильных`;
+  document.getElementById('quizScoreText').textContent=quizScoreLabel();
   document.getElementById('quizProgressFill').style.width=`${((quizState.index+1)/activeQuizQuestions.length)*100}%`;
   document.getElementById('quizNextButton').disabled=true;
   document.getElementById('quizFinishButton').hidden=true;
@@ -3628,7 +3646,7 @@ function answerQuiz(choice){
   quizState.answered=true;
   const q=activeQuizQuestions[quizState.index];
   quizState.answers[quizState.index]=choice;
-  if(choice===q.correct)quizState.score++;
+  if(choice===q.correct){if(q.bonus)quizState.bonusScore++;else quizState.score++;}
   document.querySelectorAll('.quiz-option').forEach((btn,i)=>{
     btn.disabled=true;
     if(i===q.correct)btn.classList.add('correct');
@@ -3640,7 +3658,7 @@ function answerQuiz(choice){
   fb.hidden=false;
   fb.className='quiz-feedback '+(choice===q.correct?'correct':'wrong');
   fb.innerHTML=(choice===q.correct?'✓ Правильно!':'✗ Пока неверно.')+`<div class="quiz-correct-answer">Правильный ответ: ${correctLabel}) ${escapeHtml(correctText)}</div><div>${escapeHtml(q.why)}</div>`;
-  document.getElementById('quizScoreText').textContent=`${quizState.score} правильных`;
+  document.getElementById('quizScoreText').textContent=quizScoreLabel();
   const next=document.getElementById('quizNextButton');
   if(quizState.index<activeQuizQuestions.length-1){next.disabled=false;next.textContent='Следующий вопрос →';}
   else{next.disabled=false;next.textContent='Показать итог';}
@@ -3683,7 +3701,8 @@ async function finishQuiz(){
   quizState.finishing=true;
   const finishingRunId=quizState.runId,finishingSession=authSession;
   try{
-  const result={name,score:quizState.score,total:activeQuizQuestions.length,lesson:activeQuizLesson,date:new Date().toLocaleString('ru-RU'),answers:[...quizState.answers]};
+  const mainTotal=quizMainTotal(),bonusTotal=quizBonusTotal();
+  const result={name,score:quizState.score,total:mainTotal,bonusScore:quizState.bonusScore,bonusTotal,lesson:activeQuizLesson,date:new Date().toLocaleString('ru-RU'),answers:[...quizState.answers]};
   const key='python_quiz_results_v1';
   const results=readLocalJSON(key,[]);
   results.push(result);
@@ -3695,7 +3714,7 @@ async function finishQuiz(){
     type:'quiz',submissionId:crypto.randomUUID(),token:authSession.token,accountId:authSession.accountId,
     name:name,
     date:result.date,
-    result:`Занятие ${activeQuizLesson}: ${quizState.score} / ${activeQuizQuestions.length}`, 
+    result:activeQuizLesson===8?`Занятие 8: ${quizState.score} / ${mainTotal} + ${quizState.bonusScore} бонуса`:`Занятие ${activeQuizLesson}: ${quizState.score} / ${activeQuizQuestions.length}`,
     answers:quizState.answers.map((answer,index)=>{
       const question=activeQuizQuestions[index];
       const letters=['A','B','C','D','E'];
@@ -3719,7 +3738,8 @@ async function finishQuiz(){
   if(quizState.runId!==finishingRunId||!authSession||authSession.accountId!==finishingSession.accountId)return;
   const resultBox=document.getElementById('quizResult');
   resultBox.hidden=false;
-  resultBox.innerHTML=`<div class="quiz-result-score">${quizState.score} / ${activeQuizQuestions.length}</div><div class="quiz-result-text"><strong>${escapeHtml(name)}</strong>, викторина закончена.<br>${quizState.score>=9?'Отличный результат!':quizState.score>=7?'Хороший результат!':'Ничего страшного — ошибки можно разобрать и попробовать ещё раз.'}<br><span style="display:inline-block;margin-top:8px;color:#596273;font-size:12px">${escapeHtml(sendStatus)}</span></div>`;
+  const resultScore=activeQuizLesson===8?`${quizState.score} / ${mainTotal} · бонус: ${quizState.bonusScore} / ${bonusTotal}`:`${quizState.score} / ${activeQuizQuestions.length}`;
+  resultBox.innerHTML=`<div class="quiz-result-score">${resultScore}</div><div class="quiz-result-text"><strong>${escapeHtml(name)}</strong>, викторина закончена.<br>${quizState.score>=9?'Отличный результат!':quizState.score>=7?'Хороший результат!':'Ничего страшного — ошибки можно разобрать и попробовать ещё раз.'}<br><span style="display:inline-block;margin-top:8px;color:#596273;font-size:12px">${escapeHtml(sendStatus)}</span></div>`;
   document.getElementById('quizQuestionArea').innerHTML='';
   document.getElementById('quizNextButton').hidden=true;
   document.getElementById('quizFinishButton').hidden=true;
@@ -3737,7 +3757,7 @@ function renderTeacherResults(){
   const box=document.getElementById('quizTeacherResults');
   const results=readLocalJSON('python_quiz_results_v1',[]).slice().reverse();
   if(!results.length){box.innerHTML='<div class="quiz-teacher-subtitle">Пока никто не проходил викторину.</div>';return}
-  box.innerHTML=results.map(r=>{const details=(r.answers||[]).map((a,i)=>{const q=activeQuizQuestions[i];const letter=['A','B','C','D','E'][a];const ok=a===q.correct;return `<div style="padding:5px 0"><strong>${i+1}.</strong> ${ok?'✓':'✗'} выбран ${letter||'—'}; правильный ${['A','B','C','D','E'][q.correct]}</div>`}).join('');return `<details class="quiz-result-row"><summary><span class="quiz-result-name">${escapeHtml(r.name)}</span><span class="quiz-result-score-cell">${r.score} / ${r.total}</span><span class="quiz-result-date">${escapeHtml(r.date)}</span></summary><div style="grid-column:1/-1;padding-top:8px;color:#606a79;font-size:12px;line-height:1.5">${details}</div></details>`}).join('');
+  box.innerHTML=results.map(r=>{const details=(r.answers||[]).map((a,i)=>{const q=activeQuizQuestions[i];if(!q)return '';const letter=['A','B','C','D','E'][a];const ok=a===q.correct;return `<div style="padding:5px 0"><strong>${i+1}.</strong> ${ok?'✓':'✗'} выбран ${letter||'—'}; правильный ${['A','B','C','D','E'][q.correct]}</div>`}).join('');return `<details class="quiz-result-row"><summary><span class="quiz-result-name">${escapeHtml(r.name)}</span><span class="quiz-result-score-cell">${escapeHtml(quizResultScoreLabel(r))}</span><span class="quiz-result-date">${escapeHtml(r.date)}</span></summary><div style="grid-column:1/-1;padding-top:8px;color:#606a79;font-size:12px;line-height:1.5">${details}</div></details>`}).join('');
 }
 function toggleTeacherResults(){
   const box=document.getElementById('quizTeacherResults');

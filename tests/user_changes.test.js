@@ -22,3 +22,11 @@ test('editor height follows the number of code lines', () => {
   assert.match(index, /editor\.setSize\(null,contentHeight\+'px'\)/);
   assert.match(index, /editor\.on\('change',\(\)=>\{resizeEditorToContent\(\)/);
 });
+
+test('lesson 8 has its own ten-question quiz with two bonus questions', () => {
+  assert.match(index, /const lesson8QuizQuestions=\[/);
+  assert.strictEqual((index.match(/bonus:true/g) || []).length, 2);
+  assert.match(index, /l\.id===1\|\|l\.id===5\|\|l\.id===6\|\|l\.id===7\|\|l\.id===8/);
+  assert.match(index, /lessonId===8\?lesson8QuizQuestions/);
+  assert.match(index, /activeQuizLesson===8\?`\$\{quizState\.score\} \/ \$\{quizMainTotal\(\)\} баллов/);
+});
