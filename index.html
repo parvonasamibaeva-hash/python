@@ -202,7 +202,7 @@ body.teacher-dashboard-mode .teacher-dashboard-view{display:block!important}
 .teacher-progress-track{height:7px;background:#e8ecf3;border-radius:999px;overflow:hidden;min-width:130px}
 .teacher-progress-fill{height:100%;background:#596fe4;border-radius:999px}
 .teacher-dashboard-empty{padding:18px;border-radius:11px;background:#f8f9fd;color:#697384;font-size:13px;line-height:1.55;margin-top:14px}
-.teacher-dashboard-note{font-size:11px;color:#7a8392;line-height:1.5;margin-top:10px}
+.teacher-dashboard-note{font-size:11px;color:#7a8392;line-height:1.5;margin-top:10px}.teacher-attention-list{display:grid;gap:8px;margin-top:14px}.teacher-attention-row{display:grid;grid-template-columns:minmax(120px,1fr) minmax(160px,1.5fr) minmax(120px,1fr);gap:10px;padding:10px 12px;background:#fff8df;border:1px solid #f0d98e;border-radius:9px;font-size:12px;color:#6d5a19}.teacher-attention-row strong{color:#4b3c08}.teacher-report-filters{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:15px;padding:13px 14px;background:#fff;border:1px solid #e0e5ef;border-radius:12px}.teacher-report-filters label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:800;color:#596273}.teacher-report-filters select,.teacher-report-filters input{min-width:145px;padding:8px 9px;border:1px solid #d5dbe7;border-radius:8px;background:#fff;color:#303746;font:inherit;font-weight:400}
 .teacher-hardest{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .teacher-hardest-item{border:1px solid #e8ebf1;border-radius:11px;padding:12px;background:#fafbfc}
 .teacher-hardest-title{font-size:13px;font-weight:900;color:#303746}
@@ -553,6 +553,13 @@ body.auth-required #mainApp { visibility:hidden !important; pointer-events:none 
         </div>
       </div>
       <div id="teacherDashboardStatus" class="teacher-dashboard-status"></div>
+      <div class="teacher-report-filters" id="teacherReportFilters" hidden>
+        <label>Ученик<select id="teacherFilterStudent"><option value="">Все ученики</option></select></label>
+        <label>Статус<select id="teacherFilterStatus"><option value="">Все записи</option><option value="success">Тесты пройдены</option><option value="attention">Требуют внимания</option></select></label>
+        <label>С даты<input id="teacherFilterFrom" type="date"></label>
+        <label>По дату<input id="teacherFilterTo" type="date"></label>
+        <button type="button" class="teacher-dashboard-action" id="teacherPrintReport">🖨 Печать отчёта</button>
+      </div>
       <div id="teacherDashboardContent">
         <div class="teacher-loading">Загружаем данные из Google Таблицы…</div>
       </div>
@@ -2609,7 +2616,7 @@ function normalizeStudentRow(row){
     result:String(row['Результат']||'').trim(),
     failed:Number(row['Неудачных проверок']||0),
     rating:Number(row['Сложность']||0),
-    solution:String(row['Решение']||row['Код решения']||'')
+    solution:String(row['Решение']||row['Код решения']||''),passedTests:Number(row['Пройдено тестов']||0),totalTests:Number(row['Всего тестов']||0),errorCategory:String(row['Категория ошибки']||''),checkerVersion:String(row['Версия проверки']||''),checkedAt:String(row['Время проверки']||''),attemptId:String(row['ID попытки']||'')
   };
 }
 
@@ -2848,7 +2855,7 @@ const teacherLessonCards=document.getElementById('teacherLessonCards');
 const teacherDashboardContent=document.getElementById('teacherDashboardContent');
 const teacherDashboardStatus=document.getElementById('teacherDashboardStatus');
 const teacherDashboardBack=document.getElementById('teacherDashboardBack');
-const teacherDashboardRefresh=document.getElementById('teacherDashboardRefresh');
+const teacherDashboardRefresh=document.getElementById('teacherDashboardRefresh');const teacherReportFilters=document.getElementById('teacherReportFilters');const teacherFilterStudent=document.getElementById('teacherFilterStudent');const teacherFilterStatus=document.getElementById('teacherFilterStatus');const teacherFilterFrom=document.getElementById('teacherFilterFrom');const teacherFilterTo=document.getElementById('teacherFilterTo');const teacherPrintReport=document.getElementById('teacherPrintReport');
 const teacherDetailTitle=document.getElementById('teacherDetailTitle');
 const teacherDetailSubtitle=document.getElementById('teacherDetailSubtitle');
 
@@ -2911,6 +2918,10 @@ function normalizeTeacherRow(row){
   };
 }
 
+function teacherRowDate(row){const value=String(row.date||row.checkedAt||'');const time=Date.parse(value);return Number.isNaN(time)?null:time}
+function setupTeacherFilters(rows){if(!teacherReportFilters)return;const names=[...new Set(rows.map(r=>r.name))].sort((a,b)=>a.localeCompare(b,'ru'));teacherFilterStudent.innerHTML='<option value="">Все ученики</option>'+names.map(name=>`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');teacherReportFilters.hidden=false}
+function applyTeacherFilters(rows,lessonId){const lessonName='Занятие '+lessonId;const student=teacherFilterStudent&&teacherFilterStudent.value||'',status=teacherFilterStatus&&teacherFilterStatus.value||'',from=teacherFilterFrom&&teacherFilterFrom.value?Date.parse(teacherFilterFrom.value):null,to=teacherFilterTo&&teacherFilterTo.value?Date.parse(teacherFilterTo.value+'T23:59:59'):null;return rows.filter(row=>{if(row.lesson&&row.lesson!==lessonName)return false;if(student&&row.name!==student)return false;const time=teacherRowDate(row);if(from!==null&&(!time||time<from))return false;if(to!==null&&(!time||time>to))return false;const success=String(row.result).toLowerCase()==='решена';const attention=Number(row.failed)>=5||/manual|review|провер/i.test(row.errorCategory);return status==='success'?success:status==='attention'?attention:true})}
+function renderTeacherJournal(){if(teacherDashboardLessonId!==null)buildTeacherDashboard(teacherDashboardRows,teacherDashboardLessonId)}
 function buildTeacherOverview(rows){
   const lessonIds=lessons.map(lesson=>lesson.id);
   const cards=lessonIds.map(id=>{
@@ -2956,7 +2967,7 @@ function openTeacherLesson(lessonId){
 function buildTeacherDashboard(rows,lessonId=5){
   const lessonTasks=teacherDashboardTaskList(lessonId);
   const lessonName='Занятие '+lessonId;
-  const relevant=rows.filter(r=>String(r.lesson||'').trim()===lessonName || !r.lesson);
+  const relevant=applyTeacherFilters(rows,lessonId).filter(r=>String(r.lesson||'').trim()===lessonName || !r.lesson);
 
   const latest=new Map();
   relevant.forEach(row=>{
@@ -2986,6 +2997,8 @@ function buildTeacherDashboard(rows,lessonId=5){
     return {name,count:solved.size,total:lessonTasks.length,percent:lessonTasks.length?Math.round(solved.size/lessonTasks.length*100):0};
   }).sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'ru'));
 
+  const attentionRows=unique.filter(r=>Number(r.failed)>=5||/manual|review|провер/i.test(r.errorCategory));
+  const attentionHtml=attentionRows.length?attentionRows.slice().sort((a,b)=>Number(b.failed)-Number(a.failed)).map(r=>`<div class="teacher-attention-row"><strong>${escapeHtml(r.name)}</strong><span>${escapeHtml(r.lesson||'Занятие не указано')} · задача ${escapeHtml(r.taskId||'—')}</span><span>${escapeHtml(r.errorCategory||('Неудачных проверок: '+r.failed))}</span></div>`).join(''):'<div class="teacher-dashboard-empty">Нет записей, требующих отдельного внимания по текущим правилам.</div>';
   const hardest=taskStats.filter(x=>x.count>0).sort((a,b)=>b.avgFailed-a.avgFailed).slice(0,3);
   const totalSolved=studentStats.reduce((sum,s)=>sum+s.count,0);
   const averageProgress=students.length&&lessonTasks.length?Math.round(totalSolved/(students.length*lessonTasks.length)*100):0;
@@ -3027,6 +3040,12 @@ function buildTeacherDashboard(rows,lessonId=5){
       <div class="teacher-task-grid">${taskRows}</div>
     </section>
 
+    <section class="teacher-dashboard-card teacher-attention-card">
+      <h3>Задания, требующие внимания</h3>
+      <div class="teacher-dashboard-card-subtitle">Показываются только случаи с 5 и более неудачными проверками или явной ручной проверкой.</div>
+      <div class="teacher-attention-list">${attentionHtml}</div>
+    </section>
+
     <section class="teacher-dashboard-card">
       <h3>Прогресс учеников</h3>
       <div class="teacher-dashboard-card-subtitle">Количество решённых задач из ${lessonTasks.length}.</div>
@@ -3050,6 +3069,7 @@ async function loadTeacherDashboard(){
     const data=await authRequest({action:'getTeacherTasks',token:authSession&&authSession.token});
     if(!data.success)throw new Error(data.error||'Не удалось получить данные.');
     teacherDashboardRows=(Array.isArray(data.tasks)?data.tasks:[]).map(normalizeTeacherRow);
+    setupTeacherFilters(teacherDashboardRows);
     buildTeacherOverview(teacherDashboardRows);
     if(!teacherDashboardRows.length)showTeacherDashboardStatus('Пока в листе «Задачи» нет результатов. Как только ученик решит задачу, здесь появится статистика.');
   }catch(error){
@@ -3058,6 +3078,8 @@ async function loadTeacherDashboard(){
   }
 }
 
+[teacherFilterStudent,teacherFilterStatus,teacherFilterFrom,teacherFilterTo].forEach(control=>{if(control)control.addEventListener('change',renderTeacherJournal)});
+if(teacherPrintReport)teacherPrintReport.onclick=()=>window.print();
 teacherDashboardButton.onclick=openTeacherDashboard;
 teacherDashboardBack.onclick=()=>{
   document.body.classList.remove('teacher-detail');
