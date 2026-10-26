@@ -493,31 +493,24 @@ function assertStudentLessonAccess_(session,lessonId) {
   if(!open)throw new Error('Преподаватель пока не открыл это занятие.');
 }
 
-// Ветки доступа для дополнительных этапов проекта «Угадай число 2.0».
-// Каждая внутренняя группа — набор обязательных завершённых задач; достаточно выполнить одну из групп.
-// Это позволяет продолжить старую игру после подтверждённой задачи 5-13, не засчитывая новый этап автоматически.
+// Последовательный маршрут занятия 8.
+// Исторические записи задачи 5-13 сохраняются в таблице, но не подменяют новые задачи занятия 8.
 function taskPrerequisiteGroups_(lessonId,taskId) {
-  if(Number(lessonId)===8&&Number(taskId)===9)return [[]];
-  // Первая задача занятия 8 — базовая игра (8-9). Подтверждённая старая запись (5-13)
-  // удовлетворяет этому условию без создания дублирующей исторической записи.
-  if(Number(lessonId)===8&&Number(taskId)===1)return [[{lessonId:8,taskId:9}],[{lessonId:5,taskId:13}]];
-  // Дополнительные этапы и исследовательский вызов открываются от подтверждённой базовой игры.
-  if(Number(lessonId)===8&&(Number(taskId)===10||Number(taskId)===15))return [[{lessonId:8,taskId:9}],[{lessonId:5,taskId:13}]];
-  if(Number(taskId)<=1)return [[]];
-  return [[{lessonId:Number(lessonId),taskId:Number(taskId)-1}]];
+  const lesson=Number(lessonId),task=Number(taskId);
+  // Занятие 8 теперь состоит из девяти последовательных задач из утверждённого документа.
+  // Первая задача доступна сразу, каждая следующая — после предыдущей.
+  if(lesson===8&&task>=1&&task<=9)return task===1?[[]]:[[{lessonId:8,taskId:task-1}]];
+  if(task<=1)return [[]];
+  return [[{lessonId:lesson,taskId:task-1}]];
 }
 function assertPreviousTaskCompleted_(session,lessonId,taskId) {
   const groups=taskPrerequisiteGroups_(lessonId,taskId);
   if(!groups.length)return;
   const accountId=String(session.accountId||'');
   const rows=readTaskObjects_().filter(row=>String(row['ID аккаунта']||'')===accountId&&String(row['Результат']||'').trim().toLowerCase()==='решена');
-  if(Number(lessonId)===8&&Number(taskId)===9&&rows.some(row=>String(row['Занятие']||'')==='Занятие 5'&&Number(row['№ задачи'])===13)){
-    throw new Error('Базовая игра уже подтверждена в занятии 5. Продолжи проект с этапа 2.');
-  }
   const completed=new Set(rows.map(row=>String(row['Занятие']||'')+'::'+Number(row['№ задачи'])));
   const allowed=groups.some(group=>group.every(required=>completed.has('Занятие '+required.lessonId+'::'+required.taskId)));
   if(!allowed){
-    if(Number(lessonId)===8&&(Number(taskId)===10||Number(taskId)===15))throw new Error('Сначала выполни необходимые предыдущие шаги и дождись подтверждения сохранения результата.');
     throw new Error('Сначала выполни предыдущую задачу и дождись подтверждения сохранения результата.');
   }
 }
