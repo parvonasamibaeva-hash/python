@@ -10,9 +10,7 @@ test('passport versions are created from run or verification code, not typing de
   assert.doesNotMatch(index, /setTimeout\(\(\)=>passportCheckpoint\(t,'checkpoint'/);
 });
 
-test('historical lesson 5 task 13 stays in the catalog but is hidden from students', () => {
-  assert.match(index, /title:"Задача 13\. Проект «Угадай число»"[\s\S]*?hiddenFromStudent:true/);
-  assert.match(index, /arr\.filter\(t=>taskIsAvailable\(t\)/);
-  assert.match(index, /visibleTasks\.filter\(t=>!t\.hiddenFromStudent\)/);
-  assert.match(index, /find\(item=>!\(authSession&&authSession\.role==='student'&&item\.hiddenFromStudent===true\)\)/);
+test('lesson 5 active catalog no longer contains task 13', () => {
+  assert.doesNotMatch(index, /title:"Задача 13\. Проект «Угадай число»"/);
+  assert.match(index, /title:"Задача 14\. Играем в рулетку"/);
 });
