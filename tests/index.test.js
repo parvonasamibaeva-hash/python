@@ -33,9 +33,17 @@ test('local progress and Python input checks remain wired', () => {
   assert.match(html, /editor\.on\('change'/);
   assert.match(html, /saveState\(\)/);
   assert.match(functionBody('runOneTest'), /inputfun/);
-  assert.match(functionBody('checkTask'), /for\(const test of \(t\.tests\|\|\[\]\)\)/);
+  assert.match(functionBody('checkTask'), /PythonTaskChecker\.run/);
+  assert.match(html, /src="checker\.js"/);
   assert.match(html, /lesson1Tasks/);
   assert.match(html, /lesson7Tasks|homeworkTasks/);
+});
+
+test('verification metadata is saved and sent with task results', () => {
+  assert.match(html, /verificationResults/);
+  assert.match(functionBody('recordVerificationResult'), /passedTests/);
+  assert.match(functionBody('sendTaskResult'), /totalTests/);
+  assert.match(functionBody('runPython'), /type==='manual_review'/);
 });
 
 test('offline task results remain visible for retry', () => {

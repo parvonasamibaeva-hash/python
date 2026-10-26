@@ -14,6 +14,8 @@ function functionBody(name) {
 
 test('task rows have an idempotency column', () => {
   assert.match(source, /const TASK_HEADERS[^;]*'ID отправки'/);
+  assert.match(source, /'Пройдено тестов'/);
+  assert.match(source, /'Версия проверки'/);
 });
 
 test('saveTask deduplicates retries for the same account and submission id', () => {
@@ -22,6 +24,8 @@ test('saveTask deduplicates retries for the same account and submission id', () 
   assert.match(saveTask, /LockService\.getScriptLock\(\)/);
   assert.match(saveTask, /duplicate:true/);
   assert.match(saveTask, /session\.accountId/);
+  assert.match(saveTask, /passedTests/);
+  assert.match(saveTask, /checkerVersion/);
   assert.match(saveTask, /finally \{\s*lock\.releaseLock\(\)/);
 });
 

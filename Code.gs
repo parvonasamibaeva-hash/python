@@ -2,7 +2,7 @@ const QUIZ_SHEET_NAME = 'Лист1';
 const TASKS_SHEET_NAME = 'Задачи';
 const ACCOUNTS_SHEET_NAME = 'Аккаунты';
 const QUIZ_HEADERS = ['Имя','Дата','Результат','Вопрос 1','Вопрос 2','Вопрос 3','Вопрос 4','Вопрос 5','Вопрос 6','Вопрос 7','Вопрос 8','Вопрос 9','Вопрос 10','ID аккаунта','ID отправки'];
-const TASK_HEADERS = ['Имя','Дата','Занятие','№ задачи','Название задачи','Результат','Неудачных проверок','Сложность','Решение','ID аккаунта','ID отправки'];
+const TASK_HEADERS = ['Имя','Дата','Занятие','№ задачи','Название задачи','Результат','Неудачных проверок','Сложность','Решение','ID аккаунта','ID отправки','ID попытки','Пройдено тестов','Всего тестов','Категория ошибки','Версия проверки','Время проверки'];
 const ACCOUNT_HEADERS = ['ID аккаунта','Имя','Логин','Хеш кода','Активен','Создан','Группа'];
 const ACCESS_SHEET_NAME = 'Доступ к занятиям';
 const ACCESS_HEADERS = ['Занятие','Группа','Открыто','Обновлено','ID аккаунта'];
@@ -217,7 +217,13 @@ function saveTask_(data) {
         'Сложность': data.rating || '',
         'Решение': String(data.solution || ''),
         'ID аккаунта': session.accountId,
-        'ID отправки': submissionId
+        'ID отправки': submissionId,
+        'ID попытки': String(data.attemptId || '').slice(0, 100),
+        'Пройдено тестов': Math.max(0, Number(data.passedTests || 0)),
+        'Всего тестов': Math.max(0, Number(data.totalTests || 0)),
+        'Категория ошибки': String(data.errorCategory || '').slice(0, 100),
+        'Версия проверки': String(data.checkerVersion || '').slice(0, 100),
+        'Время проверки': data.checkedAt || ''
       };
       return sheetText_(values[header] === undefined ? '' : values[header]);
     });
