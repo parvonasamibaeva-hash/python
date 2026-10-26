@@ -497,11 +497,11 @@ function assertStudentLessonAccess_(session,lessonId) {
 // Исторические записи задачи 5-13 сохраняются в таблице, но не подменяют новые задачи занятия 8.
 function taskPrerequisiteGroups_(lessonId,taskId) {
   const lesson=Number(lessonId),task=Number(taskId);
-  // В занятии 8 сначала выполняются пять этапов проекта (8-10…8-14).
+  // В занятии 8 сначала выполняются шесть этапов проекта (8-10…8-15).
   // После финального этапа открывается набор из девяти самостоятельных задач (8-1…8-9).
   if(lesson===8&&task===10)return [[]];
-  if(lesson===8&&task>=11&&task<=14)return [[{lessonId:8,taskId:task-1}]];
-  if(lesson===8&&task===1)return [[{lessonId:8,taskId:14}]];
+  if(lesson===8&&task>=11&&task<=15)return [[{lessonId:8,taskId:task-1}]];
+  if(lesson===8&&task===1)return [[{lessonId:8,taskId:15}]];
   if(lesson===8&&task>=2&&task<=9)return [[{lessonId:8,taskId:task-1}]];
   if(task<=1)return [[]];
   return [[{lessonId:lesson,taskId:task-1}]];

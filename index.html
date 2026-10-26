@@ -1447,36 +1447,36 @@ const lesson2TheoryHtml = "<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n<meta ch
 const lesson8Tasks=[
   {
     "id": 10,
-    "title": "Проект. Этап 1 — режимы и базовая игра",
+    "title": "Проект. Этап 1 — каркас игры",
     "level": "project",
     "stars": "⭐",
-    "short": "Выбери сложность и собери основную игру «Угадай число». ",
-    "problem": "Начни общий проект «Угадай число». Перед раундом игрок вводит режим: «лёгкий», «средний» или «тяжёлый» (можно также принять Easy, Medium, Hard).\n\nПараметры режима:\n• лёгкий: числа от 1 до 50;\n• средний: числа от 1 до 100;\n• тяжёлый: числа от 1 до 500.\n\nКомпьютер загадывает число через random.randint(). Игрок вводит предположения, а программа отвечает «Моё число больше!», «Моё число меньше!» или «Угадал!». После победы раунд завершается. Сделай так, чтобы код был понятен и его можно было продолжить на следующих этапах.",
-    "criteria": "• Режим выбирается до начала раунда.\n• Диапазон зависит от режима.\n• Используется random.randint() с правильными границами.\n• Ввод повторяется до правильного ответа.\n• Для каждого неверного предположения выводится правильная подсказка.",
-    "examples": "Для среднего режима при загаданном числе 73 ввод 80 → «Моё число меньше!», затем 73 → «Угадал!».",
-    "starter": "import random\n\n# Этап 1. Выбери режим и загадай число.\n# Затем повторяй ввод предположения до победы.\n",
-    "hint": "Сначала прочитай режим и выбери low и high. Затем secret = random.randint(low, high). В цикле сравни guess с secret через if / elif / else.",
-    "theory": "Проект начинается с трёх идей: выбор параметров, случайное число и цикл до победы. Сохраняй low и high отдельно, чтобы следующие этапы могли использовать их.",
-    "checker": "project_stage1",
+    "short": "Собери базовую игру с одним стандартным диапазоном.",
+    "problem": "Начни проект «Угадай число». Компьютер загадывает целое число от 1 до 100 через random.randint(1, 100). Игрок вводит предположения, а программа отвечает «Моё число больше!», «Моё число меньше!» или «Угадал!». Повторяй ввод до правильного ответа. На этом этапе не добавляй режимы, баланс, таймер и магазин подсказок: сначала нужен рабочий каркас игры.",
+    "criteria": "• Используется random.randint(1, 100).\n• Игрок может делать несколько предположений.\n• Для каждого неверного предположения выводится правильная подсказка.\n• После правильного ответа цикл завершается и выводится «Угадал!».\n• В коде пока нет усложнений следующих этапов.",
+    "examples": "Если загаданное число 37, ввод 20 → «Моё число больше!», затем 37 → «Угадал!».",
+    "starter": "import random\n\n# Этап 1. Загадай число от 1 до 100.\n# Повторяй ввод и подсказывай «больше» или «меньше» до победы.\n",
+    "hint": "Создай secret = random.randint(1, 100), затем запусти while guess != secret. Внутри цикла сравни guess и secret через if и elif.",
+    "theory": "Каркас проекта состоит из случайного числа, цикла и трёх вариантов сравнения. Сначала добейся устойчивой базовой игры, а усложнения добавляй только в следующих этапах.",
+    "checker": "project_stage1_base",
     "tests": [],
     "projectStage": "base",
     "unlockAfterKeys": []
   },
   {
     "id": 11,
-    "title": "Проект. Этап 2 — кошелёк и удвоение ставки",
+    "title": "Проект. Этап 2 — режимы сложности",
     "level": "project",
     "stars": "⭐⭐",
-    "short": "Добавь баланс монет, стоимость попытки и ставку раунда.",
-    "problem": "Продолжи код этапа 1. Добавь кошелёк игрока со стартовым балансом 100 монет. Перед раундом игрок вводит ставку и отвечает, удваивать ли её («да»/«нет»).\n\nПравила этого этапа:\n• перед раундом из баланса вычитается ставка, умноженная на 2 при удвоении;\n• каждая попытка числа стоит 1 монету;\n• при победе игрок получает обратно удвоенную ставку при выборе «да» или обычную ставку при выборе «нет»;\n• после раунда выведи текущий баланс.\n\nСохрани баланс в переменной так, чтобы его можно было переносить между раундами на следующем этапе.",
-    "criteria": "• Есть переменная баланса со стартом 100.\n• Ставка и выбор удвоения считываются до игры.\n• Стоимость ставки и попыток списывается.\n• Победа возвращает ставку с правильным множителем.\n• Текущий баланс выводится после раунда.",
-    "examples": "При балансе 100, ставке 10, без удвоения и двух попытках до победы: 100 − 10 − 2 + 20 = 108 монет. При удвоении и победе с первой попытки: 100 − 20 − 1 + 40 = 119 монет.",
-    "starter": "# Продолжи код этапа 1.\n# Добавь balance = 100, ставку, списание монет и награду за победу.\n",
-    "hint": "Сделай multiplier = 2, если игрок выбрал «да», иначе 1. Сначала вычти stake * multiplier, затем при каждой попытке вычитай 1, а при победе прибавь stake * multiplier * 2.",
-    "theory": "Баланс — состояние всей игры, а ставка — состояние одного раунда. Не создавай баланс заново внутри цикла раунда.",
-    "checker": "project_stage2",
+    "short": "Добавь лёгкий, средний и тяжёлый диапазоны.",
+    "problem": "Продолжи каркас игры. Перед началом раунда игрок выбирает режим: «лёгкий», «средний» или «тяжёлый» (можно принять Easy, Medium, Hard). Теперь диапазон зависит от выбора: лёгкий — 1–50, средний — 1–100, тяжёлый — 1–500. Остальная логика игры должна остаться рабочей.",
+    "criteria": "• Режим выбирается до загадывания числа.\n• Лёгкий режим использует диапазон 1–50.\n• Средний режим использует диапазон 1–100.\n• Тяжёлый режим использует диапазон 1–500.\n• Цикл и подсказки из этапа 1 сохранены.",
+    "examples": "При режиме «лёгкий» компьютер загадывает число от 1 до 50, при «тяжёлом» — от 1 до 500.",
+    "starter": "# Продолжи код этапа 1.\n# Добавь выбор режима и переменные low и high.\n",
+    "hint": "Сначала прочитай mode. В ветках if/elif задай low и high, затем используй random.randint(low, high).",
+    "theory": "Новое поведение лучше добавлять отдельной веткой выбора параметров. Основной цикл угадывания не нужно переписывать.",
+    "checker": "project_stage2_difficulty",
     "tests": [],
-    "projectStage": "economy",
+    "projectStage": "difficulty",
     "unlockAfterKeys": [
       "8-10"
     ],
@@ -1486,19 +1486,19 @@ const lesson8Tasks=[
   },
   {
     "id": 12,
-    "title": "Проект. Этап 3 — время и заморозка",
+    "title": "Проект. Этап 3 — кошелёк и удвоение ставки",
     "level": "project",
     "stars": "⭐⭐⭐",
-    "short": "Добавь ограничение времени и способность заморозить его.",
-    "problem": "Продолжи игру с балансом. На весь раунд установи лимит 45 секунд. Для обычного Python можно использовать time.time() и отдельную логику контроля времени. Для учебной версии разрешён пошаговый вариант: после каждой попытки отнимай 5 секунд из time_left.\n\nДобавь команду «заморозка» в меню подсказок. Она стоит 20 монет и один раз за раунд добавляет 15 секунд к time_left (или временно останавливает реальный таймер). Если время закончилось до победы, раунд завершается поражением и ставка не возвращается.",
-    "criteria": "• Ограничение времени действует на весь раунд.\n• В коде есть понятное состояние оставшегося времени или измерение time.time().\n• Заморозка доступна не более одного раза и стоит 20 монет.\n• После окончания времени раунд завершается.\n• Победа и поражение обновляют баланс по правилам этапа 2.",
-    "examples": "В пошаговом варианте 45 секунд дают 9 ходов. После покупки заморозки остаётся на 3 хода больше, но баланс уменьшается ещё на 20 монет.",
-    "starter": "# Продолжи код этапа 2.\n# Добавь time_left = 45 и одноразовую заморозку за 20 монет.\n",
-    "hint": "Для простой версии заведи time_left и уменьши его после попытки. Флаг freeze_used не даёт купить заморозку второй раз.",
-    "theory": "Параллельный таймер и input() сложны для начинающих, поэтому пошаговое время — честная учебная альтернатива. Главное — отделить состояние времени от состояния ставки.",
-    "checker": "project_stage3",
+    "short": "Добавь баланс монет, стоимость попыток и ставку раунда.",
+    "problem": "Продолжи код этапа 2. Добавь кошелёк игрока со стартовым балансом 100 монет. Перед раундом игрок вводит ставку и отвечает, удваивать ли её («да»/«нет»). Перед каждой попыткой списывай 1 монету. При победе игрок получает обычную ставку обратно или двойную выплату при выборе удвоения. После раунда выведи текущий баланс.",
+    "criteria": "• Есть баланс со стартом 100 монет.\n• Ставка и выбор удвоения считываются до игры.\n• Стоимость ставки и попыток списывается.\n• Победа возвращает ставку с правильным множителем.\n• Текущий баланс выводится после раунда.",
+    "examples": "При балансе 100, ставке 10, без удвоения и двух попытках до победы: 100 − 10 − 2 + 20 = 108 монет. При удвоении и победе с первой попытки: 100 − 20 − 1 + 40 = 119 монет.",
+    "starter": "# Продолжи код этапа 2.\n# Добавь balance = 100, ставку, списание монет и награду за победу.\n",
+    "hint": "Сделай multiplier = 2, если игрок выбрал «да», иначе 1. Сначала вычти stake * multiplier, затем при каждой попытке вычитай 1, а при победе прибавь stake * multiplier * 2.",
+    "theory": "Баланс — состояние всей игры, а ставка — состояние одного раунда. Не создавай баланс заново внутри цикла раунда.",
+    "checker": "project_stage3_economy",
     "tests": [],
-    "projectStage": "time",
+    "projectStage": "economy",
     "unlockAfterKeys": [
       "8-11"
     ],
@@ -1508,19 +1508,19 @@ const lesson8Tasks=[
   },
   {
     "id": 13,
-    "title": "Проект. Этап 4 — умные подсказки",
+    "title": "Проект. Этап 4 — время и заморозка",
     "level": "project",
     "stars": "⭐⭐⭐",
-    "short": "Добавь меню динамических и математических подсказок.",
-    "problem": "Продолжи игру. Перед очередной попыткой игрок может выбрать подсказку.\n\nДинамическая подсказка сравнивает расстояние abs(secret − guess):\n• меньше 5 — «Горячо»;\n• от 5 до 25 — «Тепло»;\n• больше 25 — «Холодно».\n\nДобавь платные математические подсказки: чётность числа, делимость на 3/5/10 и проверку, является ли число простым. Каждая покупка списывает монеты и не должна раскрывать само число.",
-    "criteria": "• Есть меню выбора подсказки.\n• Используется abs() для оценки расстояния.\n• Покупки списывают монеты.\n• Проверки используют %, а проверка простоты работает для диапазона режима.\n• Подсказки не ломают основной цикл игры.",
-    "examples": "Если secret = 40 и guess = 50, расстояние 10: динамическая подсказка — «Тепло». Для secret = 40 проверка чётности сообщает «чётное».",
-    "starter": "# Продолжи код этапа 3.\n# Добавь меню подсказок и функции для математических свойств.\n",
-    "hint": "Вынеси подсказки в функции. Сначала выведи меню, затем обработай выбор. Для простоты используй отдельную функцию is_prime(n).",
-    "theory": "Функции помогают не смешивать экономику, ввод и вычисления. abs() даёт расстояние, % — остаток и проверку делимости.",
-    "checker": "project_stage4",
+    "short": "Добавь ограничение времени и одноразовую заморозку.",
+    "problem": "Продолжи код этапа 3. На весь раунд установи лимит 45 секунд. Для учебной версии разрешён пошаговый вариант: после каждой попытки отнимай 5 секунд из time_left. Добавь команду «заморозка»: она стоит 20 монет и один раз за раунд добавляет 15 секунд. Если время закончилось до победы, раунд завершается поражением.",
+    "criteria": "• Ограничение времени действует на весь раунд.\n• В коде есть состояние оставшегося времени или измерение time.time().\n• Заморозка доступна не более одного раза и стоит 20 монет.\n• После окончания времени раунд завершается.\n• Победа и поражение обновляют баланс.",
+    "examples": "В пошаговом варианте 45 секунд дают 9 ходов. После покупки заморозки остаётся ещё 15 секунд, но баланс уменьшается на 20 монет.",
+    "starter": "# Продолжи код этапа 3.\n# Добавь time_left = 45 и одноразовую заморозку за 20 монет.\n",
+    "hint": "Для простой версии заведи time_left и уменьши его после попытки. Флаг freeze_used не даёт купить заморозку второй раз.",
+    "theory": "Параллельный таймер и input() сложны для начинающих, поэтому пошаговое время — учебная альтернатива. Отдели состояние времени от баланса.",
+    "checker": "project_stage4_time",
     "tests": [],
-    "projectStage": "hints",
+    "projectStage": "time",
     "unlockAfterKeys": [
       "8-12"
     ],
@@ -1530,24 +1530,46 @@ const lesson8Tasks=[
   },
   {
     "id": 14,
-    "title": "Проект. Этап 5 — блеф компьютера",
+    "title": "Проект. Этап 5 — умные подсказки",
     "level": "project",
     "stars": "⭐⭐⭐⭐",
-    "short": "Добавь ложную подсказку только на тяжёлом режиме и заверши проект.",
-    "problem": "Заверши проект. Только в тяжёлом режиме компьютер один раз за игру может специально заменить динамическую подсказку на противоположную. Например, вместо «Моё число меньше!» сказать «Моё число больше!».\n\nСоздай скрытый флаг has_lied = False и включай ложь не более одного раза. Игрок должен иметь возможность проверить свойства числа математической подсказкой и заметить несоответствие. В лёгком и среднем режиме блефа быть не должно.",
-    "criteria": "• Блеф включается только в тяжёлом режиме.\n• За игру ложная динамическая подсказка появляется не более одного раза.\n• После блефа обычные подсказки возвращаются.\n• Математическая подсказка проверяет истинное свойство числа.\n• Лёгкий и средний режимы работают без блефа.\n• Баланс, время, заморозка и подсказки из предыдущих этапов сохранены.",
-    "examples": "В тяжёлом режиме компьютер может один раз дать неверное «больше/меньше», но проверка чётности или делимости показывает правду. В среднем режиме все динамические подсказки честные.",
-    "starter": "# Продолжи код этапа 4.\n# Добавь has_lied = False и одноразовый блеф только для тяжёлого режима.\n",
-    "hint": "Проверяй режим до изменения текста подсказки. После использования блефа сразу установи has_lied = True.",
-    "theory": "Блеф — это отдельное состояние игры. Не меняй secret: изменяй только текст одной подсказки и сохраняй флаг, чтобы не повторить обман.",
-    "checker": "project_stage5",
+    "short": "Добавь динамические и математические подсказки.",
+    "problem": "Продолжи код этапа 4. Перед очередной попыткой игрок может выбрать подсказку. Динамическая подсказка сравнивает расстояние abs(secret − guess): меньше 5 — «Горячо», от 5 до 25 — «Тепло», больше 25 — «Холодно». Добавь платные математические подсказки: чётность, делимость на 3/5/10 и проверку простоты. Каждая покупка списывает монеты.",
+    "criteria": "• Есть меню выбора подсказки.\n• Используется abs() для оценки расстояния.\n• Покупки списывают монеты.\n• Проверки используют %, а проверка простоты работает для диапазона режима.\n• Подсказки не ломают основной цикл игры.",
+    "examples": "Если secret = 40 и guess = 50, расстояние 10: динамическая подсказка — «Тепло». Для secret = 40 проверка чётности сообщает «чётное».",
+    "starter": "# Продолжи код этапа 4.\n# Добавь меню подсказок и функции для математических свойств.\n",
+    "hint": "Вынеси подсказки в функции. Сначала выведи меню, затем обработай выбор. Для простоты используй отдельную функцию is_prime(n).",
+    "theory": "Функции помогают не смешивать экономику, ввод и вычисления. abs() даёт расстояние, % — остаток и проверку делимости.",
+    "checker": "project_stage5_hints",
     "tests": [],
-    "projectStage": "final",
+    "projectStage": "hints",
     "unlockAfterKeys": [
       "8-13"
     ],
     "starterSourceKeys": [
       "8-13"
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Проект. Этап 6 — блеф компьютера",
+    "level": "project",
+    "stars": "⭐⭐⭐⭐",
+    "short": "Добавь ложную подсказку только на тяжёлом режиме и заверши проект.",
+    "problem": "Заверши проект. Только в тяжёлом режиме компьютер один раз за игру может специально заменить динамическую подсказку на противоположную. Например, вместо «Моё число меньше!» сказать «Моё число больше!». Создай скрытый флаг has_lied = False и включай ложь не более одного раза. Игрок должен иметь возможность проверить свойства числа математической подсказкой и заметить несоответствие. В лёгком и среднем режиме блефа быть не должно.",
+    "criteria": "• Блеф включается только в тяжёлом режиме.\n• За игру ложная динамическая подсказка появляется не более одного раза.\n• После блефа обычные подсказки возвращаются.\n• Математическая подсказка проверяет истинное свойство числа.\n• Лёгкий и средний режимы работают без блефа.\n• Баланс, время и подсказки предыдущих этапов сохранены.",
+    "examples": "В тяжёлом режиме компьютер может один раз дать неверное «больше/меньше», но математическая подсказка показывает правду. В среднем режиме все динамические подсказки честные.",
+    "starter": "# Продолжи код этапа 5.\n# Добавь has_lied = False и одноразовый блеф только для тяжёлого режима.\n",
+    "hint": "Проверяй режим до изменения текста подсказки. После использования блефа сразу установи has_lied = True.",
+    "theory": "Блеф — это отдельное состояние игры. Не меняй secret: изменяй только текст одной подсказки и сохраняй флаг, чтобы не повторить обман.",
+    "checker": "project_stage6_bluff",
+    "tests": [],
+    "projectStage": "final",
+    "unlockAfterKeys": [
+      "8-14"
+    ],
+    "starterSourceKeys": [
+      "8-14"
     ]
   },
   {
@@ -1587,7 +1609,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1628,7 +1650,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1667,7 +1689,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1708,7 +1730,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1746,7 +1768,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1781,7 +1803,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1822,7 +1844,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1879,7 +1901,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   },
   {
@@ -1896,7 +1918,7 @@ const lesson8Tasks=[
     "checker": "coin_flip",
     "tests": [],
     "unlockAfterKeys": [
-      "8-14"
+      "8-15"
     ]
   }
 ];
@@ -1955,16 +1977,28 @@ if(!saved.__collapsedLessonsInitialized){
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
 const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||Object.fromEntries(lessons.map(lesson=>[lesson.id,false])),codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},hintDiagnostics:saved.hintDiagnostics||{},solved:saved.solved||{},confirmedSolved:saved.confirmedSolved||{},manualReviewStatus:saved.manualReviewStatus||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},taskSubmissionIds:saved.taskSubmissionIds||{},verificationResults:saved.verificationResults||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
-const LESSON8_CONTENT_VERSION='project-game-v1';
+const LESSON8_CONTENT_VERSION='project-game-v2';
 if(saved.lesson8ContentVersion!==LESSON8_CONTENT_VERSION){
+  const previousLesson8Version=String(saved.lesson8ContentVersion||'');
   const legacyLesson8State={};
   ['codes','attempts','failedCodes','hints','hintDiagnostics','solved','confirmedSolved','manualReviewStatus','ratings','inputs','manualRunPassed','unsentResults','taskSubmissionIds','verificationResults'].forEach(field=>{
     const source=state[field]||{},legacy={};
-    Object.keys(source).filter(key=>key.startsWith('8-')).forEach(key=>{legacy[key]=source[key];delete source[key];});
+    const keys=Object.keys(source).filter(key=>key.startsWith('8-'));
+    keys.forEach(key=>{legacy[key]=source[key];delete source[key];});
+    keys.forEach(key=>{
+      // Версия v1 уже содержала пять этапов проекта. Переносим их на один шаг,
+      // чтобы выполненные режимы, экономика, время, подсказки и финал сохранились
+      // после добавления нового базового этапа.
+      const match=previousLesson8Version==='project-game-v1'&&/^8-(1[0-4])$/.exec(key);
+      const target=match?'8-'+(Number(match[1])+1):key;
+      source[target]=legacy[key];
+    });
     if(Object.keys(legacy).length)legacyLesson8State[field]=legacy;
   });
   if(Object.keys(legacyLesson8State).length)state.legacyLesson8State=legacyLesson8State;
-  if(String(state.currentKey).startsWith('8-'))state.currentKey='8-1';
+  const currentMatch=previousLesson8Version==='project-game-v1'&&/^8-(1[0-4])$/.exec(String(state.currentKey));
+  if(currentMatch)state.currentKey='8-'+(Number(currentMatch[1])+1);
+  else if(String(state.currentKey).startsWith('8-')&&!lessons.flatMap(lesson=>lesson.tasks).some(task=>task.key===state.currentKey))state.currentKey='8-1';
   state.lesson8ContentVersion=LESSON8_CONTENT_VERSION;
   saveState();
 }
@@ -2449,7 +2483,7 @@ function renderNav(){
       });
     });
     if(authSession&&authSession.role==='student'&&l.tasks.some(t=>!taskIsAvailable(t))){
-      const note=document.createElement('div');note.className='task-locked-note';note.textContent=l.id===8?'Закрытые этапы проекта открываются после выполнения нужных шагов. Базовая игра завершает обязательную часть; улучшения и исследовательский вызов — дополнительные.':'Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
+      const note=document.createElement('div');note.className='task-locked-note';note.textContent=l.id===8?'Следующий этап проекта открывается после успешной проверки и подтверждённого сохранения предыдущего. После шестого этапа откроются самостоятельные задачи.':'Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
     }
     wrap.appendChild(body);
     lessonNav.appendChild(wrap);
@@ -3246,12 +3280,17 @@ async function runProjectStageCases(code,cases,validator){
   }
   return {type:'success',category:'all_tests_passed',passedTests:passed,totalTests:cases.length};
 }
-async function checkProjectStage1(code){return runProjectStageCases(code,[
+async function checkProjectStage1Base(code){return runProjectStageCases(code,[
+  {input:['20','37'],range:[1,100],secret:37,direction:'больше',description:'Базовый диапазон 1–100 и подсказка «больше»'},
+  {input:['80','73'],range:[1,100],secret:73,direction:'меньше',description:'Базовый диапазон 1–100 и подсказка «меньше»'},
+  {input:['1'],range:[1,100],secret:1,direction:'',description:'Победа с первой попытки'}
+],(result,test)=>{const out=projectStageOutput(result);return out.includes('угадал')&&(!test.direction||out.includes(test.direction));})}
+async function checkProjectStage2Difficulty(code){return runProjectStageCases(code,[
   {input:['лёгкий','20','37'],range:[1,50],secret:37,description:'Лёгкий режим: диапазон 1–50 и победа после подсказки «больше»'},
   {input:['средний','80','73'],range:[1,100],secret:73,description:'Средний режим: диапазон 1–100 и подсказка «меньше»'},
   {input:['тяжёлый','400','420'],range:[1,500],secret:420,description:'Тяжёлый режим: диапазон 1–500'}
 ],(result,test)=>{const out=projectStageOutput(result);return out.includes('угадал')&&((test.secret===37||test.secret===420)?out.includes('больше'):out.includes('меньше'));})}
-async function checkProjectStage2(code){
+async function checkProjectStage3Economy(code){
   const source=String(code||'').toLowerCase();
   if(!/balance|баланс/.test(source)||!/(stake|ставк)/.test(source)||!/(double|удво|множител)/.test(source))return {type:'wrong_answer',category:'project_economy_contract',passedTests:0,totalTests:2,expected:'Баланс, ставка и удвоение ставки должны быть в коде.',actual:'Не найдены обязательные переменные или логика.'};
   return runProjectStageCases(code,[
@@ -3260,11 +3299,11 @@ async function checkProjectStage2(code){
   ],(result,test)=>{const out=projectStageOutput(result);return out.includes('баланс')&&out.includes(test.expectedBalance);});
 }
 function projectStaticContract(code,patterns,category){const source=String(code||'').toLowerCase();const missing=patterns.filter(pattern=>!pattern.test(source));return missing.length?{type:'wrong_answer',category,passedTests:0,totalTests:1,expected:'Выполни все требования текущего этапа.',actual:'Не найдены обязательные элементы: '+missing.map(pattern=>pattern.source).join(', ')}:{type:'success',category:'project_contract_passed',passedTests:1,totalTests:1}}
-async function checkProjectStage3(code){return projectStaticContract(code,[/time_left|time\.time|время/,/freeze|замороз/,/45/,/15/],'project_time_contract')}
-async function checkProjectStage4(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
-async function checkProjectStage5(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
+async function checkProjectStage4Time(code){return projectStaticContract(code,[/time_left|time\.time|время/,/freeze|замороз/,/45/,/15/],'project_time_contract')}
+async function checkProjectStage5Hints(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
+async function checkProjectStage6Bluff(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
 async function checkCoinFlip(code){return {type:'manual_review',category:'randomized_coin_sequence',passedTests:0,totalTests:2,reviewCriteria:'Проверь вручную: используется генератор случайных результатов, вывод строится одной строкой из О и Р, программа останавливается после трёх одинаковых результатов подряд и сообщает количество бросков.'}}
-async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,project_stage1:checkProjectStage1,project_stage2:checkProjectStage2,project_stage3:checkProjectStage3,project_stage4:checkProjectStage4,project_stage5:checkProjectStage5}})}
+async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,project_stage1_base:checkProjectStage1Base,project_stage2_difficulty:checkProjectStage2Difficulty,project_stage3_economy:checkProjectStage3Economy,project_stage4_time:checkProjectStage4Time,project_stage5_hints:checkProjectStage5Hints,project_stage6_bluff:checkProjectStage6Bluff}})}
 function getStdinValues(){const raw=String(stdinInput.value||'').replace(/\r\n/g,'\n');if(raw==='')return [];const values=raw.split('\n');if(values.length&&values[values.length-1]==='')values.pop();return values}
 function showConsoleOutput(text,ok=true){consoleBox.classList.add('show');consoleOutput.className='console-output'+(ok?'':' error');consoleOutput.textContent=text||'(программа ничего не вывела)';consoleOutput.scrollTop=consoleOutput.scrollHeight}
 function appendTerminalLine(text,className=''){const value=String(text);terminalTranscript+=(terminalTranscript&&!terminalTranscript.endsWith('\n')?'\n':'')+value+'\n';consoleOutput.textContent=terminalTranscript;consoleOutput.classList.remove('empty','error');consoleOutput.scrollTop=consoleOutput.scrollHeight;}
