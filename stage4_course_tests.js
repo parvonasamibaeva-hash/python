@@ -78,7 +78,9 @@ test('server no longer has a 20-lesson limit and uses a shared max constant', ()
 });
 test('student dashboard excludes closed and empty lessons from progress', () => {
   assert.match(fnSrc(html, 'buildStudentDashboard'), /lessons\.filter\(lesson=>Array\.isArray\(lesson\.tasks\)&&lesson\.tasks\.length>0&&lessonIsVisibleForCurrentStudent/);
-  assert.match(fnSrc(html, 'updateStats'), /countedTasks=authSession&&authSession\.role==='student'\?courseTasks\.filter/);
+  assert.match(fnSrc(html, 'updateStats'), /visibleTasks=authSession&&authSession\.role==='student'\?courseTasks\.filter/);
+  assert.match(fnSrc(html, 'updateStats'), /countedTasks=authSession&&authSession\.role==='student'\?visibleTasks\.filter\(t=>t\.optional!==true\):visibleTasks/);
+  assert.match(fnSrc(html, 'updateStats'), /progressTasks=legacyGuessCompleted\?countedTasks\.filter\(t=>t\.skipIfConfirmedKey!=='5-13'\):countedTasks/);
 });
 test('manual-review queue uses the catalog condition and criteria without copying hidden tests', () => {
   const start=html.indexOf('async function loadManualReviews(){');
@@ -99,7 +101,9 @@ test('client blocks direct selection of locked tasks and hides future titles', (
   assert.match(fnSrc(html, 'loadTask'), /!taskIsAvailable\(selected\)/);
 });
 test('client unlocks only from server-confirmed completion', () => {
-  assert.match(fnSrc(html, 'taskIsAvailable'), /state\.confirmedSolved&&state\.confirmedSolved\[previous\.key\]/);
+  assert.match(fnSrc(html, 'taskIsAvailable'), /confirmed\[previous\.key\]/);
+  assert.match(fnSrc(html, 'taskIsAvailable'), /unlockAfterKeys/);
+  assert.match(fnSrc(html, 'taskIsAvailable'), /unlockAfterAnyKeys/);
   assert.match(fnSrc(html, 'markResultSent'), /state\.confirmedSolved\[key\]=true/);
   assert.match(fnSrc(html, 'restoreStudentProgress'), /state\.confirmedSolved\[match\.key\]=true/);
 });
@@ -182,7 +186,7 @@ test('task-specific diagnostic rules override generic fallbacks', () => {
 // Server helper behavior without a live Apps Script connection.
 const serverCtx = {COURSE_MAX_LESSON_NUMBER:36, readTaskObjects_:()=>[], ensureLegacyLessonAccess_:()=>{}, findAccountById_:()=>({group:'thursday'}), readLessonAccess_:()=>({'thursday:8':true}), LEGACY_PUBLISHED_LESSON_IDS:[1,2,3,4,5,6,7,8]};
 vm.createContext(serverCtx);
-vm.runInContext([fnSrc(codeGs,'parseLessonNumber_'),fnSrc(codeGs,'assertStudentLessonAccess_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),serverCtx);
+vm.runInContext([fnSrc(codeGs,'parseLessonNumber_'),fnSrc(codeGs,'assertStudentLessonAccess_'),fnSrc(codeGs,'taskPrerequisiteGroups_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),serverCtx);
 test('server lesson parser accepts 36 and rejects 37', () => {
   assert.strictEqual(serverCtx.parseLessonNumber_('Занятие 36'),36);
   assert.strictEqual(serverCtx.parseLessonNumber_('Занятие 37'),null);
@@ -198,6 +202,22 @@ test('server rejects a later task unless previous result exists', () => {
   assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2),/предыдущую задачу/);
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':1,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2));
+});
+test('legacy guess-number completion unlocks continuation without marking new task solved', () => {
+  serverCtx.readTaskObjects_=()=>[
+    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':8,'Результат':'Решена'},
+    {'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}
+  ];
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,9),/уже подтверждена/);
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,15),/предыдущие шаги/);
+  serverCtx.readTaskObjects_=()=>[
+    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':8,'Результат':'Решена'},
+    {'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'},
+    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'},
+    {'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':11,'Результат':'Решена'}
+  ];
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,15));
 });
 
 const checkerCtx={console,Date,Set,Map,Number,String,Object,Array,JSON,Math};

@@ -1,0 +1,520 @@
+--- a/index.html
++++ b/index.html
+@@ -2128,7 +2128,167 @@
+     "methodSource": "Развитие исследовательского задания из комплекта версии 3",
+     "methodKey": "RCOIN",
+     "methodRoute": "Математический резерв"
+-  }
++  },
++{
++  "id": 9,
++  "title": "Проект 1. Угадай число 2.0 — базовая игра",
++  "level": "project",
++  "stars": "★",
++  "short": "Собери полностью работающую игру с подсказками «больше» и «меньше».",
++  "problem": "Компьютер загадывает целое число от 1 до 100. Игрок вводит предположение, а программа помогает угадать число.\n\nТребования:\n1. Подключи random и выбери число через random.randint(1, 100).\n2. Считай предположение через input() и преобразуй его в int.\n3. Если число меньше загаданного, выведи ровно: «Моё число больше!»\n4. Если число больше загаданного, выведи ровно: «Моё число меньше!»\n5. Повторяй ввод, пока игрок не угадает.\n6. После победы выведи: «Угадал!»\n\nЭто законченный базовый результат. Дополнительные этапы выполнять не обязательно.",
++  "criteria": "• Загаданное число выбирается случайно в диапазоне от 1 до 100.\n• После неверного предположения программа даёт правильную подсказку.\n• Игрок может вводить новые предположения до победы.\n• При правильном ответе программа завершает игру и сообщает об успехе.",
++  "examples": "Пример: если загаданное число — 42, ввод 20 должен вызвать подсказку «Моё число больше!», ввод 60 — «Моё число меньше!», а ввод 42 — «Угадал!».\n\nТочное случайное число в обычном запуске заранее неизвестно.",
++  "starter": "# Шаг 1. Подключи random.\n# Шаг 2. Загадай число от 1 до 100.\n# Шаг 3. Организуй ввод и цикл угадывания.",
++  "hint": "Начни с import random и secret = random.randint(1, 100).\n\nСначала прочитай одно предположение, затем используй while guess != secret.\n\nВнутри цикла сравни guess и secret через if / else и не забудь запросить новое предположение. После цикла выведи «Угадал!»",
++  "theory": "random.randint(a, b) выбирает целое число от a до b включительно. Цикл while повторяется, пока условие истинно. Здесь цикл должен завершиться, когда guess == secret. Сравнения < и > помогают выбрать подсказку.",
++  "checker": "guess2_base",
++  "tests": [],
++  "skipIfConfirmedKey": "5-13",
++  "starterSourceKeys": [
++    "5-13"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint недоступен в этой среде Skulpt, проверь вручную диапазон 1–100, подсказки, повторный ввод и завершение после победы.",
++    "projectStage": "base"
++},
++{
++  "id": 10,
++  "title": "Проект 2. Счётчик и лимит попыток",
++  "level": "project",
++  "stars": "★★",
++  "short": "Добавь счётчик и заверши игру после трёх неудачных попыток.",
++  "problem": "Продолжи базовую игру. Теперь у игрока ровно 3 попытки. Перед каждой попыткой показывай её номер, например «Попытка 1 из 3».\n\nЕсли игрок угадывает число на первой, второй или третьей попытке, программа должна вывести «Угадал!» и не сообщать о проигрыше. Если все три предположения неверны, программа должна завершить раунд и вывести «Попытки закончились!» и загаданное число.\n\nНе увеличивай счётчик после завершения игры. Проверь особенно важный случай: победа именно на третьей попытке.",
++  "criteria": "• Номер попытки начинается с 1 и увеличивается после каждой неудачной попытки.\n• Используются не более трёх предположений.\n• Победа на третьей попытке считается победой, а не проигрышем.\n• После трёх ошибок программа останавливает раунд и сообщает загаданное число.",
++  "examples": "Для загаданного числа 50 ввод 10, 70, 50 должен завершиться победой на попытке 3.\n\nДля загаданного числа 50 ввод 10, 90, 20 должен завершиться сообщением «Попытки закончились!» и показать 50.",
++  "starter": "# Продолжи код базовой игры.\n# Добавь число попыток и ограничение в 3 попытки.",
++  "hint": "Создай attempts = 0 и max_attempts = 3.\n\nПеред новым предположением увеличивай attempts и показывай его номер.\n\nПосле цикла проверь, было ли угадано число: не показывай сообщение о проигрыше, если guess == secret.",
++  "theory": "Счётчик — это переменная, которая хранит количество выполненных попыток. Важно проверить условие завершения после последнего разрешённого ввода: правильный ответ на третьей попытке всё ещё является победой.",
++  "checker": "guess2_attempts",
++  "tests": [],
++  "optional": true,
++  "unlockAfterKeys": [
++    "8-8"
++  ],
++  "unlockAfterAnyKeys": [
++    "8-9",
++    "5-13"
++  ],
++  "starterSourceKeys": [
++    "8-9",
++    "5-13"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint недоступен в этой среде Skulpt, проверь вручную счётчик, лимит в 3 попытки, победу на последней попытке и проигрыш после трёх ошибок.",
++    "projectStage": "attempts"
++},
++{
++  "id": 11,
++  "title": "Проект 3. Сыграем ещё раз?",
++  "level": "project",
++  "stars": "★★",
++  "short": "Добавь повторный раунд и обработку ответов «да» и «нет» без учёта регистра.",
++  "problem": "Продолжи игру со счётчиком и лимитом в три попытки. После каждого завершённого раунда спроси: «Сыграть ещё раз? Введи да или нет».\n\n• Если ответ — «да», начни новый раунд и загадай новое число.\n• Если ответ — «нет», заверши программу.\n• Регистр не должен иметь значения: «ДА», «Да» и «да» означают одно и то же; так же для «НЕТ», «Нет» и «нет».\n• Лимит в три попытки действует отдельно в каждом раунде.",
++  "criteria": "• После победы программа предлагает сыграть ещё раз.\n• Ответ «да» запускает новый раунд с новым вызовом random.randint.\n• Ответ «нет» завершает игру без дополнительного раунда.\n• Ответы нормализуются с помощью изученного строкового метода lower().\n• Счётчик попыток начинается заново в каждом раунде.",
++  "examples": "Пример тестового сценария: число 50, предположения 10 и 50, ответ «ДА», затем число 17, предположение 17, ответ «НЕТ». Должны завершиться два раунда.",
++  "starter": "# Продолжи код этапа 2.\n# Добавь внешний цикл и вопрос о повторной игре.",
++  "hint": "После завершения раунда прочитай ответ play_again.\n\nСравнивай play_again.lower() с текстом 'да' или 'нет'.\n\nСбрось счётчик попыток внутри каждого нового раунда и загадывай новое число.",
++  "theory": "Метод lower() переводит строку в нижний регистр. Внешний цикл отвечает за повторные раунды, а внутренний — за угадывание числа в одном раунде. Не смешивай эти два условия.",
++  "checker": "guess2_replay",
++  "tests": [],
++  "optional": true,
++  "starterSourceKeys": [
++    "8-10"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint недоступен в этой среде Skulpt, проверь вручную повторный раунд, новый секрет, обработку да/нет без учёта регистра и сброс счётчика.",
++    "projectStage": "replay"
++},
++{
++  "id": 12,
++  "title": "Проект 4. Выбери сложность",
++  "level": "project",
++  "stars": "★★",
++  "short": "Добавь три уровня сложности с разными диапазонами случайного числа.",
++  "problem": "Перед началом игры предложи выбрать сложность:\n1 — лёгкая: число от 1 до 20;\n2 — средняя: число от 1 до 100;\n3 — сложная: число от 1 до 200.\n\nВ зависимости от выбора используй соответствующий диапазон random.randint. Если введён неверный номер сложности, попроси выбрать 1, 2 или 3 и не начинай игру с неправильным диапазоном. Сохрани лимит попыток и возможность сыграть ещё раз.",
++  "criteria": "• Выбор 1 использует диапазон 1–20.\n• Выбор 2 использует диапазон 1–100.\n• Выбор 3 использует диапазон 1–200.\n• Игра сохраняет лимит попыток и предложение повторного раунда.\n• Неверный выбор сложности не приводит к случайному числу из чужого диапазона.",
++  "examples": "Если выбрана лёгкая сложность, проверка может загадать 10 в диапазоне 1–20. Для средней сложности — 75 в диапазоне 1–100. Для сложной — 175 в диапазоне 1–200.",
++  "starter": "# Продолжи код этапа 3.\n# Сначала спроси уровень сложности, затем выбери границы случайного числа.",
++  "hint": "Сохрани выбор в переменной level.\n\nИспользуй if / elif / else, чтобы установить нижнюю и верхнюю границы.\n\nТолько после выбора диапазона вызывай random.randint(low, high). Проверь, что повторная игра тоже использует выбранную сложность.",
++  "theory": "Ветвление if / elif / else помогает выбрать один из трёх диапазонов. Границы random.randint включаются в возможные значения. Сначала определи диапазон, затем загадывай число.",
++  "checker": "guess2_difficulty",
++  "tests": [],
++  "optional": true,
++  "starterSourceKeys": [
++    "8-11"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint недоступен в этой среде Skulpt, проверь вручную все три диапазона сложности и повторный запрос при неверном выборе.",
++    "projectStage": "difficulty"
++},
++{
++  "id": 13,
++  "title": "Проект 5. Горячо или холодно?",
++  "level": "project",
++  "stars": "★★★",
++  "short": "Сравнивай расстояние между загаданным числом и соседними предположениями.",
++  "problem": "Добавь к игре подсказки «Горячо!» и «Холодно!». После первого неверного предположения запомни его. После каждого следующего неверного предположения сравни расстояние до загаданного числа:\n• если новое предположение ближе предыдущего — выведи «Горячо!»;\n• если дальше — выведи «Холодно!»;\n• если расстояние одинаковое — выведи «Так же далеко».\n\nОбычные подсказки «Моё число больше!» и «Моё число меньше!» тоже должны сохраниться. Победа завершает раунд. Сохрани сложность, счётчик, лимит попыток и повторную игру.",
++  "criteria": "• Первое неверное предположение становится предыдущим.\n• Сравнивается расстояние до секрета у двух соседних предположений.\n• Выводится правильная подсказка о приближении или удалении.\n• Подсказки больше/меньше продолжают работать.\n• Победа завершает раунд, а лимит попыток не превышается.",
++  "examples": "Если секрет равен 10, в одном раунде предположения 5, 8, 10 должны показать «Горячо!» после 8. В другом раунде предположения 8, 5, 10 должны показать «Холодно!» после 5. Каждый пример укладывается в лимит из трёх попыток.",
++  "starter": "# Продолжи код этапа 4.\n# Добавь хранение предыдущего предположения и сравнение расстояний.",
++  "hint": "Для каждого предположения вычисляй расстояние: abs(secret - guess).\n\nСохрани расстояние предыдущей попытки. Сравни новое расстояние с предыдущим только после первого неверного ответа.\n\nПосле сравнения обнови предыдущее предположение и расстояние.",
++  "theory": "abs(number) возвращает абсолютное значение числа. Расстояние между двумя числами — это модуль их разности. Чтобы понять, стало ли предположение лучше, сравни расстояния, а не сами значения чисел.",
++  "checker": "guess2_hotcold",
++  "tests": [],
++  "optional": true,
++  "starterSourceKeys": [
++    "8-12"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint недоступен в этой среде Skulpt, проверь вручную сравнение расстояний, подсказки горячо/холодно и сохранение основной игры.",
++    "projectStage": "hotcold"
++},
++{
++  "id": 14,
++  "title": "Проект 6. Сколько времени заняла игра?",
++  "level": "project",
++  "stars": "★★★",
++  "short": "Измерь время от начала раунда до победы без ограничения времени на ввод.",
++  "problem": "Добавь измерение затраченного времени. Перед началом раунда сохрани time.time() в переменную start_time. После завершения раунда вычисли elapsed = time.time() - start_time и выведи понятное сообщение, например «Время игры: 4.0 секунд».\n\nЭто только измерение длительности игры. Не нужно ограничивать время на ввод, останавливать input() по таймеру или использовать time.sleep(). Сохрани остальные функции игры.",
++  "criteria": "• Используется import time и time.time().\n• Время начала сохраняется до игры, а конец измеряется после завершения раунда.\n• Вычисляется разница между двумя моментами времени.\n• На экран выводится затраченное время в секундах.\n• Программа не обещает остановить ожидание input() по истечении времени.",
++  "examples": "При контролируемом тестовом времени 100.0 и 104.0 программа должна показать длительность 4 секунды. В обычной игре значение будет зависеть от фактического времени.",
++  "starter": "# Продолжи код этапа 5.\n# Добавь замер времени одного раунда через time.time().",
++  "hint": "Сначала добавь import time.\n\nДо первого предположения сохрани start_time = time.time().\n\nПосле завершения раунда вычисли elapsed = time.time() - start_time и выведи elapsed вместе с подписью о секундах.",
++  "theory": "time.time() возвращает значение времени. Разность двух измерений показывает длительность между ними. В браузерном Skulpt поддержка стандартной библиотеки может отличаться от обычного Python, поэтому проверка отдельно проверяет наличие time.time(). Это не настоящий дедлайн на ввод.",
++  "checker": "guess2_timer",
++  "tests": [],
++  "optional": true,
++  "starterSourceKeys": [
++    "8-13"
++  ],
++  "reviewCriteria": "Если детерминированный random.randint или time.time недоступен в этой среде Skulpt, проверь вручную импорт time, два измерения времени и вычисление разницы. Тайм-аут на input() не требуется.",
++    "projectStage": "timer"
++},
++{
++  "id": 15,
++  "title": "Исследовательский вызов. Компьютер угадывает число",
++  "level": "project",
++  "stars": "★★★★",
++  "short": "Реализуй поиск делением диапазона пополам и объясни, почему он эффективен.",
++  "problem": "Теперь число загадывает человек, а компьютер пытается его найти. Считай, что человек загадал целое число от 1 до 100.\n\nАлгоритм:\n1. Компьютер предлагает середину оставшегося диапазона: guess = (low + high) // 2.\n2. Человек отвечает «больше», если его число больше предположения; «меньше», если меньше; или «угадал», если компьютер попал точно. Ответы обрабатываются без учёта регистра.\n3. При ответе «больше» нижняя граница становится guess + 1. При ответе «меньше» верхняя граница становится guess - 1.\n4. Игра заканчивается, когда компьютер угадал. После ответа «угадал» выведи «Компьютер угадал!». Для каждого предположения выводи строку «Моя попытка: N».\n\nВ конце добавь комментарий к коду, в котором объясни: почему выбор середины уменьшает число возможных вариантов примерно вдвое и почему для диапазона из 100 чисел требуется не больше примерно 7 попыток при честных ответах. Это исследовательская задача для сильных учеников.",
++  "criteria": "• Первое предположение для диапазона 1–100 — 50.\n• После ответа «больше» нижняя граница обновляется на guess + 1.\n• После ответа «меньше» верхняя граница обновляется на guess - 1.\n• Компьютер выводит каждое предположение и завершает игру после ответа «угадал».\n• В комментарии объяснена идея деления диапазона пополам и оценка числа попыток.\n\nАвтоматическая проверка проверяет последовательность предположений; преподаватель отдельно оценивает объяснение эффективности.",
++  "examples": "Для загаданного человеком числа 73 ожидаемая последовательность предположений: 50, 75, 62, 68, 71, 73. Ответы человека: больше, меньше, больше, больше, больше, угадал.",
++  "starter": "low = 1\nhigh = 100\nfound = False\n\n# Пока диапазон не пуст и компьютер не угадал:\n# 1. Найди середину диапазона.\n# 2. Выведи 'Моя попытка: N'.\n# 3. Спроси ответ человека и обработай его через lower().\n# 4. Обнови low или high либо заверши поиск.\n\n# В конце объясни алгоритм в комментарии.",
++  "hint": "При диапазоне от 1 до 100 первая середина равна (1 + 100) // 2 = 50.\n\nЕсли человек отвечает «больше», само предположение уже исключено, поэтому low = guess + 1. Если «меньше», используй high = guess - 1.\n\nДля объяснения посчитай, как уменьшается число вариантов после 1, 2, 3… делений пополам. Не используй случайный поиск: каждый шаг должен сокращать диапазон.",
++  "theory": "Это двоичный поиск. Каждый ответ исключает примерно половину оставшихся значений, поэтому количество шагов растёт гораздо медленнее, чем при проверке всех чисел по порядку. // вычисляет целую середину диапазона. Строковый метод lower() помогает принимать ответы в любом регистре.",
++  "checker": "guess2_research",
++  "tests": [],
++  "optional": true,
++  "unlockAfterKeys": [
++    "8-10",
++    "8-11"
++  ],
++  "unlockAfterAnyKeys": [
++    "8-9",
++    "5-13"
++  ],
++  "reviewCriteria": "Проверь: (1) первая попытка — середина диапазона; (2) после «больше» и «меньше» границы обновляются без повторного включения проверенного числа; (3) ответы нормализуются; (4) цикл завершается при «угадал»; (5) в комментарии объяснено уменьшение диапазона вдвое и оценка числа попыток для 100 значений. Автоматическая проверка поведения: 4/4 сценария, включая целевые числа 1, 73, 100 и ответы в верхнем регистре; требуется ручная оценка объяснения.",
++  "projectStage": "research"
++}
+ ];
+ const COURSE_CONFIG={maxLessonNumber:null,lessons:[
+ {id:1,title:'Занятие 1',status:'published',subtitle:'Ввод-вывод данных и переменные',tasks:lesson1Tasks,theory:[['Вывод данных: print()','Команда print() выводит информацию на экран. Текст заключают в одинарные или двойные кавычки.'],['Аргументы print()','Несколько аргументов разделяются запятыми. Например, print() может получить несколько значений и вывести их через пробел.'],['Кавычки внутри текста','Если в тексте есть апостроф, используй двойные кавычки снаружи.'],['Ввод данных: input()','input() считывает одну строку, введённую пользователем.'],['Переменные и присваивание','Переменная хранит значение. В записи name = Гвидо имя слева, значение справа.'],['Имена переменных','Используй латинские буквы, цифры и подчёркивание. Нельзя начинать имя с цифры или использовать пробелы.'],['Частые ошибки','Проверяй кавычки, круглые скобки, запятые, регистр команды print и вывод переменных без кавычек.']]},
+@@ -2165,7 +2325,7 @@
+ ,
+ {id:6,title:'Занятие 6',status:'published',subtitle:'Цикл while',tasks:lesson6Tasks,theory:[["1. Как работает while","Цикл while повторяет команды, пока условие истинно (True). Перед каждым повторением Python проверяет условие. Если оно ложно (False), тело цикла не запускается или цикл завершается.<pre><code>while условие:\n    команды</code></pre><strong>Запомни.</strong> Двоеточие : начинает тело цикла, а отступ показывает, какие команды относятся к циклу."],["2. Условие проверяется до выполнения тела","<pre><code>i = 5\nwhile i &lt; 5:\n    print(i)\n    i += 1</code></pre>Что выведет программа? Ничего: уже при первой проверке условие 5 &lt; 5 ложно. Поэтому цикл выполнится 0 раз. Сравни с условием i &lt;= 5: в таком случае цикл выполнится один раз и выведет 5."],["3. Как не получить бесконечный цикл","<pre><code>i = 0\nwhile i &lt; 3:\n    print(i)\n    i += 1</code></pre>Переменная i меняется на каждом повторении. После вывода 0, 1 и 2 она станет равна 3, условие i &lt; 3 станет ложным, и цикл завершится.<p><strong>Опасная ошибка.</strong> Если забыть изменить переменную, от которой зависит условие, цикл может не завершиться.</p><pre><code>i = 0\nwhile i &lt; 3:\n    print(i)  # i не меняется — цикл бесконечный</code></pre>"],["4. for или while?","Если заранее известно точное количество повторений, часто удобнее for. Если нужно повторять действия до события или до появления стоп-значения, удобен while.<pre><code>for i in range(3):\n    print(i)</code></pre><pre><code>num = int(input())\nwhile num != -1:\n    print('Получено:', num)\n    num = int(input())</code></pre>Во втором примере число -1 — стоп-значение. Оно завершает цикл и не обрабатывается телом цикла."]]},
+ {id:7,title:'Занятие 7',status:'published',subtitle:'Цикл while: обработка цифр и условия',tasks:homeworkTasks,theory:[["1. Как получить последнюю цифру","Оператор % (остаток от деления) помогает получить последнюю цифру целого неотрицательного числа: <code>n % 10</code>.<pre><code>n = 583\nprint(n % 10)  # 3</code></pre>Почему? При делении 583 на 10 остаток равен 3."],["2. Как убрать последнюю цифру","Оператор // выполняет целочисленное деление. Если разделить неотрицательное целое число на 10 с помощью <code>//</code>, последняя цифра исчезнет.<pre><code>n = 583\nn = n // 10\nprint(n)  # 58</code></pre><strong>Главная пара.</strong> <code>n % 10</code> — взять последнюю цифру. <code>n // 10</code> — убрать последнюю цифру."],["3. Как пройти по всем цифрам числа","Каждый проход цикла обрабатывает последнюю цифру. Затем число уменьшается в 10 раз (целочисленно), чтобы следующей стала предыдущая цифра.<pre><code>n = int(input())\nwhile n &gt; 0:\n    digit = n % 10\n    print(digit)\n    n //= 10</code></pre>Если ввести 583, программа выведет цифры в обратном порядке: 3, затем 8, затем 5. Это нормально: мы начинаем с последней цифры. <strong>Важно:</strong> в каждой итерации нужно убрать последнюю цифру. Иначе значение n не изменится и цикл может стать бесконечным."],["4. Как применить if к каждой цифре","Внутри цикла можно проверить каждую извлечённую цифру. Например, посчитать, сколько цифр чётные.<pre><code>n = int(input())\ncount = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit % 2 == 0:\n        count += 1\n    n //= 10\nprint(count)</code></pre>Здесь два разных действия с %: <code>n % 10</code> получает последнюю цифру числа, а <code>digit % 2</code> проверяет, делится ли эта цифра на 2 без остатка."],["5. Сумма, количество, максимум и произведение","<table><thead><tr><th>Что ищем</th><th>Начальное значение</th><th>Действие внутри цикла</th></tr></thead><tbody><tr><td>Количество цифр с нужным свойством</td><td><code>count = 0</code></td><td>Если условие выполнено: <code>count += 1</code></td></tr><tr><td>Сумму выбранных цифр</td><td><code>total = 0</code></td><td>Если условие выполнено: <code>total += digit</code></td></tr><tr><td>Максимальную цифру</td><td><code>max_digit = 0</code></td><td>Если <code>digit &gt; max_digit</code>: сохранить digit</td></tr><tr><td>Произведение выбранных ненулевых цифр</td><td><code>product = 1</code></td><td>Если цифра подходит: <code>product *= digit</code></td></tr></tbody></table><p>Почему для суммы берём 0, а для произведения — 1? Ноль не меняет сумму, а единица не меняет произведение. Если начать произведение с нуля, оно останется нулём при любом умножении.</p>"],["6. Пример","<pre><code>n = int(input())\nmax_digit = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit &gt; max_digit:\n        max_digit = digit\n    n //= 10\nprint(max_digit)</code></pre>Пример: для числа 48271 цифры рассматриваются так: 1, 7, 2, 8, 4. Переменная <code>max_digit</code> хранит наибольшую цифру, найденную к текущему моменту. Ответ — 8."]],tasks:homeworkTasks}
+-,{id:8,title:'Занятие 8',status:'published',subtitle:'Цикл while: потоки, состояние и математические алгоритмы',tasks:lesson8Tasks,theory:[
++,{id:8,title:'Занятие 8',status:'published',subtitle:'Цикл while: потоки, состояние и проект «Угадай число 2.0»',tasks:lesson8Tasks,theory:[
+ ["Что новое в занятии 8","Вы уже умеете использовать while и break. Теперь задача — хранить сразу несколько сведений о потоке, учитывать пустой ввод и не забывать прежнее состояние."],
+ ["Сигнал завершения и данные","Завершающее значение не является обычным элементом. Условие выхода должно проверяться до обновления счётчика, суммы или лучшего результата. Пустая строка и число 0 — разные сигналы."],
+ ["Пустой поток и первое значение","Для среднего арифметического количество не должно быть равно нулю при делении. Максимум и лучший результат обрабатывайте отдельно, если ни одного результата нет."],
+@@ -2311,13 +2471,18 @@
+   if(!lessonIsVisibleForCurrentStudent(task.lessonId))return false;
+   if(state.confirmedSolved&&state.confirmedSolved[task.key])return true;
+   if(state.solved&&state.solved[task.key]&&state.unsentResults&&state.unsentResults[task.key])return true;
++  if(task.skipIfConfirmedKey&&state.confirmedSolved&&state.confirmedSolved[task.skipIfConfirmedKey])return false;
++  const confirmed=state.confirmedSolved||{};
++  if(Array.isArray(task.unlockAfterKeys)&&task.unlockAfterKeys.length&&!task.unlockAfterKeys.every(key=>!!confirmed[key]))return false;
++  if(Array.isArray(task.unlockAfterAnyKeys)&&task.unlockAfterAnyKeys.length&&!task.unlockAfterAnyKeys.some(key=>!!confirmed[key]))return false;
++  if((Array.isArray(task.unlockAfterKeys)&&task.unlockAfterKeys.length)||(Array.isArray(task.unlockAfterAnyKeys)&&task.unlockAfterAnyKeys.length))return true;
+   const lesson=getLesson(task.lessonId);
+   if(!lesson||!Array.isArray(lesson.tasks))return false;
+   const index=lesson.tasks.findIndex(item=>item.key===task.key);
+   if(index<0)return false;
+   if(index===0)return true;
+   const previous=lesson.tasks[index-1];
+-  return !!(previous&&state.confirmedSolved&&state.confirmedSolved[previous.key]);
++  return !!(previous&&confirmed[previous.key]);
+ }
+ function firstAvailableStudentTask(){
+   const available=allTasks.filter(task=>lessonIsVisibleForCurrentStudent(task.lessonId)&&taskIsAvailable(task));
+@@ -2542,7 +2707,7 @@
+     wrap.className='lesson '+(state.openLessons[l.id]?'open':'');
+     const head=document.createElement('button');
+     head.className='lesson-head';
+-    const navTitles={1:'Ввод-вывод данных и переменные',2:'Цифры, числа + тип данных',3:'Условные операторы',4:'Условные операторы',5:'Вложенные и каскадные условия',6:'Цикл while',7:'Цикл while: обработка цифр и условия',8:'Цикл while: потоки и состояние'};
++    const navTitles={1:'Ввод-вывод данных и переменные',2:'Цифры, числа + тип данных',3:'Условные операторы',4:'Условные операторы',5:'Вложенные и каскадные условия',6:'Цикл while',7:'Цикл while: обработка цифр и условия',8:'Цикл while + проект «Угадай число 2.0»'};
+      head.innerHTML=`<span>▸</span><span class="lesson-head-title"><strong>${l.title}.</strong> <span>${navTitles[l.id]||l.subtitle}</span></span><span class="lesson-head-arrow">›</span>`;
+     head.onclick=()=>{state.openLessons[l.id]=!state.openLessons[l.id];saveState();renderNav()};
+     wrap.appendChild(head);
+@@ -2627,14 +2792,14 @@
+       quizBtn.onclick=function(e){openQuiz(e,l.id);};
+       body.appendChild(quizBtn);
+     }
+-    const groups={past:[],pro:[],base:[],medium:[],hard:[],boss:[],homework:[]};
++    const groups={past:[],pro:[],base:[],medium:[],hard:[],boss:[],project:[],homework:[]};
+     l.tasks.forEach(t=>groups[t.level].push(t));
+     Object.entries(groups).forEach(([level,arr])=>{
+       const visibleTasks=authSession&&authSession.role==='student'?arr.filter(t=>taskIsAvailable(t)):arr;
+       if(!visibleTasks.length)return;
+       const lt=document.createElement('div');
+       lt.className='level-title';
+-      lt.textContent={past:'ОСНОВНОЙ МАРШРУТ',pro:'PRO',base:'БАЗОВЫЙ УРОВЕНЬ',medium:'СРЕДНИЙ УРОВЕНЬ',hard:'СУПЕР / ДОПОЛНИТЕЛЬНЫЕ',boss:'BOSS',homework:'ДОМАШНЕЕ ЗАДАНИЕ'}[level];
++      lt.textContent={past:'ОСНОВНОЙ МАРШРУТ',pro:'PRO',base:'БАЗОВЫЙ УРОВЕНЬ',medium:'СРЕДНИЙ УРОВЕНЬ',hard:'СУПЕР / ДОПОЛНИТЕЛЬНЫЕ',boss:'BOSS',project:'ПРОЕКТ «УГАДАЙ ЧИСЛО 2.0»',homework:'ДОМАШНЕЕ ЗАДАНИЕ'}[level];
+       body.appendChild(lt);
+       visibleTasks.forEach(t=>{
+         const b=document.createElement('button');
+@@ -2645,7 +2810,7 @@
+       });
+     });
+     if(authSession&&authSession.role==='student'&&l.tasks.some(t=>!taskIsAvailable(t))){
+-      const note=document.createElement('div');note.className='task-locked-note';note.textContent='Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
++      const note=document.createElement('div');note.className='task-locked-note';note.textContent=l.id===8?'Закрытые этапы проекта открываются после выполнения нужных шагов. Базовая игра завершает обязательную часть; улучшения и исследовательский вызов — дополнительные.':'Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
+     }
+     wrap.appendChild(body);
+     lessonNav.appendChild(wrap);
+@@ -2808,13 +2973,21 @@
+   });
+   const latest=new Map();mine.forEach(r=>latest.set(r.lesson+'::'+r.taskId,r));
+   const unique=[...latest.values()];
+-  const totalTasks=visibleLessons.reduce((sum,l)=>sum+l.tasks.length,0);
+-  const solvedCountServer=unique.length,overallPercent=totalTasks?Math.round(solvedCountServer/totalTasks*100):0;
++  const legacyGuessCompleted=unique.some(r=>r.lesson==='Занятие 5'&&String(r.taskId)==='13');
++  const hasOptionalProject=visibleLessons.some(l=>l.tasks.some(t=>t.optional===true||t.skipIfConfirmedKey));
++  const requiredForLesson=lesson=>lesson.tasks.filter(t=>t.optional!==true&&!(legacyGuessCompleted&&t.skipIfConfirmedKey==='5-13'));
++  const isRowSolved=(lesson,task)=>unique.some(r=>r.lesson===('Занятие '+lesson.id)&&String(r.taskId)===String(task.id));
++  const totalTasks=hasOptionalProject?visibleLessons.reduce((sum,l)=>sum+requiredForLesson(l).length,0):visibleLessons.reduce((sum,l)=>sum+l.tasks.length,0);
++  const solvedCountServer=hasOptionalProject?visibleLessons.reduce((sum,l)=>sum+requiredForLesson(l).filter(t=>isRowSolved(l,t)).length,0):unique.length,overallPercent=totalTasks?Math.round(solvedCountServer/totalTasks*100):0;
+   studentProfileName.textContent=clean;studentOverallCount.textContent=`${solvedCountServer} / ${totalTasks}`;
+   studentOverallFill.style.width=`${overallPercent}%`;studentOverallPercent.textContent=`${overallPercent}%`;
+   studentLessonCards.innerHTML=visibleLessons.map(lesson=>{
+-    const solved=unique.filter(r=>r.lesson===('Занятие '+lesson.id)).length,total=lesson.tasks.length,percent=total?Math.round(solved/total*100):0;
+-    return `<div class="student-lesson-card"><div class="student-lesson-number">ЗАНЯТИЕ ${lesson.id}</div><div class="student-lesson-title">${escapeHtml(lesson.subtitle||lesson.title)}</div><div class="student-lesson-subtitle">${total} задач в маршрутном листе</div><div class="student-lesson-track"><div class="student-lesson-fill" style="width:${percent}%"></div></div><div class="student-lesson-bottom"><span class="student-lesson-count">${solved} / ${total} решено</span><span class="student-lesson-percent">${percent}%</span></div></div>`;
++    const hasOptional=lesson.tasks.some(t=>t.optional===true||t.skipIfConfirmedKey);
++    if(!hasOptional){const solved=unique.filter(r=>r.lesson===('Занятие '+lesson.id)).length,total=lesson.tasks.length,percent=total?Math.round(solved/total*100):0;return `<div class="student-lesson-card"><div class="student-lesson-number">ЗАНЯТИЕ ${lesson.id}</div><div class="student-lesson-title">${escapeHtml(lesson.subtitle||lesson.title)}</div><div class="student-lesson-subtitle">${total} задач в маршрутном листе</div><div class="student-lesson-track"><div class="student-lesson-fill" style="width:${percent}%"></div></div><div class="student-lesson-bottom"><span class="student-lesson-count">${solved} / ${total} решено</span><span class="student-lesson-percent">${percent}%</span></div></div>`;}
++    const required=requiredForLesson(lesson),solved=required.filter(t=>isRowSolved(lesson,t)).length,total=required.length,percent=total?Math.round(solved/total*100):0;
++    const optional=lesson.tasks.filter(t=>t.optional===true),optionalSolved=optional.filter(t=>isRowSolved(lesson,t)).length;
++    const optionalNote=optional.length?` · Дополнительные этапы: ${optionalSolved}/${optional.length}`:'';
++    return `<div class="student-lesson-card"><div class="student-lesson-number">ЗАНЯТИЕ ${lesson.id}</div><div class="student-lesson-title">${escapeHtml(lesson.subtitle||lesson.title)}</div><div class="student-lesson-subtitle">${total} обязательных задач${optionalNote}</div><div class="student-lesson-track"><div class="student-lesson-fill" style="width:${percent}%"></div></div><div class="student-lesson-bottom"><span class="student-lesson-count">${solved} / ${total} обязательных решено</span><span class="student-lesson-percent">${percent}%</span></div></div>`;
+   }).join('');
+ }
+ function openStudentDashboard(){
+@@ -3126,8 +3299,8 @@
+       const lessonMatch=String(r['Занятие']||'').match(/^Занятие\s+(\d+)$/);
+       const taskKey=lessonMatch?Number(lessonMatch[1])+'-'+String(r['№ задачи']||''):'';
+       const task=allTasks.find(item=>item.key===taskKey);
+-      const condition=task?String(task.problem||task.short||'Условие не заполнено.'):'Условие не найдено в текущем каталоге занятий.';
+-      const criteria=task?(task.checker?'Ручная проверка ('+String(task.checker)+')':(Array.isArray(task.tests)&&task.tests.length?'Автоматические тесты: '+task.tests.length:'Для задачи не настроены автоматические тесты; требуется ручная проверка.')):'Критерии не найдены в текущем каталоге.';
++      const condition=task?String(task.problem||task.short||'Условие не заполнено.')+(task.criteria?'\n\nКритерии готовности:\n'+String(task.criteria):''):'Условие не найдено в текущем каталоге занятий.';
++      const criteria=task?String(task.reviewCriteria||(task.checker?'Автоматическая/ручная проверка ('+String(task.checker)+')':(Array.isArray(task.tests)&&task.tests.length?'Автоматические тесты: '+task.tests.length:'Для задачи не настроены автоматические тесты; требуется ручная проверка.'))):'Критерии не найдены в текущем каталоге.';
+       return `<article class="teacher-manual-review-item" data-review-card="${escapeHtml(reviewId)}"><h4>${escapeHtml(r['Имя ученика']||'Ученик')} — ${escapeHtml(r['Название задачи']||'Задача '+(r['№ задачи']||''))}</h4><div class="teacher-manual-review-meta">${escapeHtml(r['Занятие']||'')} · задача ${escapeHtml(r['№ задачи']||'')} · отправлено ${escapeHtml(String(r['Дата']||'').replace('T',' ').slice(0,19))}</div><div class="teacher-manual-review-meta teacher-manual-review-condition"><strong>Условие:</strong> ${escapeHtml(condition)}</div><div class="teacher-manual-review-meta"><strong>Критерии проверки:</strong> ${escapeHtml(criteria)}</div><details><summary>Посмотреть решение ученика</summary><pre class="teacher-manual-review-code">${escapeHtml(code)}</pre>${r['Объяснение ученика']?`<p>${escapeHtml(r['Объяснение ученика'])}</p>`:''}</details><textarea class="teacher-manual-review-comment" data-review-comment="${escapeHtml(reviewId)}" maxlength="1000" placeholder="Комментарий ученику (обязателен, если нужно исправить)">${escapeHtml(r['Комментарий преподавателя']||'')}</textarea><div class="teacher-manual-review-actions"><button type="button" data-review-id="${escapeHtml(reviewId)}" data-review-status="Принято">Принять решение</button><button type="button" data-review-id="${escapeHtml(reviewId)}" data-review-status="Нужно исправить">Попросить исправить</button></div></article>`;
+     }).join('');
+     teacherManualReviewList.querySelectorAll('[data-review-status]').forEach(button=>button.onclick=()=>{
+@@ -3205,10 +3378,13 @@
+ 
+ function updateStats(){
+   const courseTasks=allTasks.filter(t=>lessonWithinCourseLimit(t.lessonId));
+-  const countedTasks=authSession&&authSession.role==='student'?courseTasks.filter(t=>lessonIsVisibleForCurrentStudent(t.lessonId)):courseTasks;
+-  const solved=countedTasks.filter(t=>taskCompletionConfirmed(t)).length;
+-  solvedCount.textContent=`${solved} / ${countedTasks.length}`;
+-  const ratedSolved=countedTasks.filter(t=>taskCompletionConfirmed(t)&&Number(state.ratings[t.key]||0)>0);
++  const visibleTasks=authSession&&authSession.role==='student'?courseTasks.filter(t=>lessonIsVisibleForCurrentStudent(t.lessonId)):courseTasks;
++  const legacyGuessCompleted=!!(authSession&&authSession.role==='student'&&state.confirmedSolved&&state.confirmedSolved['5-13']);
++  const countedTasks=authSession&&authSession.role==='student'?visibleTasks.filter(t=>t.optional!==true):visibleTasks;
++  const progressTasks=legacyGuessCompleted?countedTasks.filter(t=>t.skipIfConfirmedKey!=='5-13'):countedTasks;
++  const solved=progressTasks.filter(t=>taskCompletionConfirmed(t)).length;
++  solvedCount.textContent=`${solved} / ${progressTasks.length}`;
++  const ratedSolved=progressTasks.filter(t=>taskCompletionConfirmed(t)&&Number(state.ratings[t.key]||0)>0);
+   if(!ratedSolved.length){
+     hardestTask.textContent='Самая сложная задача: —';
+     hardestList.innerHTML='<div class=\"hardest-list-empty\">Пока нет оценённых решённых задач.</div>';
+@@ -3292,7 +3468,7 @@
+   else{document.getElementById('taskView').style.display='none';taskTitle.textContent='Занятия пока закрыты';taskShort.textContent='Преподаватель откроет доступ, когда можно будет начать.';lessonBadge.textContent='МОЁ ОБУЧЕНИЕ';return;}
+  }
+  document.getElementById('taskView').style.display='';
+-}selectedTestInputs=null;if(interactiveRunButton.disabled){interactiveRunId++;interactiveRunButton.disabled=false;interactiveRunButton.textContent='▶ Запустить код';stopRunButton.hidden=true}if(freeTerminalLesson!==null)leaveFreeTerminal();const t=currentTask();const l=getLesson(t.lessonId);lessonBadge.textContent=`ЗАНЯТИЕ ${l.id} · ${l.subtitle.toUpperCase()}`;taskTitle.textContent=t.title;taskShort.textContent=t.short;taskProblem.textContent=t.problem;loadTaskImage(t);renderTestData(t);renderPassport(t);taskTheory.textContent=t.theory||'Смотри теорию занятия и попробуй сформулировать условие своими словами.';const numericAnswerMode=t.lessonId===6&&(t.title==="Задача 13. Сколько раз выполнится цикл?"||t.title==="Задача 7. Сколько раз напечатается сообщение?"||t.title==="Задача 8. Сколько раз напечатается сообщение?"||t.title==="Задача 9. Ровно N повторений");const numericAnswerOnlyMode=t.lessonId===6&&t.title==="Задача 13. Сколько раз выполнится цикл?";const task7CountMode=t.lessonId===6&&t.title==="Задача 7. Сколько раз напечатается сообщение?";const experimentMode=t.lessonId===6&&t.title==="Задача 5. Измени начальное значение";const task10AnswerMode=t.lessonId===6&&t.title==="Задача 10. Что изменится при перестановке строк?";const answerWrap=document.getElementById('numericAnswerWrap');const experimentWrap=document.getElementById('experimentAnswerWrap');const task10Wrap=document.getElementById('task10AnswerWrap');const editorWrap=document.getElementById('editorWrap');const ioBlock=document.querySelector('.io-block');answerWrap.hidden=!numericAnswerMode;experimentWrap.hidden=!experimentMode;task10Wrap.hidden=!task10AnswerMode;editorWrap.hidden=numericAnswerOnlyMode||task10AnswerMode;ioBlock.hidden=numericAnswerOnlyMode||task10AnswerMode;interactiveRunButton.hidden=numericAnswerOnlyMode||task10AnswerMode;clearButton.hidden=numericAnswerOnlyMode||task10AnswerMode;hintButton.hidden=false;theoryButton.hidden=numericAnswerOnlyMode;document.querySelector('#taskView > section.card:last-of-type > h3').textContent=numericAnswerOnlyMode?'Введи ответ':task7CountMode?'Введи количество повторений':(t.title==='Задача 8. Сколько раз напечатается сообщение?'||t.title==='Задача 9. Ровно N повторений')?'Введи количество повторений':experimentMode?'Проведи эксперименты и запиши результаты':task10AnswerMode?'Введи результаты и объяснение':'Напишите программу';runButton.textContent=(numericAnswerMode||task10AnswerMode)?'✓ Проверить ответ':experimentMode?'✓ Проверить результаты':'✓ Отправить на проверку';document.getElementById('numericAnswer').value=numericAnswerMode?(state.codes[t.key]||''):'';const task10Saved=state.task10Answers?.[t.key]||{};document.getElementById('task10VariantA').value=task10AnswerMode?(task10Saved.a||''):'';document.getElementById('task10VariantB').value=task10AnswerMode?(task10Saved.b||''):'';document.getElementById('task10Explanation').value=task10AnswerMode?(task10Saved.explanation||''):'';const exp=state.experimentAnswers?.[t.key]||{};['experimentI0','experimentI5','experimentI10'].forEach((id,index)=>{const key=['i0','i5','i10'][index];const el=document.getElementById(id);if(el)el.value=experimentMode?(exp[key]||''):''});const stored=state.codes[t.key];suppressCodeSave=true;try{editor.setValue(stored!==undefined&&!numericAnswerOnlyMode?stored:(t.starter||''));}finally{suppressCodeSave=false;}stdinInput.value=state.inputs[t.key]||'';stdinInput.hidden=false;stdinInput.removeAttribute('aria-hidden');const a=Number(state.attempts[t.key]||0);updateProgress(a);renderHint(t);updateHintButton(a);updateSyncLine();updateSubmitButton();interactiveRunButton.disabled=false;interactiveRunButton.textContent='▶ Запустить код';if(pendingTerminalInput){pendingTerminalInput.resolve('');pendingTerminalInput=null}terminalInputRow.hidden=true;terminalInput.value='';terminalInput.disabled=false;terminalEnterButton.disabled=false;terminalContinueButton.hidden=true;terminalContinueButton.disabled=false;terminalStatusLine.hidden=true;terminalTranscript='';terminalRunCount=0;clearExecutionHighlight();showConsoleOutput('Нажми «Запустить код», чтобы увидеть результат программы.');consoleBox.classList.remove('show');stopRunButton.hidden=true;showStatus('','');const reviewState=state.manualReviewStatus&&state.manualReviewStatus[t.key];if(reviewState&&reviewState.status==='Ожидает проверки')showStatus('warning','Решение отправлено преподавателю и ожидает проверки. Следующая задача откроется после принятия.');else if(reviewState&&reviewState.status==='Нужно исправить')showStatus('error','Преподаватель попросил исправить решение.'+(reviewState.comment?'\n\nКомментарий: '+reviewState.comment:''));else if(reviewState&&reviewState.status==='Принято'&&taskCompletionConfirmed(t))showStatus('success','Преподаватель принял решение. Задача отмечена выполненной.');renderRating()}
++}selectedTestInputs=null;if(interactiveRunButton.disabled){interactiveRunId++;interactiveRunButton.disabled=false;interactiveRunButton.textContent='▶ Запустить код';stopRunButton.hidden=true}if(freeTerminalLesson!==null)leaveFreeTerminal();const t=currentTask();const l=getLesson(t.lessonId);lessonBadge.textContent=`ЗАНЯТИЕ ${l.id} · ${l.subtitle.toUpperCase()}`;taskTitle.textContent=t.title;taskShort.textContent=t.short;taskProblem.textContent=t.problem+(t.criteria?'\n\nКритерии готовности:\n'+t.criteria:'');loadTaskImage(t);renderTestData(t);renderPassport(t);taskTheory.textContent=t.theory||'Смотри теорию занятия и попробуй сформулировать условие своими словами.';const numericAnswerMode=t.lessonId===6&&(t.title==="Задача 13. Сколько раз выполнится цикл?"||t.title==="Задача 7. Сколько раз напечатается сообщение?"||t.title==="Задача 8. Сколько раз напечатается сообщение?"||t.title==="Задача 9. Ровно N повторений");const numericAnswerOnlyMode=t.lessonId===6&&t.title==="Задача 13. Сколько раз выполнится цикл?";const task7CountMode=t.lessonId===6&&t.title==="Задача 7. Сколько раз напечатается сообщение?";const experimentMode=t.lessonId===6&&t.title==="Задача 5. Измени начальное значение";const task10AnswerMode=t.lessonId===6&&t.title==="Задача 10. Что изменится при перестановке строк?";const answerWrap=document.getElementById('numericAnswerWrap');const experimentWrap=document.getElementById('experimentAnswerWrap');const task10Wrap=document.getElementById('task10AnswerWrap');const editorWrap=document.getElementById('editorWrap');const ioBlock=document.querySelector('.io-block');answerWrap.hidden=!numericAnswerMode;experimentWrap.hidden=!experimentMode;task10Wrap.hidden=!task10AnswerMode;editorWrap.hidden=numericAnswerOnlyMode||task10AnswerMode;ioBlock.hidden=numericAnswerOnlyMode||task10AnswerMode;interactiveRunButton.hidden=numericAnswerOnlyMode||task10AnswerMode;clearButton.hidden=numericAnswerOnlyMode||task10AnswerMode;hintButton.hidden=false;theoryButton.hidden=numericAnswerOnlyMode;document.querySelector('#taskView > section.card:last-of-type > h3').textContent=numericAnswerOnlyMode?'Введи ответ':task7CountMode?'Введи количество повторений':(t.title==='Задача 8. Сколько раз напечатается сообщение?'||t.title==='Задача 9. Ровно N повторений')?'Введи количество повторений':experimentMode?'Проведи эксперименты и запиши результаты':task10AnswerMode?'Введи результаты и объяснение':'Напишите программу';runButton.textContent=(numericAnswerMode||task10AnswerMode)?'✓ Проверить ответ':experimentMode?'✓ Проверить результаты':'✓ Отправить на проверку';document.getElementById('numericAnswer').value=numericAnswerMode?(state.codes[t.key]||''):'';const task10Saved=state.task10Answers?.[t.key]||{};document.getElementById('task10VariantA').value=task10AnswerMode?(task10Saved.a||''):'';document.getElementById('task10VariantB').value=task10AnswerMode?(task10Saved.b||''):'';document.getElementById('task10Explanation').value=task10AnswerMode?(task10Saved.explanation||''):'';const exp=state.experimentAnswers?.[t.key]||{};['experimentI0','experimentI5','experimentI10'].forEach((id,index)=>{const key=['i0','i5','i10'][index];const el=document.getElementById(id);if(el)el.value=experimentMode?(exp[key]||''):''});const stored=state.codes[t.key];const sourceCode=Array.isArray(t.starterSourceKeys)?t.starterSourceKeys.map(key=>state.codes[key]).find(code=>typeof code==='string'&&code.trim()):'';const initialCode=stored!==undefined?stored:(sourceCode||t.starter||'');suppressCodeSave=true;try{editor.setValue(initialCode);}finally{suppressCodeSave=false;}stdinInput.value=state.inputs[t.key]||'';stdinInput.hidden=false;stdinInput.removeAttribute('aria-hidden');const a=Number(state.attempts[t.key]||0);updateProgress(a);renderHint(t);updateHintButton(a);updateSyncLine();updateSubmitButton();interactiveRunButton.disabled=false;interactiveRunButton.textContent='▶ Запустить код';if(pendingTerminalInput){pendingTerminalInput.resolve('');pendingTerminalInput=null}terminalInputRow.hidden=true;terminalInput.value='';terminalInput.disabled=false;terminalEnterButton.disabled=false;terminalContinueButton.hidden=true;terminalContinueButton.disabled=false;terminalStatusLine.hidden=true;terminalTranscript='';terminalRunCount=0;clearExecutionHighlight();showConsoleOutput('Нажми «Запустить код», чтобы увидеть результат программы.');consoleBox.classList.remove('show');stopRunButton.hidden=true;showStatus('','');const reviewState=state.manualReviewStatus&&state.manualReviewStatus[t.key];if(reviewState&&reviewState.status==='Ожидает проверки')showStatus('warning','Решение отправлено преподавателю и ожидает проверки. Следующая задача откроется после принятия.');else if(reviewState&&reviewState.status==='Нужно исправить')showStatus('error','Преподаватель попросил исправить решение.'+(reviewState.comment?'\n\nКомментарий: '+reviewState.comment:''));else if(reviewState&&reviewState.status==='Принято'&&taskCompletionConfirmed(t))showStatus('success','Преподаватель принял решение. Задача отмечена выполненной.');renderRating()}
+ function updateHintButton(a){
+   const t=currentTask(),n=hintParts(t).length,lv=hintLevel(t);
+   if(state.solved[t.key]||taskCompletionConfirmed(t)){hintButton.disabled=true;hintButton.textContent='✓ Задача решена';return}
+@@ -3309,7 +3485,76 @@
+ function highlightExecutionLine(lineNumber,kind='runtime'){clearExecutionHighlight();const line=Number(lineNumber);if(!Number.isInteger(line)||line<1||line>editor.lineCount())return;const index=line-1;const bg=kind==='error'?'cm-error-line':'cm-runtime-line';const gutter=kind==='error'?'cm-error-gutter':'cm-runtime-gutter';editor.addLineClass(index,'background',bg);editor.addLineClass(index,'gutter',gutter);highlightedRuntimeLine=index;try{editor.scrollIntoView({line:index,ch:0},100)}catch(e){}}
+ function findInputLine(code,requestIndex){const lines=String(code||'').split('\n');const matches=[];lines.forEach((line,index)=>{const re=/\binput\s*\(/g;let m;while((m=re.exec(line))!==null)matches.push(index+1)});return matches[Math.min(Math.max(0,requestIndex-1),Math.max(0,matches.length-1))]||null;}
+ function explainPythonError(raw){const text=String(raw||'').replace(/^Error:\s*/,'').trim();const lineNumber=extractPythonErrorLine(text);const line=lineNumber?`\nСтрока: ${lineNumber}.`:'';let title='Ошибка выполнения';let advice='Проверь написание команды, скобки, кавычки и названия переменных.';if(/SyntaxError|invalid syntax|EOL while scanning|string literal|unexpected EOF/i.test(text)){title='Синтаксическая ошибка';advice='Python не может прочитать команду. Проверь кавычки, круглые скобки, двоеточия и написание команды.'}else if(/NameError|name .* is not defined/i.test(text)){title='Ошибка в имени переменной';advice='Проверь, что переменная написана одинаково везде и что ты создал(а) её до использования.'}else if(/TypeError|can only concatenate|unsupported operand type/i.test(text)){title='Ошибка типов данных';advice='Проверь, не пытаешься ли ты складывать текст и число. Для преобразования используй int() или float(), если это нужно по задаче.'}else if(/ValueError|invalid literal/i.test(text)){title='Ошибка значения';advice='Проверь, подходит ли введённое значение для преобразования, например int() принимает целое число.'}else if(/ZeroDivisionError|division by zero/i.test(text)){title='Деление на ноль';advice='Проверь делитель: на ноль делить нельзя.'}else if(/TimeLimitError|execution limit|too many instructions|time limit/i.test(text)){title='Программа выполнялась слишком долго';advice='Возможно, цикл стал бесконечным. Проверь, меняется ли счётчик внутри while и может ли условие стать ложным. Сайт остановил запуск, чтобы страница не зависла.'}else if(/IndexError/i.test(text)){title='Индекс за пределами списка или строки';advice='Проверь длину списка или строки и номер элемента, к которому обращаешься.'}else if(/IndentationError|unexpected indent|unindent/i.test(text)){title='Ошибка отступов';advice='Проверь пробелы в начале строк. Внутри одного блока отступы должны быть одинаковыми.'}const clean=text.replace(/<stdin>/g,'').replace(/\s+at \S+/g,'').slice(0,700);return {message:`${title}${line}\n\nПодробности Python: ${clean}\n\nЧто проверить: ${advice}`,line:lineNumber};}
+-function runOneTest(code,inputValues){return new Promise(resolve=>{let output='';let inputIndex=0;function inputFun(){if(inputIndex>=inputValues.length)throw new Error('Программа запросила больше входных данных, чем указано в тесте.');return String(inputValues[inputIndex++]);}Sk.configure({output:text=>output+=text,inputfun:inputFun,inputfunTakesPrompt:false,read:builtinRead,__future__:Sk.python3,execLimit:100000});Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,code,true)).then(()=>resolve({ok:true,output:normalizeOutput(output)}),error=>resolve({ok:false,error:String(error)}))})}
++function controlledTestPrelude(options){
++  const opts=options||{},parts=[];
++  if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2){
++    const values=opts.randomValues.length?opts.randomValues:[-999999];
++    parts.push('import random');parts.push('__guess_test_original_randint = random.randint');parts.push('__guess_test_values = '+JSON.stringify(values));parts.push('__guess_test_index = 0');parts.push('__guess_test_random_calls = []');
++    parts.push('def __guess_test_randint(a, b):');parts.push('    global __guess_test_index');parts.push('    __guess_test_random_calls.append((a, b))');
++    parts.push('    if a != '+Number(opts.randomRange[0])+' or b != '+Number(opts.randomRange[1])+':');parts.push('        return -999999');
++    parts.push('    if __guess_test_index >= len(__guess_test_values):');parts.push('        return -999999');
++    parts.push('    value = __guess_test_values[__guess_test_index]');parts.push('    __guess_test_index += 1');parts.push('    return value');
++  }
++  if(Array.isArray(opts.clockValues)&&opts.clockValues.length){
++    parts.push('import time');parts.push('__guess_test_original_time = time.time');parts.push('__guess_test_clock_values = '+JSON.stringify(opts.clockValues));parts.push('__guess_test_clock_index = 0');parts.push('__guess_test_clock_calls = []');
++    parts.push('def __guess_test_time():');parts.push('    global __guess_test_clock_index');
++    parts.push('    if __guess_test_clock_index < len(__guess_test_clock_values):');parts.push('        value = __guess_test_clock_values[__guess_test_clock_index]');
++    parts.push('    else:');parts.push('        value = __guess_test_clock_values[-1]');
++    parts.push('    __guess_test_clock_index += 1');parts.push('    __guess_test_clock_calls.append(value)');parts.push('    return value');
++  }
++  return parts.length?parts.join('\n')+'\n':'';
++}
++function controlledTestApply(options){
++  const opts=options||{},parts=[];
++  if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    random.randint = __guess_test_randint');
++  if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    time.time = __guess_test_time');
++  return parts.join('\n');
++}
++function controlledTestCleanup(options){
++  const opts=options||{},parts=[];
++  if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    random.randint = __guess_test_original_randint');
++  if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    time.time = __guess_test_original_time');
++  return parts.join('\n');
++}
++function controlledTestMetadata(options){
++  const opts=options||{},parts=[];
++  if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    print("__GUESS_TEST_RANDOM__" + str(__guess_test_random_calls))');
++  if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    print("__GUESS_TEST_CLOCK__" + str(__guess_test_clock_calls))');
++  return parts.length?'    print()\n'+parts.join('\n'):'';
++}
++function parseControlledTestOutput(raw){
++  let randomCalls=null,clockCalls=null;
++  const visible=[];
++  String(raw||'').split('\n').forEach(line=>{
++    if(line.startsWith('__GUESS_TEST_RANDOM__')){
++      const payload=line.slice('__GUESS_TEST_RANDOM__'.length);
++      randomCalls=[...payload.matchAll(/\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/g)].map(match=>[Number(match[1]),Number(match[2])]);
++    }else if(line.startsWith('__GUESS_TEST_CLOCK__')){
++      const payload=line.slice('__GUESS_TEST_CLOCK__'.length);
++      clockCalls=(payload.match(/-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/g)||[]).map(Number);
++    }else visible.push(line);
++  });
++  return {output:visible.join('\n'),randomCalls,clockCalls};
++}
++function runOneTest(code,inputValues,options){return new Promise(resolve=>{
++  let output='';let inputIndex=0;const inputOffsets=[];
++  function inputFun(){inputOffsets.push(output.length);if(inputIndex>=inputValues.length)throw new Error('Программа запросила больше входных данных, чем указано в тесте.');return String(inputValues[inputIndex++]);}
++  const opts=options||{},prelude=controlledTestPrelude(opts);let source=String(code||'');
++  if(prelude){
++    const apply=controlledTestApply(opts),cleanup=controlledTestCleanup(opts),metadata=controlledTestMetadata(opts);
++    const indented=source.split(/\r?\n/).map(line=>'    '+line).join('\n')||'    pass';
++    source=prelude+'try:\n'+(apply?apply+'\n':'')+indented+'\n'+(metadata?metadata+'\n':'')+'finally:\n'+(cleanup?cleanup+'\n':'    pass\n');
++  }
++  const finish=(ok,error)=>{
++    const parsed=parseControlledTestOutput(output),clean=parsed.output;
++    const offsets=inputOffsets.map(offset=>Math.min(offset,clean.length));
++    const before=offsets.length?clean.slice(0,offsets[0]):clean;
++    const segments=offsets.map((start,index)=>clean.slice(start,index+1<offsets.length?offsets[index+1]:clean.length));
++    resolve({ok,output:normalizeOutput(clean),inputsUsed:inputIndex,outputBeforeFirstInput:normalizeOutput(before),inputSegments:segments.map(normalizeOutput),randomCalls:parsed.randomCalls,clockCalls:parsed.clockCalls,...(error?{error}: {})});
++  };
++  Sk.configure({output:text=>output+=text,inputfun:inputFun,inputfunTakesPrompt:false,read:builtinRead,__future__:Sk.python3,execLimit:100000});
++  Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,source,true)).then(()=>finish(true),error=>finish(false,String(error)));
++})}
+ function explainWrongOutput(expected,actual){
+  const exp=normalizeOutput(expected),got=normalizeOutput(actual);
+  if(!got)return 'Программа ничего не вывела, а ожидался результат. Добавь команду print() и проверь, что именно нужно вывести.';
+@@ -3351,7 +3596,7 @@
+ function expectedPhoneOutput(minutes,sms){const base=15,em=minutes>50?(minutes-50)*.25:0,es=sms>50?(sms-50)*.15:0,fee=.44,sub=base+em+es+fee,tax=sub*.05,total=sub+tax;const lines=[`Базовая сумма: $${base.toFixed(2)}`];if(minutes>50)lines.push(`Дополнительные минуты: $${em.toFixed(2)}`);if(sms>50)lines.push(`Дополнительные SMS: $${es.toFixed(2)}`);lines.push(`Сбор emergency services: $${fee.toFixed(2)}`,`Налог: $${tax.toFixed(2)}`,`Итого: $${total.toFixed(2)}`);return lines.join('\n')}
+ async function checkPhone(code){const cases=[['50','50'],['60','55'],['40','70']];let passedTests=0;for(const input of cases){const r=await runOneTest(code,input);if(!r.ok)return {type:'execution_error',category:PythonTaskChecker.errorCategory(r.error),passedTests,totalTests:cases.length,error:r.error};const expected=expectedPhoneOutput(Number(input[0]),Number(input[1]));if(normalizeOutput(r.output)!==normalizeOutput(expected))return {type:'wrong_answer',category:'wrong_output',passedTests,totalTests:cases.length,expected,actual:r.output};passedTests++;}return {type:'success',category:'all_tests_passed',passedTests,totalTests:cases.length}}
+ function checkRouletteOutput(output){const lines=normalizeOutput(output).split('\n').map(x=>x.trim()).filter(Boolean);if(!lines.length)return false;const m=lines[0].match(/^Выпавший номер:\s*(0|00|[1-9]|[1-2][0-9]|3[0-6])$/);if(!m)return false;const v=m[1];if(v==='0'||v==='00')return lines.length===2&&lines[1]===`Выигравшая ставка: ${v}`;const n=Number(v);if(lines.length!==5)return false;const red=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);const color=red.has(n)?'красное':'черное';const parity=n%2===0?'четное':'нечетное';const range=n<=18?'от 1 до 18':'от 19 до 36';return lines[1]===`Выигравшая ставка: ${n}`&&lines[2]===`Выигравшая ставка: ${color}`&&lines[3]===`Выигравшая ставка: ${parity}`&&lines[4]===`Выигравшая ставка: ${range}`}
+-async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,roulette:async()=>({type:'manual_review',category:'randomized_behavior'})}})}
++async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'})}})}
+ function getStdinValues(){const raw=String(stdinInput.value||'').replace(/\r\n/g,'\n');if(raw==='')return [];const values=raw.split('\n');if(values.length&&values[values.length-1]==='')values.pop();return values}
+ function showConsoleOutput(text,ok=true){consoleBox.classList.add('show');consoleOutput.className='console-output'+(ok?'':' error');consoleOutput.textContent=text||'(программа ничего не вывела)';consoleOutput.scrollTop=consoleOutput.scrollHeight}
+ function appendTerminalLine(text,className=''){const value=String(text);terminalTranscript+=(terminalTranscript&&!terminalTranscript.endsWith('\n')?'\n':'')+value+'\n';consoleOutput.textContent=terminalTranscript;consoleOutput.classList.remove('empty','error');consoleOutput.scrollTop=consoleOutput.scrollHeight;}
+@@ -3788,6 +4033,133 @@
+ 
+ 
+ function checkGuessProject(){return {type:'manual_review',category:'dynamic_behavior'}}
++function guessProjectText(output){return String(output||'').toLowerCase().replace(/ё/g,'е')}
++function guessProjectHasSuccess(output){const text=guessProjectText(output);return /(?:^|\n)\s*(?:(?:ты|компьютер)\s+)?угадал[!.]?\s*(?:\n|$)/.test(text)&&!/(?:не\s+угадал)/.test(text)}
++function guessProjectSegmentHas(segment,category){
++  const text=guessProjectText(segment);
++  const patterns={
++    greater:/мо[её] число больше|число больше|больше/,
++    less:/мо[её] число меньше|число меньше|меньше/,
++    success:/(?:^|\n)\s*(?:(?:ты|компьютер)\s+)?угадал[!.]?\s*(?:\n|$)/,
++    exhausted:/попытки закончились|попытки исчерпаны|лимит попыток/,
++    invalid:/неверн|ошиб/,
++    rechoose:/выбер[\s\S]*1[\s\S]*2[\s\S]*3/,
++    replay:/сыграть еще раз|сыграть ещ[её] раз|еще раз\?|ещ[её] раз\?/,
++    hot:/горячо/,
++    cold:/холодно/,
++    'attempt:1':/попытк[а-яё]*\s*(?:№\s*)?1\b/,
++    'attempt:2':/попытк[а-яё]*\s*(?:№\s*)?2\b/,
++    'attempt:3':/попытк[а-яё]*\s*(?:№\s*)?3\b/
++  };
++  if(category&&category.startsWith('guess:'))return new RegExp('моя попытка:\\s*'+Number(category.slice(6))+'\\b').test(text);
++  return !!(patterns[category]&&patterns[category].test(text));
++}
++function guessProjectCasePassed(test,result){
++  if(!result||!result.ok)return false;
++  const out=guessProjectText(result.output),used=Number(result.inputsUsed||0);
++  if(used!==test.input.length)return false;
++  if(test.success&&!guessProjectHasSuccess(out))return false;
++  if(test.successCount){const wins=out.split('\n').filter(line=>/^\s*(?:(?:ты|компьютер)\s+)?угадал[!.]?\s*$/.test(line)).length;if(wins<test.successCount)return false;}
++  if(test.noSuccess&&guessProjectHasSuccess(out))return false;
++  if(test.expectedBeforeInput&&test.expectedBeforeInput.some(category=>!guessProjectSegmentHas(result.outputBeforeFirstInput,category)))return false;
++  if(test.expectedAfterInput){
++    if(!Array.isArray(result.inputSegments)||result.inputSegments.length<test.expectedAfterInput.length)return false;
++    for(let i=0;i<test.expectedAfterInput.length;i++){
++      const expected=Array.isArray(test.expectedAfterInput[i])?test.expectedAfterInput[i]:(test.expectedAfterInput[i]?[test.expectedAfterInput[i]]:[]);
++      if(expected.some(category=>!guessProjectSegmentHas(result.inputSegments[i],category)))return false;
++    }
++  }
++  if(test.greater&&!/мо[её] число больше|число больше|больше/.test(out))return false;
++  if(test.less&&!/мо[её] число меньше|число меньше|меньше/.test(out))return false;
++  if(test.feedbackOrder){const patterns={greater:/мо[её] число больше|число больше|больше/,less:/мо[её] число меньше|число меньше|меньше/,success:/(?:^|\n)\s*(?:(?:ты|компьютер)\s+)?угадал[!.]?\s*(?:\n|$)/};let last=-1;for(const key of test.feedbackOrder){const match=(patterns[key]||/.^/).exec(out);if(!match||match.index<=last)return false;last=match.index;}}
++  if(test.attempts){const segments=[String(result.outputBeforeFirstInput||''),...(result.inputSegments||[])].map(guessProjectText);for(let i=0;i<test.attempts.length;i++)if(!guessProjectSegmentHas(segments[i],'attempt:'+test.attempts[i]))return false;}
++  if(test.attemptCounts&&Object.entries(test.attemptCounts).some(([n,count])=>(out.match(new RegExp('попытк[а-яё]*\\s*(?:№\\s*)?'+n+'\\b','g'))||[]).length<count))return false;
++  if(test.exhausted&&!/попытки закончились|попытки исчерпаны|лимит попыток/.test(out))return false;
++  if(test.noExhausted&&/попытки закончились|попытки исчерпаны|лимит попыток/.test(out))return false;
++  if(typeof test.secretShown==='number'&&!out.includes(String(test.secretShown)))return false;
++  if(test.invalidChoice&&!(/неверн|ошиб/.test(out)||(out.match(/выбер/g)||[]).length>=2))return false;
++  if(test.askReplay&&!/сыграть еще раз|сыграть ещ[её] раз|еще раз\?|ещ[её] раз\?/.test(out))return false;
++  if(test.hot&&!/горячо/.test(out))return false;
++  if(test.cold&&!/холодно/.test(out))return false;
++  if(test.elapsed&&!(/\b4(?:\.0+)?\b/.test(out)&&/секунд|время/.test(out)))return false;
++  if(test.elapsed&&(!Array.isArray(result.clockCalls)||result.clockCalls.length<2||Number(result.clockCalls[0])!==100||Number(result.clockCalls[1])!==104))return false;
++  if(test.guesses){
++    const guessMatches=[...out.matchAll(/моя попытка:\s*(-?\d+)\b/g)].map(match=>Number(match[1]));
++    if(JSON.stringify(guessMatches)!==JSON.stringify(test.guesses))return false;
++    const prefix=guessProjectText(result.outputBeforeFirstInput||'');
++    if(!prefix.includes('моя попытка: '+test.guesses[0]))return false;
++    for(let i=1;i<test.guesses.length;i++)if(!guessProjectText((result.inputSegments||[])[i-1]||'').includes('моя попытка: '+test.guesses[i]))return false;
++    if(test.success&&!guessProjectHasSuccess((result.inputSegments||[])[test.guesses.length-1]||''))return false;
++  }
++  return true;
++}
++async function runGuessProjectCases(code,cases){
++  const randomProbeA=await runOneTest('print(random.randint(1, 100))',[],{randomRange:[1,100],randomValues:[37]});
++  const randomProbeB=await runOneTest('print(random.randint(1, 100))',[],{randomRange:[1,100],randomValues:[73]});
++  const probeWorks=probe=>probe&&probe.ok&&Array.isArray(probe.randomCalls)&&probe.randomCalls.length===1&&probe.randomCalls[0][0]===1&&probe.randomCalls[0][1]===100;
++  if(!probeWorks(randomProbeA)||!probeWorks(randomProbeB)||String(randomProbeA.output).trim()!=='37'||String(randomProbeB.output).trim()!=='73')return {type:'manual_review',category:'random_control_unavailable',passedTests:0,totalTests:cases.length,reviewCriteria:'Текущая среда Skulpt не подтвердила детерминированное управление random.randint и регистрацию вызовов. Преподаватель проверяет правильность границ, цикл, подсказки и завершение игры по коду и наблюдаемым запускам.'};
++  let passed=0;
++  for(let i=0;i<cases.length;i++){
++    const test=cases[i],range=test.range||[1,100],values=test.secrets||[test.secret];
++    const result=await runOneTest(code,test.input,{randomRange:range,randomValues:values,clockValues:test.clockValues});
++    const calls=Array.isArray(result&&result.randomCalls)?result.randomCalls:null,expectedCallCount=Array.isArray(test.secrets)?test.secrets.length:1;
++    const callsValid=!!calls&&calls.length===expectedCallCount&&calls.every(call=>Array.isArray(call)&&Number(call[0])===Number(range[0])&&Number(call[1])===Number(range[1]));
++    if(!callsValid||!guessProjectCasePassed(test,result)){
++      const isExecutionError=!!(result&&!result.ok);
++      return {type:isExecutionError?'execution_error':'wrong_answer',category:isExecutionError?PythonTaskChecker.errorCategory(result.error):(!callsValid?'random_range_or_call_count':'guess_project_case_failed'),passedTests:passed,totalTests:cases.length,failedTest:i+1,expected:test.description||'Выполнение сценария по условию задачи',actual:isExecutionError?String(result.error||'Ошибка выполнения'):String(result.output||'Нет вывода'),error:isExecutionError?String(result.error||'Ошибка выполнения'):undefined};
++    }
++    passed++;
++  }
++  return {type:'success',category:'all_tests_passed',passedTests:passed,totalTests:cases.length};
++}
++async function checkGuess2Base(code){return runGuessProjectCases(code,[
++  {description:'Победа с первой попытки',input:['42'],secret:42,success:true,expectedAfterInput:[['success']]},
++  {description:'Подсказки больше/меньше и последующая победа',input:['30','70','50'],secret:50,greater:true,less:true,success:true,feedbackOrder:['greater','less','success'],expectedAfterInput:[['greater'],['less'],['success']]},
++  {description:'Другой секрет подтверждает сравнение с загаданным числом',input:['30','70','73'],secret:73,success:true,expectedAfterInput:[['greater'],['greater'],['success']]}
++]);}
++async function checkGuess2Attempts(code){return runGuessProjectCases(code,[
++  {description:'Правильный ответ на третьей попытке',input:['10','90','50'],secret:50,attempts:[1,2,3],success:true,noExhausted:true,expectedBeforeInput:['attempt:1'],expectedAfterInput:[['greater','attempt:2'],['less','attempt:3'],['success']]},
++  {description:'Победа на третьей попытке при другом загаданном числе',input:['10','90','73'],secret:73,attempts:[1,2,3],success:true,noExhausted:true,expectedBeforeInput:['attempt:1'],expectedAfterInput:[['greater','attempt:2'],['less','attempt:3'],['success']]},
++  {description:'Три ошибки завершают игру и раскрывают секрет',input:['10','90','20'],secret:50,attempts:[1,2,3],noSuccess:true,exhausted:true,secretShown:50,expectedBeforeInput:['attempt:1'],expectedAfterInput:[['greater','attempt:2'],['less','attempt:3'],['greater','exhausted']]}
++]);}
++async function checkGuess2Replay(code){return runGuessProjectCases(code,[
++  {description:'Два раунда и ответ «да»',input:['10','50','да','17','нет'],secrets:[50,17],attempts:[1,2],attemptCounts:{1:2,2:1},success:true,successCount:2,askReplay:true,expectedAfterInput:[['greater'],['success','replay'],['attempt:1'],['success','replay'],[]]},
++  {description:'Ответы «ДА» и «НЕТ» без учёта регистра',input:['10','50','ДА','17','НЕТ'],secrets:[50,17],attempts:[1,2],attemptCounts:{1:2,2:1},success:true,successCount:2,askReplay:true,expectedAfterInput:[['greater'],['success','replay'],['attempt:1'],['success','replay'],[]]}
++]);}
++async function checkGuess2Difficulty(code){return runGuessProjectCases(code,[
++  {description:'Лёгкая сложность использует диапазон 1–20',input:['1','10','нет'],range:[1,20],secret:10,success:true,askReplay:true,expectedAfterInput:[[],['success','replay'],[]]},
++  {description:'Средняя сложность использует диапазон 1–100',input:['2','75','нет'],range:[1,100],secret:75,success:true,askReplay:true,expectedAfterInput:[[],['success','replay'],[]]},
++  {description:'Сложная сложность использует диапазон 1–200',input:['3','175','нет'],range:[1,200],secret:175,success:true,askReplay:true,expectedAfterInput:[[],['success','replay'],[]]},
++  {description:'Неверный выбор просит повторить ввод сложности',input:['4','1','10','нет'],range:[1,20],secret:10,success:true,askReplay:true,invalidChoice:true,expectedAfterInput:[['rechoose'],[],['success','replay'],[]]}
++]);}
++async function checkGuess2HotCold(code){return runGuessProjectCases(code,[
++  {description:'Более близкое предположение даёт подсказку «Горячо»',input:['5','8','10','нет'],range:[1,20],secret:10,success:true,askReplay:true,hot:true,expectedAfterInput:[['greater'],['greater','hot'],['success','replay'],[]]},
++  {description:'Более далёкое предположение даёт подсказку «Холодно»',input:['8','5','10','нет'],range:[1,20],secret:10,success:true,askReplay:true,cold:true,expectedAfterInput:[['greater'],['greater','cold'],['success','replay'],[]]}
++]);}
++async function checkGuess2Timer(code){
++  const probe=await runOneTest('import time\nprint(time.time())',[]);
++  if(!probe.ok)return {type:'manual_review',category:'time_module_unavailable',passedTests:0,totalTests:1,reviewCriteria:'В этой версии Skulpt не удалось выполнить import time и time.time(); преподаватель проверяет измерение по коду вручную.'};
++  const controlledProbe=await runOneTest('print(time.time())',[],{clockValues:[100,104]});
++  if(!controlledProbe.ok||!String(controlledProbe.output||'').includes('100')||!Array.isArray(controlledProbe.clockCalls)||Number(controlledProbe.clockCalls[0])!==100)return {type:'manual_review',category:'time_clock_control_unavailable',passedTests:0,totalTests:1,reviewCriteria:'time.time() доступен, но контроль времени для детерминированного теста не сработал. Преподаватель проверяет замер вручную.'};
++  return runGuessProjectCases(code,[{description:'Замер времени раунда выводит длительность в секундах',input:['1','10','нет'],range:[1,20],secret:10,clockValues:[100,104],success:true,askReplay:true,elapsed:true,expectedAfterInput:[['greater'],['success','replay'],[]]}]);
++}
++async function checkGuess2Research(code){
++  const cases=[
++    {input:['больше','меньше','больше','больше','больше','угадал'],description:'Целевое число 73, обычный регистр',guesses:[50,75,62,68,71,73]},
++    {input:['БОЛЬШЕ','МЕНЬШЕ','БОЛЬШЕ','БОЛЬШЕ','БОЛЬШЕ','УГАДАЛ'],description:'Целевое число 73, ответы в верхнем регистре',guesses:[50,75,62,68,71,73]},
++    {input:['меньше','меньше','меньше','меньше','меньше','угадал'],description:'Граничное число 1',guesses:[50,25,12,6,3,1]},
++    {input:['БОЛЬШЕ','БОЛЬШЕ','БОЛЬШЕ','БОЛЬШЕ','БОЛЬШЕ','БОЛЬШЕ','УГАДАЛ'],description:'Граничное число 100, не более семи попыток',guesses:[50,75,88,94,97,99,100]}
++  ];
++  cases.forEach(test=>{test.success=true;test.expectedAfterInput=test.guesses.slice(1).map(value=>['guess:'+value]).concat([['success']]);});
++  for(let i=0;i<cases.length;i++){
++    const test=cases[i],result=await runOneTest(code,test.input);
++    if(!guessProjectCasePassed(test,result)){
++      const isExecutionError=!!(result&&!result.ok);
++      return {type:isExecutionError?'execution_error':'wrong_answer',category:isExecutionError?PythonTaskChecker.errorCategory(result.error):'binary_search_sequence',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'Последовательность догадок: '+test.guesses.join(', ')+'; завершение после «угадал»; '+test.description,actual:isExecutionError?String(result.error||'Ошибка выполнения'):String(result.output||'Нет вывода'),error:isExecutionError?String(result.error||'Ошибка выполнения'):undefined};
++    }
++  }
++  return {type:'manual_review',category:'research_reasoning',passedTests:cases.length,totalTests:cases.length,automaticBehaviorPassed:true,reviewCriteria:'Автоматическая проверка поведения пройдена ('+cases.length+'/'+cases.length+'), включая число 1, число 100 и ответы в разном регистре. Преподавателю нужно проверить комментарий с объяснением деления диапазона пополам и оценки количества попыток.'};
++}
+ 
+ function openModal(modal){if(!modal)return;modal.classList.add('show');document.body.classList.add('modal-open')}
+ function closeModal(modal){if(!modal)return;modal.classList.remove('show');document.body.classList.remove('modal-open')}
