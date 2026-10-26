@@ -6,8 +6,13 @@
   const storage = () => root.localStorage;
   const key = (accountId, taskId) => `python_passport_v1:${String(accountId || 'local')}:${String(taskId || 'unknown')}`;
   function read(accountId, taskId) {
-    try { return JSON.parse(storage().getItem(key(accountId, taskId)) || '{"versions":[],"events":[]}'); }
-    catch (_) { return { versions: [], events: [] }; }
+    try {
+      const data = JSON.parse(storage().getItem(key(accountId, taskId)) || '{"versions":[],"events":[]}');
+      const seen = new Set();
+      data.versions = (Array.isArray(data.versions) ? data.versions : []).filter(version => { if (seen.has(version.code)) return false; seen.add(version.code); return true; });
+      data.events = Array.isArray(data.events) ? data.events : [];
+      return data;
+    } catch (_) { return { versions: [], events: [] }; }
   }
   function write(accountId, taskId, data) { storage().setItem(key(accountId, taskId), JSON.stringify(data)); return data; }
   function id(prefix) { return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`; }
