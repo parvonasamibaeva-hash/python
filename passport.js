@@ -40,10 +40,13 @@
     for (let i = 0; i < n; i += 1) if (left[i] !== right[i]) rows.push({ line: i + 1, before: left[i] === undefined ? '' : left[i], after: right[i] === undefined ? '' : right[i] });
     return rows;
   }
+  function reasonLabel(reason) {
+    return { run: 'запуск', verification: 'проверка', checkpoint: 'контрольная точка' }[reason] || String(reason || 'событие');
+  }
   function render(container, opts) {
     if (!container) return;
     const c = context(opts), versions = listVersions(c.accountId, c.taskId), events = listEvents(c.accountId, c.taskId);
-    container.innerHTML = `<div class="passport-summary">Сохранённых версий: <strong>${versions.length}</strong> · Событий: <strong>${events.length}</strong></div>` + (versions.length ? `<ol class="passport-versions">${versions.map(v => `<li><button type="button" data-passport-version="${v.versionId}">${v.savedAt.replace('T',' ').slice(0,19)}</button> <span>${v.reason}</span></li>`).join('')}</ol>` : '<div class="passport-empty">История появится после изменений кода.</div>');
+    container.innerHTML = `<div class="passport-summary">Версий: <strong>${versions.length}</strong> · событий: <strong>${events.length}</strong></div>` + (versions.length ? `<ol class="passport-versions">${versions.map(v => `<li><button type="button" data-passport-version="${v.versionId}">${v.savedAt.slice(5,16).replace('T',' ')}</button><span class="passport-reason">${reasonLabel(v.reason)}</span></li>`).join('')}</ol>` : '<div class="passport-empty">История появится после запуска или проверки.</div>');
     container.querySelectorAll('[data-passport-version]').forEach(btn => btn.addEventListener('click', () => { const v = versions.find(item => item.versionId === btn.dataset.passportVersion); if (v && opts.onRestore) opts.onRestore(v); }));
   }
   root.SolutionPassport = { VERSION, saveVersion, recordEvent, listVersions, listEvents, diff, render };

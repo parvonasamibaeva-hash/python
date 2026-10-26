@@ -15,10 +15,11 @@ test('teacher solution view does not restore student data into the teacher edito
   const view = functionBody('viewStudentAccount');
   assert.doesNotMatch(view, /restoreStudentProgress\s*\(/);
 
+  assert.match(view, /teacherViewingStudent=/);
+  assert.match(view, /studentDashboardRows=/);
+  assert.match(view, /Режим просмотра преподавателем/);
   const dashboard = functionBody('buildStudentDashboard');
-  assert.match(dashboard, /teacherViewingStudent/);
-  assert.match(dashboard, /openStudentSolutionPreview/);
-  assert.match(functionBody('openStudentSolutionPreview'), /Режим просмотра/);
+  assert.doesNotMatch(dashboard, /editor\.setValue|state\.codes|ACTIVE_STORAGE_KEY/);
 });
 
 test('task submissions carry a stable id and bounded network request', () => {
