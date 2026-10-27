@@ -54,3 +54,11 @@ test('step debugger supports standard random and math modules', () => {
   assert.match(index, /from\\s\+\(random\|math\|statistics\|time\)/);
   assert.match(index, /__mod_/);
 });
+
+test('mobile code input opens autocomplete and uses suitable keyboard hints', () => {
+  assert.match(index, /editor\.on\('inputRead',\(cm,change\)=>/);
+  assert.match(index, /CodeMirror\.showHint\(cm,CodeMirror\.hint\.python,\{completeSingle:false,closeOnUnfocus:true\}\)/);
+  assert.match(index, /id="terminalInput"[^>]+inputmode="text"[^>]+enterkeyhint="enter"/);
+  assert.match(index, /id="debugInput"[^>]+inputmode="text"[^>]+enterkeyhint="enter"/);
+  assert.match(index, /id="numericAnswer"[^>]+inputmode="numeric"[^>]+enterkeyhint="done"/);
+});
