@@ -4008,7 +4008,7 @@ document.addEventListener('click',function(e){
  function indentOf(line){return (line.match(/^\s*/)||[''])[0].replace(/\t/g,'    ').length;}
  function significant(i){while(i<lines.length&&(!lines[i].trim()||lines[i].trim().startsWith('#')))i++;return i;}
  function nextAtIndent(i,indent){for(let j=i;j<lines.length;j++){if(!lines[j].trim()||lines[j].trim().startsWith('#'))continue;/* A block ends at the first non-comment line whose indentation is the same as, or less than, its header. */if(indentOf(lines[j])<=indent)return j;}return lines.length;}
- function pyString(v){if(typeof v==='string')return v;if(v===true)return 'True';if(v===false)return 'False';if(v===null)return 'None';if(Array.isArray(v))return '['+v.map(pyString).join(', ')+']';return String(v);}
+ function pyString(v){if(v&&typeof v==='object'&&v.__module)return '<модуль '+v.__module+'>';if(typeof v==='string')return v;if(v===true)return 'True';if(v===false)return 'False';if(v===null)return 'None';if(Array.isArray(v))return '['+v.map(pyString).join(', ')+']';return String(v);}
  function convertFloorDiv(src){
    let s=src,guard=0;
    while(s.indexOf('//')>=0&&guard++<100){
@@ -4040,21 +4040,33 @@ document.addEventListener('click',function(e){
    }
    return s;
   }
+ function debugModuleMember(module,member){
+  const randomFns={randint:(a,b)=>{a=Number(a);b=Number(b);if(!Number.isInteger(a)||!Number.isInteger(b)||a>b)throw Error('Проверь границы random.randint().');return Math.floor(Math.random()*(b-a+1))+a;},random:()=>Math.random(),uniform:(a,b)=>Number(a)+Math.random()*(Number(b)-Number(a)),choice:items=>{if(!Array.isArray(items)||!items.length)throw Error('random.choice() ожидает непустой список.');return items[Math.floor(Math.random()*items.length)];}};
+  const mathFns={sqrt:x=>Math.sqrt(Number(x)),floor:x=>Math.floor(Number(x)),ceil:x=>Math.ceil(Number(x)),fabs:x=>Math.abs(Number(x)),pow:(a,b)=>Math.pow(Number(a),Number(b)),sin:x=>Math.sin(Number(x)),cos:x=>Math.cos(Number(x)),log:(x,b)=>b===undefined?Math.log(Number(x)):Math.log(Number(x))/Math.log(Number(b))};
+  const statisticsFns={mean:items=>{if(!Array.isArray(items)||!items.length)throw Error('statistics.mean() ожидает непустой список.');return items.reduce((sum,x)=>sum+Number(x),0)/items.length;},median:items=>{if(!Array.isArray(items)||!items.length)throw Error('statistics.median() ожидает непустой список.');const values=items.map(Number).sort((a,b)=>a-b),middle=Math.floor(values.length/2);return values.length%2?values[middle]:(values[middle-1]+values[middle])/2;}};
+  const modules={random:randomFns,math:mathFns,statistics:statisticsFns,time:{time:()=>1000+steps/10}};
+  if(modules[module]&&Object.prototype.hasOwnProperty.call(modules[module],member))return modules[module][member];
+  if(module==='math'&&member==='pi')return Math.PI;
+  if(module==='math'&&member==='e')return Math.E;
+  return undefined;
+ }
   function safeExpr(expr){
   let e=expr.trim(); if(!e)throw Error('Не найдено выражение.');
   const strings=[];e=e.replace(/(['\"])(?:\\.|(?!\1)[^\\])*?\1/g,match=>{strings.push(match);return '__STR'+(strings.length-1)+'__';});
   if(/[^\w\s.+\-*/%()<>=!&|,'"\[\]]/.test(e))throw Error('В выражении есть неподдерживаемые символы.');
   e=e.replace(/\bTrue\b/g,'true').replace(/\bFalse\b/g,'false').replace(/\bNone\b/g,'null').replace(/\band\b/g,'&&').replace(/\bor\b/g,'||').replace(/\bnot\b/g,'!');e=convertFloorDiv(e);
-  e=e.replace(/\b([A-Za-z_]\w*)\b/g,(m)=>{if(['true','false','null','Math'].includes(m))return m;if(Object.prototype.hasOwnProperty.call(vars,m))return '__v'+Object.keys(vars).indexOf(m);if(['abs','round','int','float','str','len'].includes(m))return '__fn_'+m;return m;});
-  const names=Object.keys(vars), vals=Object.values(vars); let args=names.map((_,i)=>'__v'+i);
+  const moduleRefs={};
+  e=e.replace(/\b([A-Za-z_]\w*)\.([A-Za-z_]\w*)\b/g,(full,alias,member)=>{const marker=vars[alias];if(!marker||!marker.__module)return full;const value=debugModuleMember(marker.__module,member);if(value===undefined)throw Error('В модуле '+marker.__module+' пока не поддерживается «'+member+'».');const key='__mod_'+alias+'_'+member;moduleRefs[key]=value;return key;});
+  e=e.replace(/\b([A-Za-z_]\w*)\b/g,(m)=>{if(['true','false','null','Math'].includes(m))return m;if(Object.prototype.hasOwnProperty.call(vars,m)){const marker=vars[m];if(marker&&marker.__module&&marker.__member){const value=debugModuleMember(marker.__module,marker.__member);if(value===undefined)throw Error('В модуле '+marker.__module+' пока не поддерживается «'+marker.__member+'».');const key='__mod_'+m;moduleRefs[key]=value;return key;}return '__v'+Object.keys(vars).indexOf(m);}if(['abs','round','int','float','str','len'].includes(m))return '__fn_'+m;return m;});
+  const names=Object.keys(vars), vals=Object.values(vars),moduleKeys=Object.keys(moduleRefs); let args=names.map((_,i)=>'__v'+i);
   // Whitelist identifiers after variable substitution; no property access or arbitrary JS names.
   const identifiers=e.match(/[A-Za-z_$][\w$]*/g)||[];
-  const allowed=new Set([...args,'true','false','null','Math','__fn_abs','__fn_round','__fn_int','__fn_float','__fn_str','__fn_len','__fd']);
+  const allowed=new Set([...args,'true','false','null','Math','__fn_abs','__fn_round','__fn_int','__fn_float','__fn_str','__fn_len','__fd',...moduleKeys]);
   for(const id of identifiers)if(!allowed.has(id)&&!/^__STR\d+__$/.test(id))throw Error('Переменная «'+id+'» ещё не создана или эта функция пока не поддерживается.');
-  if(/\b[A-Za-z_$][\w$]*\s*\./.test(e)||/[\[\]]/.test(e))throw Error('Обращение через точку и индексы пока не поддерживаются в отладчике.');
+  if(/\b[A-Za-z_$][\w$]*\s*\./.test(e))throw Error('Обращение к этому свойству пока не поддерживается в отладчике.');
   e=e.replace(/__STR(\d+)__/g,(_,n)=>strings[Number(n)]);
-  const fn=Function(...args,'__fn_abs','__fn_round','__fn_int','__fn_float','__fn_str','__fn_len','__fd','"use strict"; return ('+e+');');
-  return fn(...vals,Math.abs,Math.round,x=>parseInt(x,10),x=>Number(x),x=>String(x),x=>typeof x==='string'||Array.isArray(x)?x.length:0,(a,b)=>{if(b===0)throw Error('Деление на ноль.');return Math.floor(a/b);});
+  const fn=Function(...args,'__fn_abs','__fn_round','__fn_int','__fn_float','__fn_str','__fn_len','__fd',...moduleKeys,'"use strict"; return ('+e+');');
+  return fn(...vals,Math.abs,Math.round,x=>parseInt(x,10),x=>Number(x),x=>String(x),x=>typeof x==='string'||Array.isArray(x)?x.length:0,(a,b)=>{if(b===0)throw Error('Деление на ноль.');return Math.floor(a/b);},...moduleKeys.map(key=>moduleRefs[key]));
  }
  function findBlockEnd(i){const ind=indentOf(lines[i]);return nextAtIndent(i+1,ind);}
  function findFollowingClause(end,indent){let j=end;while(j<lines.length){if(!lines[j].trim()||lines[j].trim().startsWith('#')){j++;continue;}if(indentOf(lines[j])!==indent)return null;const t=lines[j].trim();if(/^(elif\b|else\s*:)/.test(t))return j;return null;}return null;}
@@ -4120,7 +4132,15 @@ document.addEventListener('click',function(e){
    // Repeat an active while-loop by returning to its condition line.
    let loop=loops.length?loops[loops.length-1]:null;
    if(loop&&i===loop.bodyEnd){setPC(loop.line);render();markLine(currentLine,false);history.push(snapshot());return;}
-   if(/^if\s+(.+)\s*:$/.test(t)||/^elif\s+(.+)\s*:$/.test(t)||/^while\s+(.+)\s*:$/.test(t)){
+   if(/^import\s+/.test(t)){
+    const specs=t.replace(/^import\s+/,'').split(',').map(part=>part.trim()).filter(Boolean);if(!specs.length)throw Error('После import укажи название модуля.');
+    specs.forEach(spec=>{const m=spec.match(/^(random|math|statistics|time)(?:\s+as\s+([A-Za-z_]\w*))?$/);if(!m)throw Error('Модуль «'+spec.split(/\s+as\s+/i)[0]+'» пока не поддерживается пошаговым отладчиком. Доступны random, math, statistics и time.');vars[m[2]||m[1]]={__module:m[1]};});
+    setPC(i+1);message('Модуль подключён. Его основные функции доступны в следующих шагах.');
+   }else if(/^from\s+/.test(t)){
+    const m=t.match(/^from\s+(random|math|statistics|time)\s+import\s+(.+)$/);if(!m)throw Error('Поддерживается импорт функций из модулей random, math, statistics и time.');
+    m[2].split(',').map(part=>part.trim()).filter(Boolean).forEach(spec=>{const parts=spec.split(/\s+as\s+/i),name=parts[0].trim(),alias=(parts[1]||name).trim();if(!/^[A-Za-z_]\w*$/.test(name)||!/^[A-Za-z_]\w*$/.test(alias)||debugModuleMember(m[1],name)===undefined)throw Error('Функция «'+name+'» пока не поддерживается в модуле '+m[1]+'.');vars[alias]={__module:m[1],__member:name};});
+    setPC(i+1);message('Функция из модуля подключена.');
+   }else if(/^if\s+(.+)\s*:$/.test(t)||/^elif\s+(.+)\s*:$/.test(t)||/^while\s+(.+)\s*:$/.test(t)){
     const m=t.match(/^(if|elif|while)\s+(.+)\s*:/),kind=m[1],truth=!!safeExpr(m[2]);
     if(kind==='while'){
       let existing=loops.findIndex(x=>x.type==='while'&&x.line===i);

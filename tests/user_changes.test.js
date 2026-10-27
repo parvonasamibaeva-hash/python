@@ -44,3 +44,13 @@ test('autocomplete includes variables and functions from the current Python code
   assert.match(index, /const assignment=\/\^/);
   assert.match(index, /pythonUserSymbols\(cm\)\.map\(name=>\[name,'переменная из программы'\]\)/);
 });
+
+test('step debugger supports standard random and math modules', () => {
+  assert.match(index, /function debugModuleMember\(module,member\)/);
+  assert.match(index, /randint:/);
+  assert.match(index, /sqrt:x=>Math\.sqrt/);
+  assert.match(index, /statisticsFns/);
+  assert.match(index, /random\|math\|statistics\|time/);
+  assert.match(index, /from\\s\+\(random\|math\|statistics\|time\)/);
+  assert.match(index, /__mod_/);
+});
