@@ -3,11 +3,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const index = fs.readFileSync('index.html', 'utf8');
+const passport = fs.readFileSync('passport.js', 'utf8');
 
 test('passport versions are created from run or verification code, not typing debounce', () => {
   assert.match(index, /passportCheckpoint\(runTaskForPassport,'run',null,code\)/);
   assert.match(index, /passportCheckpoint\(t,'verification',result,code\)/);
   assert.doesNotMatch(index, /setTimeout\(\(\)=>passportCheckpoint\(t,'checkpoint'/);
+  assert.match(index, /onRename:version=>/);
+  assert.match(index, /SolutionPassport\.renameVersion/);
+  assert.match(passport, /data-passport-rename/);
 });
 
 test('lesson 5 active catalog no longer contains task 13', () => {

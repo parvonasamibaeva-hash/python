@@ -23,6 +23,14 @@ test('does not create a duplicate version when restoring the same code', () => {
   p.saveVersion({ accountId: 'a', taskId: '1-1', code: 'print(1)', reason: 'before_restore' });
   assert.equal(p.listVersions('a', '1-1').length, 2);
 });
+test('renames an existing version without changing its code or count', () => {
+  const p = load();
+  const version = p.saveVersion({ accountId: 'a', taskId: '1-1', code: 'print(1)', reason: 'run' });
+  const renamed = p.renameVersion({ accountId: 'a', taskId: '1-1', versionId: version.versionId, label: 'Первая рабочая версия' });
+  assert.equal(renamed.label, 'Первая рабочая версия');
+  assert.equal(p.listVersions('a', '1-1').length, 1);
+  assert.equal(p.listVersions('a', '1-1')[0].code, 'print(1)');
+});
 test('coalesces rapid code-change events and keeps event metadata only', () => {
   const p = load(); p.recordEvent({ accountId: 'a', taskId: '1-1', type: 'code_changed', metadata: { length: 1 } }); p.recordEvent({ accountId: 'a', taskId: '1-1', type: 'code_changed', metadata: { length: 2 } });
   assert.equal(p.listEvents('a', '1-1').length, 1); assert.deepEqual(p.listEvents('a', '1-1')[0].metadata, { length: 2 });

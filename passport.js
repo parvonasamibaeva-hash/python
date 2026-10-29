@@ -23,8 +23,15 @@
     const c = context(opts), data = read(c.accountId, c.taskId), code = String(opts.code || '');
     const previous = data.versions[0];
     if (data.versions.some(version => version.code === code)) return data.versions.find(version => version.code === code);
-    const version = { versionId: id('ver'), accountId: c.accountId, taskId: c.taskId, attemptId: String(opts.attemptId || ''), savedAt: now(), code, reason: String(opts.reason || 'checkpoint'), parentVersionId: previous ? previous.versionId : '', verification: opts.verification || null, passportVersion: VERSION };
+    const version = { versionId: id('ver'), accountId: c.accountId, taskId: c.taskId, attemptId: String(opts.attemptId || ''), savedAt: now(), code, label: String(opts.label || '').trim().slice(0, 60), reason: String(opts.reason || 'checkpoint'), parentVersionId: previous ? previous.versionId : '', verification: opts.verification || null, passportVersion: VERSION };
     data.versions.unshift(version); data.versions = data.versions.slice(0, MAX_VERSIONS); write(c.accountId, c.taskId, data); return version;
+  }
+  function renameVersion(opts) {
+    const c = context(opts), data = read(c.accountId, c.taskId), target = data.versions.find(version => version.versionId === String(opts.versionId || ''));
+    if (!target) return null;
+    target.label = String(opts.label || '').trim().slice(0, 60);
+    write(c.accountId, c.taskId, data);
+    return target;
   }
   function recordEvent(opts) {
     const c = context(opts), data = read(c.accountId, c.taskId), type = String(opts.type || 'unknown'), at = now();
@@ -43,11 +50,15 @@
   function reasonLabel(reason) {
     return { run: 'запуск', verification: 'проверка', checkpoint: 'контрольная точка' }[reason] || String(reason || 'событие');
   }
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+  }
   function render(container, opts) {
     if (!container) return;
     const c = context(opts), versions = listVersions(c.accountId, c.taskId), events = listEvents(c.accountId, c.taskId);
-    container.innerHTML = `<div class="passport-summary">Версий: <strong>${versions.length}</strong> · событий: <strong>${events.length}</strong></div>` + (versions.length ? `<ol class="passport-versions">${versions.map(v => `<li><button type="button" data-passport-version="${v.versionId}">${v.savedAt.slice(5,16).replace('T',' ')}</button><span class="passport-reason">${reasonLabel(v.reason)}</span></li>`).join('')}</ol>` : '<div class="passport-empty">История появится после запуска или проверки.</div>');
+    container.innerHTML = `<div class="passport-summary">Версий: <strong>${versions.length}</strong> · событий: <strong>${events.length}</strong></div>` + (versions.length ? `<ol class="passport-versions">${versions.map(v => { const date = escapeHtml(String(v.savedAt || '').slice(5,16).replace('T',' ')); const label = escapeHtml(v.label || ''); return `<li><button type="button" data-passport-version="${escapeHtml(v.versionId)}">${date}</button><button type="button" class="passport-rename" data-passport-rename="${escapeHtml(v.versionId)}" title="Переименовать версию" aria-label="Переименовать версию">✎</button>${label ? `<span class="passport-label">${label}</span>` : ''}<span class="passport-reason">${escapeHtml(reasonLabel(v.reason))}</span></li>`; }).join('')}</ol>` : '<div class="passport-empty">История появится после запуска или проверки.</div>');
     container.querySelectorAll('[data-passport-version]').forEach(btn => btn.addEventListener('click', () => { const v = versions.find(item => item.versionId === btn.dataset.passportVersion); if (v && opts.onRestore) opts.onRestore(v); }));
+    container.querySelectorAll('[data-passport-rename]').forEach(btn => btn.addEventListener('click', () => { const v = versions.find(item => item.versionId === btn.dataset.passportRename); if (v && opts.onRename) opts.onRename(v); }));
   }
-  root.SolutionPassport = { VERSION, saveVersion, recordEvent, listVersions, listEvents, diff, render };
+  root.SolutionPassport = { VERSION, saveVersion, renameVersion, recordEvent, listVersions, listEvents, diff, render };
 })(typeof window === 'undefined' ? globalThis : window);
