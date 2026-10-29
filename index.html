@@ -3409,10 +3409,10 @@ async function checkProjectStage4Time(code){return projectStaticContract(code,[/
 async function checkProjectStage5Hints(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
 async function checkProjectStage6Bluff(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
 function coinFlipOutputMatches(output,expected){
-  const lines=normalizeOutput(output).split('\n');
-  const sequences=[...normalizeOutput(output).matchAll(/(?:^|[^А-Яа-я])([ОР]{3,})(?=$|[^А-Яа-я])/gmu)].map(match=>match[1]);
+  const text=normalizeOutput(output);
+  const sequences=[...text.matchAll(/(?:^|[^А-Яа-я])([ОР]{3,})(?=$|[^А-Яа-я])/gmu)].map(match=>match[1]);
   if(sequences.length!==1||sequences[0]!==expected)return false;
-  return lines.some(line=>/(?:броск|попыт)/i.test(line)&&(line.match(/\b\d+\b/g)||[]).some(value=>Number(value)===expected.length));
+  return (text.match(/\b\d+\b/g)||[]).some(value=>Number(value)===expected.length);
 }
 async function checkCoinFlip(code){
   const cases=[[0,0,0],[1,1,1],[0,1,0,0,0],[1,1,0,0,1,1,1]];
