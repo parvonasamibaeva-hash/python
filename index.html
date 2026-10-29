@@ -3249,6 +3249,14 @@ function findInputLine(code,requestIndex){const lines=String(code||'').split('\n
 function explainPythonError(raw){const text=String(raw||'').replace(/^Error:\s*/,'').trim();const lineNumber=extractPythonErrorLine(text);const line=lineNumber?`\nСтрока: ${lineNumber}.`:'';let title='Ошибка выполнения';let advice='Проверь написание команды, скобки, кавычки и названия переменных.';if(/SyntaxError|invalid syntax|EOL while scanning|string literal|unexpected EOF/i.test(text)){title='Синтаксическая ошибка';advice='Python не может прочитать команду. Проверь кавычки, круглые скобки, двоеточия и написание команды.'}else if(/NameError|name .* is not defined/i.test(text)){title='Ошибка в имени переменной';advice='Проверь, что переменная написана одинаково везде и что ты создал(а) её до использования.'}else if(/TypeError|can only concatenate|unsupported operand type/i.test(text)){title='Ошибка типов данных';advice='Проверь, не пытаешься ли ты складывать текст и число. Для преобразования используй int() или float(), если это нужно по задаче.'}else if(/ValueError|invalid literal/i.test(text)){title='Ошибка значения';advice='Проверь, подходит ли введённое значение для преобразования, например int() принимает целое число.'}else if(/ZeroDivisionError|division by zero/i.test(text)){title='Деление на ноль';advice='Проверь делитель: на ноль делить нельзя.'}else if(/TimeLimitError|execution limit|too many instructions|time limit/i.test(text)){title='Программа выполнялась слишком долго';advice='Возможно, цикл стал бесконечным. Проверь, меняется ли счётчик внутри while и может ли условие стать ложным. Сайт остановил запуск, чтобы страница не зависла.'}else if(/IndexError/i.test(text)){title='Индекс за пределами списка или строки';advice='Проверь длину списка или строки и номер элемента, к которому обращаешься.'}else if(/IndentationError|unexpected indent|unindent/i.test(text)){title='Ошибка отступов';advice='Проверь пробелы в начале строк. Внутри одного блока отступы должны быть одинаковыми.'}const clean=text.replace(/<stdin>/g,'').replace(/\s+at \S+/g,'').slice(0,700);return {message:`${title}${line}\n\nПодробности Python: ${clean}\n\nЧто проверить: ${advice}`,line:lineNumber};}
 function controlledTestPrelude(options){
   const opts=options||{},parts=[];
+  if(Array.isArray(opts.coinValues)){
+    parts.push('import random');parts.push('__coin_test_original_randint = random.randint');parts.push('__coin_test_original_choice = random.choice');parts.push('__coin_test_original_randrange = random.randrange');parts.push('__coin_test_original_random = random.random');parts.push('__coin_test_values = '+JSON.stringify(opts.coinValues));parts.push('__coin_test_index = 0');parts.push('__coin_test_calls = []');
+    parts.push('def __coin_test_next(kind, valid):');parts.push('    global __coin_test_index');parts.push('    __coin_test_calls.append((kind, valid))');parts.push('    if not valid:');parts.push('        raise ValueError("Для честной монеты нужны два разных равновероятных исхода")');parts.push('    if __coin_test_index >= len(__coin_test_values):');parts.push('        raise RuntimeError("Монету бросили после серии из трёх одинаковых результатов")');parts.push('    value = __coin_test_values[__coin_test_index]');parts.push('    __coin_test_index += 1');parts.push('    return value');
+    parts.push('def __coin_test_randint(a, b):');parts.push('    value = __coin_test_next("randint", (a == 0 and b == 1) or (a == 1 and b == 2))');parts.push('    return value + a');
+    parts.push('def __coin_test_random():');parts.push('    value = __coin_test_next("random", True)');parts.push('    return 0.25 if value == 0 else 0.75');
+    parts.push('def __coin_test_choice(items):');parts.push('    value = __coin_test_next("choice", len(items) == 2 and items[0] != items[1])');parts.push('    return items[value]');
+    parts.push('def __coin_test_randrange(*args):');parts.push('    valid = args == (2,) or args == (0, 2) or args == (1, 3)');parts.push('    value = __coin_test_next("randrange", valid)');parts.push('    return value + (1 if args == (1, 3) else 0)');
+  }
   if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2){
     const values=opts.randomValues.length?opts.randomValues:[-999999];
     parts.push('import random');parts.push('__guess_test_original_randint = random.randint');parts.push('__guess_test_values = '+JSON.stringify(values));parts.push('__guess_test_index = 0');parts.push('__guess_test_random_calls = []');
@@ -3268,35 +3276,41 @@ function controlledTestPrelude(options){
 }
 function controlledTestApply(options){
   const opts=options||{},parts=[];
+  if(Array.isArray(opts.coinValues))parts.push('    random.randint = __coin_test_randint','    random.choice = __coin_test_choice','    random.randrange = __coin_test_randrange','    random.random = __coin_test_random');
   if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    random.randint = __guess_test_randint');
   if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    time.time = __guess_test_time');
   return parts.join('\n');
 }
 function controlledTestCleanup(options){
   const opts=options||{},parts=[];
+  if(Array.isArray(opts.coinValues))parts.push('    random.randint = __coin_test_original_randint','    random.choice = __coin_test_original_choice','    random.randrange = __coin_test_original_randrange','    random.random = __coin_test_original_random');
   if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    random.randint = __guess_test_original_randint');
   if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    time.time = __guess_test_original_time');
   return parts.join('\n');
 }
 function controlledTestMetadata(options){
   const opts=options||{},parts=[];
+  if(Array.isArray(opts.coinValues))parts.push('    print("__COIN_TEST_CALLS__" + str(__coin_test_calls))');
   if(Array.isArray(opts.randomValues)&&Array.isArray(opts.randomRange)&&opts.randomRange.length===2)parts.push('    print("__GUESS_TEST_RANDOM__" + str(__guess_test_random_calls))');
   if(Array.isArray(opts.clockValues)&&opts.clockValues.length)parts.push('    print("__GUESS_TEST_CLOCK__" + str(__guess_test_clock_calls))');
   return parts.length?'    print()\n'+parts.join('\n'):'';
 }
 function parseControlledTestOutput(raw){
-  let randomCalls=null,clockCalls=null;
+  let randomCalls=null,clockCalls=null,coinCalls=null;
   const visible=[];
   String(raw||'').split('\n').forEach(line=>{
     if(line.startsWith('__GUESS_TEST_RANDOM__')){
       const payload=line.slice('__GUESS_TEST_RANDOM__'.length);
       randomCalls=[...payload.matchAll(/\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/g)].map(match=>[Number(match[1]),Number(match[2])]);
+    }else if(line.startsWith('__COIN_TEST_CALLS__')){
+      const payload=line.slice('__COIN_TEST_CALLS__'.length);
+      coinCalls=[...payload.matchAll(/\(\s*'([^']+)'\s*,\s*(True|False)\s*\)/g)].map(match=>({kind:match[1],valid:match[2]==='True'}));
     }else if(line.startsWith('__GUESS_TEST_CLOCK__')){
       const payload=line.slice('__GUESS_TEST_CLOCK__'.length);
       clockCalls=(payload.match(/-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/g)||[]).map(Number);
     }else visible.push(line);
   });
-  return {output:visible.join('\n'),randomCalls,clockCalls};
+  return {output:visible.join('\n'),randomCalls,clockCalls,coinCalls};
 }
 function runOneTest(code,inputValues,options){return new Promise(resolve=>{
   let output='';let inputIndex=0;const inputOffsets=[];
@@ -3312,7 +3326,7 @@ function runOneTest(code,inputValues,options){return new Promise(resolve=>{
     const offsets=inputOffsets.map(offset=>Math.min(offset,clean.length));
     const before=offsets.length?clean.slice(0,offsets[0]):clean;
     const segments=offsets.map((start,index)=>clean.slice(start,index+1<offsets.length?offsets[index+1]:clean.length));
-    resolve({ok,output:normalizeOutput(clean),inputsUsed:inputIndex,outputBeforeFirstInput:normalizeOutput(before),inputSegments:segments.map(normalizeOutput),randomCalls:parsed.randomCalls,clockCalls:parsed.clockCalls,...(error?{error}: {})});
+    resolve({ok,output:normalizeOutput(clean),inputsUsed:inputIndex,outputBeforeFirstInput:normalizeOutput(before),inputSegments:segments.map(normalizeOutput),randomCalls:parsed.randomCalls,clockCalls:parsed.clockCalls,coinCalls:parsed.coinCalls,...(error?{error}: {})});
   };
   Sk.configure({output:text=>output+=text,inputfun:inputFun,inputfunTakesPrompt:false,read:builtinRead,__future__:Sk.python3,execLimit:100000});
   Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,source,true)).then(()=>finish(true),error=>finish(false,String(error)));
@@ -3391,7 +3405,28 @@ function projectStaticContract(code,patterns,category){const source=String(code|
 async function checkProjectStage4Time(code){return projectStaticContract(code,[/time_left|time\.time|время/,/freeze|замороз/,/45/,/15/],'project_time_contract')}
 async function checkProjectStage5Hints(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
 async function checkProjectStage6Bluff(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
-async function checkCoinFlip(code){return {type:'manual_review',category:'randomized_coin_sequence',passedTests:0,totalTests:2,reviewCriteria:'Проверь вручную: используется генератор случайных результатов, вывод строится одной строкой из О и Р, программа останавливается после трёх одинаковых результатов подряд и сообщает количество бросков.'}}
+function coinFlipOutputMatches(output,expected){
+  const lines=normalizeOutput(output).split('\n');
+  const sequences=[...normalizeOutput(output).matchAll(/(?:^|[^А-Яа-я])([ОР]{3,})(?=$|[^А-Яа-я])/gmu)].map(match=>match[1]);
+  if(sequences.length!==1||sequences[0]!==expected)return false;
+  return lines.some(line=>/(?:броск|попыт)/i.test(line)&&(line.match(/\b\d+\b/g)||[]).some(value=>Number(value)===expected.length));
+}
+async function checkCoinFlip(code){
+  const cases=[[0,0,0],[1,1,1],[0,1,0,0,0],[1,1,0,0,1,1,1]];
+  const manual={type:'manual_review',category:'coin_random_control_unavailable',passedTests:0,totalTests:cases.length,reviewCriteria:'Проверь вручную: случайный выбор монеты, одна строка из О и Р, остановка после трёх одинаковых результатов подряд и верное число бросков.'};
+  const probe=await runOneTest('import random\nprint(random.randint(0, 1), random.choice(["О", "Р"]))',[],{coinValues:[0,1]});
+  if(!probe.ok||normalizeOutput(probe.output)!=='0 Р'||!Array.isArray(probe.coinCalls)||probe.coinCalls.length!==2||probe.coinCalls.some(call=>!call.valid))return manual;
+  let mappings=['ОР','РО'];
+  for(let i=0;i<cases.length;i++){
+    const values=cases[i],result=await runOneTest(code,[],{coinValues:values});
+    if(!result.ok)return {type:result.error&&/Монету бросили после серии/.test(result.error)?'wrong_answer':'execution_error',category:result.error&&/Монету бросили после серии/.test(result.error)?'coin_did_not_stop':PythonTaskChecker.errorCategory(result.error),passedTests:i,totalTests:cases.length,failedTest:i+1,error:String(result.error||'Ошибка выполнения')};
+    if(!Array.isArray(result.coinCalls)||result.coinCalls.length===0)return {...manual,passedTests:i,category:'coin_random_method_needs_review'};
+    if(result.coinCalls.length!==values.length||result.coinCalls.some(call=>!call.valid))return {type:'wrong_answer',category:'coin_flip_count',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'После трёх одинаковых результатов подряд программа должна остановиться.',actual:result.output};
+    mappings=mappings.filter(symbols=>coinFlipOutputMatches(result.output,values.map(value=>symbols[value]).join('')));
+    if(!mappings.length)return {type:'wrong_answer',category:'coin_flip_output',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'Одна строка результатов О/Р и правильное количество бросков.',actual:result.output};
+  }
+  return {type:'success',category:'all_tests_passed',passedTests:cases.length,totalTests:cases.length};
+}
 async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,project_stage1_base:checkProjectStage1Base,project_stage2_difficulty:checkProjectStage2Difficulty,project_stage3_economy:checkProjectStage3Economy,project_stage4_time:checkProjectStage4Time,project_stage5_hints:checkProjectStage5Hints,project_stage6_bluff:checkProjectStage6Bluff}})}
 function getStdinValues(){const raw=String(stdinInput.value||'').replace(/\r\n/g,'\n');if(raw==='')return [];const values=raw.split('\n');if(values.length&&values[values.length-1]==='')values.pop();return values}
 function showConsoleOutput(text,ok=true){consoleBox.classList.add('show');consoleOutput.className='console-output'+(ok?'':' error');consoleOutput.textContent=text||'(программа ничего не вывела)';consoleOutput.scrollTop=consoleOutput.scrollHeight}

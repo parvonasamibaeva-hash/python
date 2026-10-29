@@ -55,6 +55,14 @@ test('step debugger supports standard random and math modules', () => {
   assert.match(index, /__mod_/);
 });
 
+test('coin flip checker controls random outcomes and verifies the stopping sequence', () => {
+  assert.match(index, /async function checkCoinFlip\(code\)/);
+  assert.match(index, /coinValues/);
+  assert.match(index, /coin_did_not_stop/);
+  assert.match(index, /all_tests_passed/);
+  assert.match(index, /бросков/);
+});
+
 test('mobile code input opens autocomplete and uses suitable keyboard hints', () => {
   assert.match(index, /editor\.on\('inputRead',\(cm,change\)=>/);
   assert.match(index, /CodeMirror\.showHint\(cm,CodeMirror\.hint\.python,\{completeSingle:false,closeOnUnfocus:true\}\)/);
