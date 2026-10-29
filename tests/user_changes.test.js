@@ -35,6 +35,11 @@ test('lesson 8 has its own ten-question quiz with two bonus questions', () => {
   assert.match(index, /activeQuizLesson===8\?`\$\{quizState\.score\} \/ \$\{quizMainTotal\(\)\} баллов/);
 });
 
+test('all lesson 8 project stages and tasks are available immediately', () => {
+  assert.match(index, /const LESSON8_ALL_TASKS_OPEN=true/);
+  assert.match(index, /task\.lessonId\)===8&&LESSON8_ALL_TASKS_OPEN\)return true/);
+});
+
 test('free terminal opens the editor and terminal cards', () => {
   assert.match(index, /<section class="card" id="passportCard">/);
   assert.match(index, /<section class="card" id="editorCard">/);

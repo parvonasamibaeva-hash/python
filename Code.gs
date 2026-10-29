@@ -10,6 +10,8 @@ const REVIEW_SHEET_NAME = 'Проверка преподавателя';
 const REVIEW_HEADERS = ['Дата','ID аккаунта','Имя ученика','Занятие','№ задачи','Название задачи','Вариант А','Вариант Б','Объяснение ученика','Статус проверки','Комментарий преподавателя','ID проверки','Код решения','ID попытки','Категория ошибки','Версия проверки'];
 const SESSION_TTL_SECONDS = 21600; // 6 часов
 const COURSE_MAX_LESSON_NUMBER = 36;
+// Все этапы проекта и задачи занятия 8 доступны ученику сразу.
+const LESSON8_ALL_TASKS_OPEN = true;
 // Однократная совместимая миграция: эти уже существовавшие занятия сохраняют прежний доступ.
 // Новые занятия не входят в список и по умолчанию закрыты до решения преподавателя.
 const LEGACY_PUBLISHED_LESSON_IDS = [1,2,3,4,5,6,7,8];
@@ -507,6 +509,7 @@ function taskPrerequisiteGroups_(lessonId,taskId) {
   return [[{lessonId:lesson,taskId:task-1}]];
 }
 function assertPreviousTaskCompleted_(session,lessonId,taskId) {
+  if(Number(lessonId)===8&&LESSON8_ALL_TASKS_OPEN)return;
   const groups=taskPrerequisiteGroups_(lessonId,taskId);
   if(!groups.length)return;
   const accountId=String(session.accountId||'');

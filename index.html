@@ -735,6 +735,8 @@ let authMode='student';
 let lessonAccessGroup='individual';
 let lessonAccessState={};
 const LESSON_ACCESS_DEFAULT_OPEN=false;
+// В занятии 8 ребёнок может открыть любую часть проекта и любую задачу сразу.
+const LESSON8_ALL_TASKS_OPEN=true;
 async function authRequest(payload){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),20000);
@@ -2214,6 +2216,7 @@ function taskIsAvailable(task){
   if(authSession&&authSession.role==='student'&&task.hiddenFromStudent===true)return false;
   if(!authSession||authSession.role!=='student')return true;
   if(!lessonIsVisibleForCurrentStudent(task.lessonId))return false;
+  if(Number(task.lessonId)===8&&LESSON8_ALL_TASKS_OPEN)return true;
   if(state.confirmedSolved&&state.confirmedSolved[task.key])return true;
   if(state.solved&&state.solved[task.key]&&state.unsentResults&&state.unsentResults[task.key])return true;
   if(task.legacyAliasKey&&state.confirmedSolved&&state.confirmedSolved[task.legacyAliasKey])return true;

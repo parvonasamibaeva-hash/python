@@ -53,7 +53,7 @@ test('offline task results remain visible for retry', () => {
 });
 
 test('solution passport is integrated without replacing the editor', () => {
-  assert.match(html, /src="passport\.js"/);
+  assert.match(html, /src="passport\.js(?:\?[^\"]*)?"/);
   assert.match(html, /id="passportContent"/);
   assert.match(html, /SolutionPassport\.recordEvent/);
   assert.match(html, /SolutionPassport\.saveVersion/);

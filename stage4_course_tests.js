@@ -186,7 +186,7 @@ test('task-specific diagnostic rules override generic fallbacks', () => {
 });
 
 // Server helper behavior without a live Apps Script connection.
-const serverCtx = {COURSE_MAX_LESSON_NUMBER:36, readTaskObjects_:()=>[], ensureLegacyLessonAccess_:()=>{}, findAccountById_:()=>({group:'thursday'}), readLessonAccess_:()=>({'thursday:8':true}), LEGACY_PUBLISHED_LESSON_IDS:[1,2,3,4,5,6,7,8]};
+const serverCtx = {COURSE_MAX_LESSON_NUMBER:36, LESSON8_ALL_TASKS_OPEN:true, readTaskObjects_:()=>[], ensureLegacyLessonAccess_:()=>{}, findAccountById_:()=>({group:'thursday'}), readLessonAccess_:()=>({'thursday:8':true}), LEGACY_PUBLISHED_LESSON_IDS:[1,2,3,4,5,6,7,8]};
 vm.createContext(serverCtx);
 vm.runInContext([fnSrc(codeGs,'parseLessonNumber_'),fnSrc(codeGs,'assertStudentLessonAccess_'),fnSrc(codeGs,'taskPrerequisiteGroups_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),serverCtx);
 test('server lesson parser accepts 36 and rejects 37', () => {
@@ -199,25 +199,16 @@ test('server rejects a closed lesson and allows explicit group access', () => {
   assert.doesNotThrow(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},8));
   assert.throws(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},9),/не открыл/);
 });
-test('server opens six project stages, then the project and document routes in order', () => {
+test('server allows every project stage and task in lesson 8 immediately', () => {
   serverCtx.readTaskObjects_=()=>[];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11),/предыдущую задачу/);
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':10,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':14,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,15));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':15,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
-  serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 8','№ задачи':1,'Результат':'Решена'}];
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,2));
+  for (const taskId of [10,11,12,13,14,15,1,2,3,4,5,6,7,8,9]) {
+    assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,taskId));
+  }
 });
 test('historical task 5-13 does not replace the project route', () => {
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
-  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
 });
 
 const checkerCtx={console,Date,Set,Map,Number,String,Object,Array,JSON,Math};
