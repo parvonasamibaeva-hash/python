@@ -6,12 +6,14 @@ const TASK_HEADERS = ['Имя','Дата','Занятие','№ задачи','�
 const ACCOUNT_HEADERS = ['ID аккаунта','Имя','Логин','Хеш кода','Активен','Создан','Группа'];
 const ACCESS_SHEET_NAME = 'Доступ к занятиям';
 const ACCESS_HEADERS = ['Занятие','Группа','Открыто','Обновлено','ID аккаунта'];
+const TASK_ACCESS_SHEET_NAME = 'Доступ к задачам';
+const TASK_ACCESS_HEADERS = ['Занятие','№ задачи','ID аккаунта','Открыто','Обновлено','ID преподавателя','Комментарий'];
 const REVIEW_SHEET_NAME = 'Проверка преподавателя';
 const REVIEW_HEADERS = ['Дата','ID аккаунта','Имя ученика','Занятие','№ задачи','Название задачи','Вариант А','Вариант Б','Объяснение ученика','Статус проверки','Комментарий преподавателя','ID проверки','Код решения','ID попытки','Категория ошибки','Версия проверки'];
 const SESSION_TTL_SECONDS = 21600; // 6 часов
 const COURSE_MAX_LESSON_NUMBER = 36;
 // Все этапы проекта и задачи занятия 8 доступны ученику сразу.
-const LESSON8_ALL_TASKS_OPEN = true;
+const LESSON8_ALL_TASKS_OPEN = false;
 // Однократная совместимая миграция: эти уже существовавшие занятия сохраняют прежний доступ.
 // Новые занятия не входят в список и по умолчанию закрыты до решения преподавателя.
 const LEGACY_PUBLISHED_LESSON_IDS = [1,2,3,4,5,6,7,8];
@@ -27,6 +29,9 @@ function setupAuth() {
   let accessSheet = ss.getSheetByName(ACCESS_SHEET_NAME);
   if (!accessSheet) accessSheet = ss.insertSheet(ACCESS_SHEET_NAME);
   ensureHeaders_(accessSheet, ACCESS_HEADERS);
+  let taskAccessSheet = ss.getSheetByName(TASK_ACCESS_SHEET_NAME);
+  if (!taskAccessSheet) taskAccessSheet = ss.insertSheet(TASK_ACCESS_SHEET_NAME);
+  ensureHeaders_(taskAccessSheet, TASK_ACCESS_HEADERS);
   ensureLegacyLessonAccess_();
   const props = PropertiesService.getScriptProperties();
   if (!props.getProperty('HASH_PEPPER')) props.setProperty('HASH_PEPPER', Utilities.getUuid() + Utilities.getUuid());
@@ -139,14 +144,21 @@ function handleAction_(data) {
       const group=account?account.group:(session.group||'individual');
       const own={};
       Object.keys(access).forEach(key=>{if(key.startsWith(group+':')||key.startsWith('student:'+session.accountId+':'))own[key]=access[key]});
-      return {success:true,accessVersion:2,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,group,access:own};
+      const taskAccess=readTaskAccess_();
+      const ownTaskAccess={};
+      Object.keys(taskAccess).forEach(key=>{if(key.startsWith('student:'+session.accountId+':'))ownTaskAccess[key]=taskAccess[key]});
+      return {success:true,accessVersion:3,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,group,access:own,taskAccess:ownTaskAccess};
     }
     requireRole_(session,'teacher');
-    return {success:true,accessVersion:2,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,access};
+    return {success:true,accessVersion:3,maxLessonNumber:COURSE_MAX_LESSON_NUMBER,access,taskAccess:readTaskAccess_()};
   }
   if (data.action === 'setLessonAccess') {
     requireRole_(session,'teacher');
     return setLessonAccess_(data);
+  }
+  if (data.action === 'setTaskAccess') {
+    requireRole_(session,'teacher');
+    return setTaskAccess_(data,session);
   }
   if (data.action === 'resetStudentCode') {
     requireRole_(session, 'teacher');
@@ -510,6 +522,8 @@ function taskPrerequisiteGroups_(lessonId,taskId) {
 }
 function assertPreviousTaskCompleted_(session,lessonId,taskId) {
   if(Number(lessonId)===8&&LESSON8_ALL_TASKS_OPEN)return;
+  const override=readTaskAccess_()[taskAccessKey_(session.accountId,lessonId,taskId)];
+  if(override&&override.open===true)return;
   const groups=taskPrerequisiteGroups_(lessonId,taskId);
   if(!groups.length)return;
   const accountId=String(session.accountId||'');
@@ -535,6 +549,37 @@ function readLessonAccess_() {
     access[account?'student:'+account+':'+id:group+':'+id]=open===true||String(open).toLowerCase()==='true';
   });
   return access;
+}
+function taskAccessKey_(studentId,lessonId,taskId){return 'student:'+String(studentId)+':'+Number(lessonId)+':'+Number(taskId)}
+function readTaskAccess_(){
+  const ss=SpreadsheetApp.getActiveSpreadsheet(),sheet=ss.getSheetByName(TASK_ACCESS_SHEET_NAME);
+  if(!sheet||sheet.getLastRow()<2)return {};
+  const values=sheet.getDataRange().getValues(),headers=values[0].map(String),li=headers.indexOf('Занятие'),ti=headers.indexOf('№ задачи'),ai=headers.indexOf('ID аккаунта'),oi=headers.indexOf('Открыто'),ui=headers.indexOf('Обновлено'),pi=headers.indexOf('ID преподавателя'),ci=headers.indexOf('Комментарий');
+  const access={};
+  values.slice(1).forEach(row=>{
+    const lesson=Number(row[li]),task=Number(row[ti]),student=String(row[ai]||'');
+    if(!lesson||!task||!student)return;
+    const opened=row[oi]===true||String(row[oi]).toLowerCase()==='true';
+    access[taskAccessKey_(student,lesson,task)]={open:opened,updated:row[ui] instanceof Date?row[ui].toISOString():String(row[ui]||''),teacher:String(row[pi]||''),comment:String(row[ci]||'')};
+  });
+  return access;
+}
+function setTaskAccess_(data,session){
+  const lessonId=Number(data.lessonId),taskId=Number(data.taskId),studentId=String(data.studentId||'').trim();
+  if(!Number.isInteger(lessonId)||lessonId<1||lessonId>COURSE_MAX_LESSON_NUMBER||!Number.isInteger(taskId)||taskId<1||!studentId)throw new Error('Укажи ученика, занятие и задачу.');
+  if(data.open!==true&&data.open!==null)throw new Error('Некорректное состояние ручного доступа.');
+  if(!findAccountById_(studentId))throw new Error('Ученик не найден.');
+  const lock=LockService.getScriptLock();lock.waitLock(20000);
+  try{
+    const ss=SpreadsheetApp.getActiveSpreadsheet(),sheet=ss.getSheetByName(TASK_ACCESS_SHEET_NAME)||ss.insertSheet(TASK_ACCESS_SHEET_NAME);
+    ensureHeaders_(sheet,TASK_ACCESS_HEADERS);
+    const values=sheet.getDataRange().getValues(),headers=values[0].map(String),li=headers.indexOf('Занятие'),ti=headers.indexOf('№ задачи'),ai=headers.indexOf('ID аккаунта'),oi=headers.indexOf('Открыто'),ui=headers.indexOf('Обновлено'),pi=headers.indexOf('ID преподавателя'),ci=headers.indexOf('Комментарий');
+    const idx=values.findIndex((row,i)=>i>0&&Number(row[li])===lessonId&&Number(row[ti])===taskId&&String(row[ai]||'')===studentId);
+    if(data.open===null){if(idx>0)sheet.deleteRow(idx+1);}
+    else {const row=idx>0?values[idx].slice():Array(headers.length).fill('');row[li]=lessonId;row[ti]=taskId;row[ai]=studentId;row[oi]=true;row[ui]=new Date();row[pi]=String(session.name||'Преподаватель');row[ci]=String(data.comment||'').slice(0,500);if(idx>0)sheet.getRange(idx+1,1,1,headers.length).setValues([row]);else sheet.appendRow(row);}
+    SpreadsheetApp.flush();
+    return {success:true,accessVersion:3,taskAccess:readTaskAccess_()};
+  }finally{lock.releaseLock();}
 }
 function setLessonAccess_(data){
   ensureLegacyLessonAccess_();

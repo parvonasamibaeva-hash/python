@@ -29,3 +29,11 @@ test('saveTask deduplicates retries for the same account and submission id', () 
   assert.match(saveTask, /finally \{\s*lock\.releaseLock\(\)/);
 });
 
+test('task access supports a per-student teacher override', () => {
+  assert.match(source, /const TASK_ACCESS_SHEET_NAME/);
+  assert.match(source, /data\.action === 'setTaskAccess'/);
+  assert.match(source, /function setTaskAccess_\(data,session\)/);
+  assert.match(source, /taskAccessKey_\(session\.accountId,lessonId,taskId\)/);
+  assert.match(source, /if\(override&&override\.open===true\)return/);
+});
+

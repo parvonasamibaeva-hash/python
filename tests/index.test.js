@@ -47,6 +47,15 @@ test('verification metadata is saved and sent with task results', () => {
   assert.match(functionBody('runPython'), /type==='manual_review'/);
 });
 
+test('teacher can open one task for one student without changing automatic completion', () => {
+  assert.match(html, /id="taskAccessStudent"/);
+  assert.match(html, /id="taskAccessTask"/);
+  assert.match(html, /id="taskAccessOpenButton"/);
+  assert.match(html, /id="taskAccessResetButton"/);
+  assert.match(html, /taskAccessState=result\.taskAccess/);
+  assert.match(html, /Автоматическая проверка и отметка решения не изменены/);
+});
+
 test('offline task results remain visible for retry', () => {
   assert.match(functionBody('markResultSent'), /unsentResults/);
   assert.match(functionBody('updateSyncLine'), /Отправить ещё раз/);

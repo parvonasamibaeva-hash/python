@@ -128,13 +128,13 @@ const lessons = [
 const ctx = {
   lessons, COURSE_CONFIG:{maxLessonNumber:36,lessons}, allTasks: lessons.flatMap(l => l.tasks), authSession: {role:'student',accountId:'student-1'},
   state: {solved:{},confirmedSolved:{},unsentResults:{},attempts:{},hintDiagnostics:{}},
-  lessonAccessState: {'thursday:10':true,'thursday:7':true}, lessonAccessGroup:'thursday', LESSON_ACCESS_DEFAULT_OPEN:false,
+  lessonAccessState: {'thursday:10':true,'thursday:7':true}, taskAccessState:{}, lessonAccessGroup:'thursday', LESSON_ACCESS_DEFAULT_OPEN:false,
   MAX_FAILED_ATTEMPTS:2,
   hintParts:t=>String(t.hint||'').split(/\n\s*\n/).filter(Boolean),
   normalizeOutput:x=>String(x==null?'':x).replace(/\r\n/g,'\n').trim()
 };
 vm.createContext(ctx);
-const helperNames=['getLesson','lessonWithinCourseLimit','lessonDefaultAccess','effectiveLessonAccess','lessonIsVisibleForCurrentStudent','taskCompletionConfirmed','taskIsAvailable','firstAvailableStudentTask','availableHintCount','diagnoseFailure'];
+const helperNames=['getLesson','lessonWithinCourseLimit','lessonDefaultAccess','effectiveLessonAccess','lessonIsVisibleForCurrentStudent','taskCompletionConfirmed','taskAccessKey','taskManuallyOpened','taskIsAvailable','firstAvailableStudentTask','availableHintCount','diagnoseFailure'];
 vm.runInContext(helperNames.map(n=>fnSrc(html,n)).join('\n'),ctx);
 const task=(key)=>ctx.allTasks.find(t=>t.key===key);
 test('first task is open; later tasks stay hidden before confirmation', () => {
@@ -186,9 +186,9 @@ test('task-specific diagnostic rules override generic fallbacks', () => {
 });
 
 // Server helper behavior without a live Apps Script connection.
-const serverCtx = {COURSE_MAX_LESSON_NUMBER:36, LESSON8_ALL_TASKS_OPEN:true, readTaskObjects_:()=>[], ensureLegacyLessonAccess_:()=>{}, findAccountById_:()=>({group:'thursday'}), readLessonAccess_:()=>({'thursday:8':true}), LEGACY_PUBLISHED_LESSON_IDS:[1,2,3,4,5,6,7,8]};
+const serverCtx = {COURSE_MAX_LESSON_NUMBER:36, LESSON8_ALL_TASKS_OPEN:false, readTaskObjects_:()=>[], readTaskAccess_:()=>({}), taskAccessKey_:(student,lesson,task)=>'student:'+student+':'+lesson+':'+task, ensureLegacyLessonAccess_:()=>{}, findAccountById_:()=>({group:'thursday'}), readLessonAccess_:()=>({'thursday:8':true}), LEGACY_PUBLISHED_LESSON_IDS:[1,2,3,4,5,6,7,8]};
 vm.createContext(serverCtx);
-vm.runInContext([fnSrc(codeGs,'parseLessonNumber_'),fnSrc(codeGs,'assertStudentLessonAccess_'),fnSrc(codeGs,'taskPrerequisiteGroups_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),serverCtx);
+vm.runInContext([fnSrc(codeGs,'parseLessonNumber_'),fnSrc(codeGs,'assertStudentLessonAccess_'),fnSrc(codeGs,'taskAccessKey_'),fnSrc(codeGs,'taskPrerequisiteGroups_'),fnSrc(codeGs,'assertPreviousTaskCompleted_')].join('\n'),serverCtx);
 test('server lesson parser accepts 36 and rejects 37', () => {
   assert.strictEqual(serverCtx.parseLessonNumber_('Занятие 36'),36);
   assert.strictEqual(serverCtx.parseLessonNumber_('Занятие 37'),null);
@@ -199,16 +199,18 @@ test('server rejects a closed lesson and allows explicit group access', () => {
   assert.doesNotThrow(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},8));
   assert.throws(()=>serverCtx.assertStudentLessonAccess_({role:'student',accountId:'a',group:'thursday'},9),/не открыл/);
 });
-test('server allows every project stage and task in lesson 8 immediately', () => {
+test('server keeps sequential task opening and accepts a teacher override', () => {
   serverCtx.readTaskObjects_=()=>[];
-  for (const taskId of [10,11,12,13,14,15,1,2,3,4,5,6,7,8,9]) {
-    assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,taskId));
-  }
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11),/предыдущую задачу/);
+  serverCtx.readTaskAccess_=()=>({'student:a:8:11':{open:true}});
+  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,11));
 });
 test('historical task 5-13 does not replace the project route', () => {
   serverCtx.readTaskObjects_=()=>[{'ID аккаунта':'a','Занятие':'Занятие 5','№ задачи':13,'Результат':'Решена'}];
   assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,10));
-  assert.doesNotThrow(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1));
+  serverCtx.readTaskAccess_=()=>({});
+  assert.throws(()=>serverCtx.assertPreviousTaskCompleted_({accountId:'a'},8,1),/предыдущую задачу/);
 });
 
 const checkerCtx={console,Date,Set,Map,Number,String,Object,Array,JSON,Math};
