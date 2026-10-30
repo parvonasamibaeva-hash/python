@@ -15,6 +15,7 @@ const task = id => tasks.find(item => item.id === id);
 test('lesson 3 catalog keeps all tasks and corrected title', () => {
   assert.equal(tasks.length, 20);
   assert.equal(task(17).title, 'Задача 17. Оканчивается ли год на два нуля');
+  assert.deepEqual(tasks.filter(item => item.teacherRepeat).map(item => item.id), [2, 3, 7, 10]);
 });
 
 test('lesson 3 covers equality, boundary, and unsorted cases', () => {
@@ -39,6 +40,12 @@ test('lesson 3 checker wires the method restriction', () => {
   assert.match(source, /digits_math:checkDigitsMath/);
   assert.match(source, /method_requirement/);
   assert.match(source, /цифры нужно обрабатывать математически/);
+});
+
+test('teacher dashboard renders repeat markers for annotated tasks', () => {
+  assert.match(source, /teacher-repeat-badge/);
+  assert.match(source, /x\.task\.teacherRepeat/);
+  assert.match(source, /повтор темы/);
 });
 
 test('mathematical digit checker rejects conversion to strings but allows numeric code', async () => {
