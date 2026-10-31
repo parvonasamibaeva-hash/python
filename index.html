@@ -3412,7 +3412,10 @@ function runOneTest(code,inputValues,options){return new Promise(resolve=>{
     const segments=offsets.map((start,index)=>clean.slice(start,index+1<offsets.length?offsets[index+1]:clean.length));
     resolve({ok,output:normalizeOutput(clean),inputsUsed:inputIndex,outputBeforeFirstInput:normalizeOutput(before),inputSegments:segments.map(normalizeOutput),randomCalls:parsed.randomCalls,clockCalls:parsed.clockCalls,coinCalls:parsed.coinCalls,...(error?{error}: {})});
   };
-  Sk.configure({output:text=>output+=text,inputfun:inputFun,inputfunTakesPrompt:false,read:builtinRead,__future__:Sk.python3,execLimit:100000});
+  // В автоматической проверке prompt из input() не должен попадать в ответ:
+  // ученик может оставить понятную подсказку для пользователя, а сравнивается
+  // только то, что программа выводит через print().
+  Sk.configure({output:text=>output+=text,inputfun:inputFun,inputfunTakesPrompt:true,read:builtinRead,__future__:Sk.python3,execLimit:100000});
   Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,source,true)).then(()=>finish(true),error=>finish(false,String(error)));
 })}
 function explainWrongOutput(expected,actual){

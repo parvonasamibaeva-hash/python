@@ -38,6 +38,7 @@ test('local progress and Python input checks remain wired', () => {
   assert.match(html, /src="checker\.js"/);
   assert.match(html, /lesson1Tasks/);
   assert.match(html, /lesson7Tasks|homeworkTasks/);
+  assert.match(functionBody('runOneTest'), /inputfunTakesPrompt:true/);
 });
 
 test('verification metadata is saved and sent with task results', () => {
