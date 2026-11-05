@@ -1562,50 +1562,6 @@ const lesson8Tasks=[
     ]
   },
   {
-    "id": 14,
-    "title": "Проект. Этап 5 — умные подсказки",
-    "level": "project",
-    "stars": "⭐⭐⭐⭐",
-    "short": "Добавь динамические и математические подсказки.",
-    "problem": "Продолжи код этапа 4. Перед очередной попыткой игрок может выбрать подсказку. Динамическая подсказка сравнивает расстояние abs(secret − guess): меньше 5 — «Горячо», от 5 до 25 — «Тепло», больше 25 — «Холодно». Добавь платные математические подсказки: чётность, делимость на 3/5/10 и проверку простоты. Каждая покупка списывает монеты.",
-    "criteria": "• Есть меню выбора подсказки.\n• Используется abs() для оценки расстояния.\n• Покупки списывают монеты.\n• Проверки используют %, а проверка простоты работает для диапазона режима.\n• Подсказки не ломают основной цикл игры.",
-    "examples": "Если secret = 40 и guess = 50, расстояние 10: динамическая подсказка — «Тепло». Для secret = 40 проверка чётности сообщает «чётное».",
-    "starter": "# Продолжи код этапа 4.\n# Добавь меню подсказок и функции для математических свойств.\n",
-    "hint": "Вынеси подсказки в функции. Сначала выведи меню, затем обработай выбор. Для простоты используй отдельную функцию is_prime(n).",
-    "theory": "Функции помогают не смешивать экономику, ввод и вычисления. abs() даёт расстояние, % — остаток и проверку делимости.",
-    "checker": "project_stage5_hints",
-    "tests": [],
-    "projectStage": "hints",
-    "unlockAfterKeys": [
-      "8-13"
-    ],
-    "starterSourceKeys": [
-      "8-13"
-    ]
-  },
-  {
-    "id": 15,
-    "title": "Проект. Этап 6 — блеф компьютера",
-    "level": "project",
-    "stars": "⭐⭐⭐⭐",
-    "short": "Добавь ложную подсказку только на тяжёлом режиме и заверши проект.",
-    "problem": "Заверши проект. Только в тяжёлом режиме компьютер один раз за игру может специально заменить динамическую подсказку на противоположную. Например, вместо «Моё число меньше!» сказать «Моё число больше!». Создай скрытый флаг has_lied = False и включай ложь не более одного раза. Игрок должен иметь возможность проверить свойства числа математической подсказкой и заметить несоответствие. В лёгком и среднем режиме блефа быть не должно.",
-    "criteria": "• Блеф включается только в тяжёлом режиме.\n• За игру ложная динамическая подсказка появляется не более одного раза.\n• После блефа обычные подсказки возвращаются.\n• Математическая подсказка проверяет истинное свойство числа.\n• Лёгкий и средний режимы работают без блефа.\n• Баланс, время и подсказки предыдущих этапов сохранены.",
-    "examples": "В тяжёлом режиме компьютер может один раз дать неверное «больше/меньше», но математическая подсказка показывает правду. В среднем режиме все динамические подсказки честные.",
-    "starter": "# Продолжи код этапа 5.\n# Добавь has_lied = False и одноразовый блеф только для тяжёлого режима.\n",
-    "hint": "Проверяй режим до изменения текста подсказки. После использования блефа сразу установи has_lied = True.",
-    "theory": "Блеф — это отдельное состояние игры. Не меняй secret: изменяй только текст одной подсказки и сохраняй флаг, чтобы не повторить обман.",
-    "checker": "project_stage6_bluff",
-    "tests": [],
-    "projectStage": "final",
-    "unlockAfterKeys": [
-      "8-14"
-    ],
-    "starterSourceKeys": [
-      "8-14"
-    ]
-  },
-  {
     "id": 1,
     "title": "Задача 1. Сумма чисел",
     "level": "base",
@@ -1642,7 +1598,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1683,7 +1639,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1722,7 +1678,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1763,7 +1719,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1801,7 +1757,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1836,7 +1792,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1877,7 +1833,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1934,7 +1890,7 @@ const lesson8Tasks=[
       }
     ],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   },
   {
@@ -1951,7 +1907,7 @@ const lesson8Tasks=[
     "checker": "coin_flip",
     "tests": [],
     "unlockAfterKeys": [
-      "8-15"
+      "8-13"
     ]
   }
 ];
@@ -1991,7 +1947,7 @@ const COURSE_CONFIG={maxLessonNumber:null,lessons:[
 {id:6,title:'Занятие 6',status:'published',subtitle:'Цикл while',tasks:lesson6Tasks,theory:[["1. Как работает while","Цикл while повторяет команды, пока условие истинно (True). Перед каждым повторением Python проверяет условие. Если оно ложно (False), тело цикла не запускается или цикл завершается.<pre><code>while условие:\n    команды</code></pre><strong>Запомни.</strong> Двоеточие : начинает тело цикла, а отступ показывает, какие команды относятся к циклу."],["2. Условие проверяется до выполнения тела","<pre><code>i = 5\nwhile i &lt; 5:\n    print(i)\n    i += 1</code></pre>Что выведет программа? Ничего: уже при первой проверке условие 5 &lt; 5 ложно. Поэтому цикл выполнится 0 раз. Сравни с условием i &lt;= 5: в таком случае цикл выполнится один раз и выведет 5."],["3. Как не получить бесконечный цикл","<pre><code>i = 0\nwhile i &lt; 3:\n    print(i)\n    i += 1</code></pre>Переменная i меняется на каждом повторении. После вывода 0, 1 и 2 она станет равна 3, условие i &lt; 3 станет ложным, и цикл завершится.<p><strong>Опасная ошибка.</strong> Если забыть изменить переменную, от которой зависит условие, цикл может не завершиться.</p><pre><code>i = 0\nwhile i &lt; 3:\n    print(i)  # i не меняется — цикл бесконечный</code></pre>"],["4. for или while?","Если заранее известно точное количество повторений, часто удобнее for. Если нужно повторять действия до события или до появления стоп-значения, удобен while.<pre><code>for i in range(3):\n    print(i)</code></pre><pre><code>num = int(input())\nwhile num != -1:\n    print('Получено:', num)\n    num = int(input())</code></pre>Во втором примере число -1 — стоп-значение. Оно завершает цикл и не обрабатывается телом цикла."]]},
 {id:7,title:'Занятие 7',status:'published',subtitle:'Цикл while: обработка цифр и условия',tasks:homeworkTasks,theory:[["1. Как получить последнюю цифру","Оператор % (остаток от деления) помогает получить последнюю цифру целого неотрицательного числа: <code>n % 10</code>.<pre><code>n = 583\nprint(n % 10)  # 3</code></pre>Почему? При делении 583 на 10 остаток равен 3."],["2. Как убрать последнюю цифру","Оператор // выполняет целочисленное деление. Если разделить неотрицательное целое число на 10 с помощью <code>//</code>, последняя цифра исчезнет.<pre><code>n = 583\nn = n // 10\nprint(n)  # 58</code></pre><strong>Главная пара.</strong> <code>n % 10</code> — взять последнюю цифру. <code>n // 10</code> — убрать последнюю цифру."],["3. Как пройти по всем цифрам числа","Каждый проход цикла обрабатывает последнюю цифру. Затем число уменьшается в 10 раз (целочисленно), чтобы следующей стала предыдущая цифра.<pre><code>n = int(input())\nwhile n &gt; 0:\n    digit = n % 10\n    print(digit)\n    n //= 10</code></pre>Если ввести 583, программа выведет цифры в обратном порядке: 3, затем 8, затем 5. Это нормально: мы начинаем с последней цифры. <strong>Важно:</strong> в каждой итерации нужно убрать последнюю цифру. Иначе значение n не изменится и цикл может стать бесконечным."],["4. Как применить if к каждой цифре","Внутри цикла можно проверить каждую извлечённую цифру. Например, посчитать, сколько цифр чётные.<pre><code>n = int(input())\ncount = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit % 2 == 0:\n        count += 1\n    n //= 10\nprint(count)</code></pre>Здесь два разных действия с %: <code>n % 10</code> получает последнюю цифру числа, а <code>digit % 2</code> проверяет, делится ли эта цифра на 2 без остатка."],["5. Сумма, количество, максимум и произведение","<table><thead><tr><th>Что ищем</th><th>Начальное значение</th><th>Действие внутри цикла</th></tr></thead><tbody><tr><td>Количество цифр с нужным свойством</td><td><code>count = 0</code></td><td>Если условие выполнено: <code>count += 1</code></td></tr><tr><td>Сумму выбранных цифр</td><td><code>total = 0</code></td><td>Если условие выполнено: <code>total += digit</code></td></tr><tr><td>Максимальную цифру</td><td><code>max_digit = 0</code></td><td>Если <code>digit &gt; max_digit</code>: сохранить digit</td></tr><tr><td>Произведение выбранных ненулевых цифр</td><td><code>product = 1</code></td><td>Если цифра подходит: <code>product *= digit</code></td></tr></tbody></table><p>Почему для суммы берём 0, а для произведения — 1? Ноль не меняет сумму, а единица не меняет произведение. Если начать произведение с нуля, оно останется нулём при любом умножении.</p>"],["6. Пример","<pre><code>n = int(input())\nmax_digit = 0\nwhile n &gt; 0:\n    digit = n % 10\n    if digit &gt; max_digit:\n        max_digit = digit\n    n //= 10\nprint(max_digit)</code></pre>Пример: для числа 48271 цифры рассматриваются так: 1, 7, 2, 8, 4. Переменная <code>max_digit</code> хранит наибольшую цифру, найденную к текущему моменту. Ответ — 8."]],tasks:homeworkTasks}
 ,{id:8,title:'Занятие 8',status:'published',subtitle:'Проект «Угадай число» и задачи после проекта',tasks:lesson8Tasks,theory:[
-['1. Как устроен проект',`Проект строится постепенно: каркас игры → режимы сложности → кошелёк и ставка → время → подсказки → блеф. После успешной проверки код переносится в следующий этап, поэтому не удаляй рабочую часть программы. На каждом этапе сначала добейся простого правильного поведения, а потом добавляй новое.`],
+['1. Как устроен проект',`Проект строится постепенно: каркас игры → режимы сложности → кошелёк и ставка → время. После успешной проверки код переносится в следующий этап, поэтому не удаляй рабочую часть программы. На каждом этапе сначала добейся простого правильного поведения, а потом добавляй новое.`],
 ['2. Ввод данных и типы',`Команда <code>input()</code> всегда возвращает текст (тип <code>str</code>). Если нужно число, преобразуй ввод:<pre><code>name = input()
 age = int(input())
 price = float(input())</code></pre>Режим можно привести к одному виду с помощью <code>.lower()</code>:<pre><code>mode = input().lower()</code></pre>Не складывай текст и число без преобразования: <code>"10" + "20"</code> даёт <code>"1020"</code>.`],
@@ -2041,13 +1997,8 @@ time_left -= 5</code></pre>Заморозка должна сработать т
     balance -= 20
     time_left += 15
     freeze_used = True</code></pre>Если <code>time_left &lt;= 0</code>, раунд заканчивается поражением.`],
-['12. Меню умных подсказок',`Перед попыткой можно показать меню и обработать выбор игрока. Динамическая подсказка использует <code>abs(secret - guess)</code>. Математические подсказки проверяют свойства самого загаданного числа и списывают монеты. Проверку простоты удобно вынести в функцию: число простое, если у него нет делителей от 2 до его квадратного корня. Подсказка не должна случайно менять <code>secret</code>.`],
-['13. Флаг и блеф',`Для состояния, которое может произойти только один раз, используй логический флаг:<pre><code>has_lied = False
-if mode == 'тяжёлый' and not has_lied:
-    # один раз изменить текст подсказки
-    has_lied = True</code></pre>Меняй только текст динамической подсказки, а не загаданное число. В лёгком и среднем режимах блеф не запускай.`],
-['14. Как проверять свою программу',`Проверь отдельные случаи: правильный ответ с первой попытки, ответ меньше загаданного, ответ больше загаданного, каждый режим сложности, нехватку монет, окончание времени и повторную покупку заморозки. Если появляется ошибка, сначала прочитай строку и тип ошибки в терминале. После ручного запуска нажми «Отправить на проверку»: сайт использует дополнительные контрольные сценарии.`],
-['15. Как работать с этапами сайта',`Кнопка «Запустить код» нужна для обычного запуска и проверки ввода. «Использовать этот тест» подставляет тестовые данные в поле ввода, но их можно изменить вручную. «Отправить на проверку» проверяет решение отдельно. Следующий этап откроется после успешной проверки и подтверждения сохранения результата; если соединение временно пропало, локальный код сохраняется.`]
+['12. Как проверять свою программу',`Проверь отдельные случаи: правильный ответ с первой попытки, ответ меньше загаданного, ответ больше загаданного, каждый режим сложности, нехватку монет, окончание времени и повторную покупку заморозки. Если появляется ошибка, сначала прочитай строку и тип ошибки в терминале. После ручного запуска нажми «Отправить на проверку»: сайт использует дополнительные контрольные сценарии.`],
+['13. Как работать с этапами сайта',`Кнопка «Запустить код» нужна для обычного запуска и проверки ввода. «Использовать этот тест» подставляет тестовые данные в поле ввода, но их можно изменить вручную. «Отправить на проверку» проверяет решение отдельно. Следующий этап откроется после успешной проверки и подтверждения сохранения результата; если соединение временно пропало, локальный код сохраняется.`]
 ]}
 ]};
 const lessons=COURSE_CONFIG.lessons;
@@ -2062,7 +2013,9 @@ if(!saved.__collapsedLessonsInitialized){
   localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(saved));
 }
 const state={currentKey:saved.currentKey||'1-1',openLessons:saved.openLessons||Object.fromEntries(lessons.map(lesson=>[lesson.id,false])),codes:saved.codes||{},attempts:saved.attempts||{},failedCodes:saved.failedCodes||{},hints:saved.hints||{},hintDiagnostics:saved.hintDiagnostics||{},solved:saved.solved||{},confirmedSolved:saved.confirmedSolved||{},manualReviewStatus:saved.manualReviewStatus||{},ratings:saved.ratings||{},inputs:saved.inputs||{},manualRunPassed:saved.manualRunPassed||{},unsentResults:saved.unsentResults||{},taskSubmissionIds:saved.taskSubmissionIds||{},verificationResults:saved.verificationResults||{},freeTerminalCodes:saved.freeTerminalCodes||{},experimentAnswers:saved.experimentAnswers||{},task10Answers:saved.task10Answers||{}};
-const LESSON8_CONTENT_VERSION='project-game-v2';
+// Если ученик был на удалённом этапе, возвращаем его к последнему этапу проекта.
+if(state.currentKey==='8-14'||state.currentKey==='8-15'){state.currentKey='8-13';saveState();}
+const LESSON8_CONTENT_VERSION='project-game-v3';
 if(saved.lesson8ContentVersion!==LESSON8_CONTENT_VERSION){
   const previousLesson8Version=String(saved.lesson8ContentVersion||'');
   const legacyLesson8State={};
@@ -2258,7 +2211,7 @@ function passportAccountId(){return authSession&&authSession.accountId?authSessi
 function passportCheckpoint(task,reason,verification,codeOverride){if(!task||!window.SolutionPassport)return;const code=codeOverride===undefined?String(state.codes[task.key]||editor.getValue()||''):String(codeOverride);if(!code.trim())return;SolutionPassport.saveVersion({accountId:passportAccountId(),taskId:task.key,code,attemptId:(state.verificationResults&&state.verificationResults[task.key]||{}).attemptId||'',reason,verification:verification||null})}
 function renderPassport(task){const box=document.getElementById('passportContent');if(!box||!window.SolutionPassport)return;SolutionPassport.render(box,{accountId:passportAccountId(),taskId:task.key,onRestore:version=>{if(!window.confirm('Текущий код будет заменён выбранной версией. Если нужно сохранить текущий вариант, сначала дождись контрольной точки или измени код. Продолжить?'))return;suppressCodeSave=true;try{editor.setValue(version.code)}finally{suppressCodeSave=false}state.codes[task.key]=version.code;saveState();renderPassport(task);showStatus('info','Предыдущая версия восстановлена в редактор. Проверь код и сохрани его обычной отправкой.')},onRename:version=>{const label=window.prompt('Название версии (до 60 символов):',version.label||'');if(label===null)return;SolutionPassport.renameVersion({accountId:passportAccountId(),taskId:task.key,versionId:version.versionId,label});renderPassport(task);showStatus('info',label.trim()?'Название версии сохранено.':'Название версии очищено.')}})}
 function saveState(){localStorage.setItem(ACTIVE_STORAGE_KEY,JSON.stringify(state))}
-function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:Object.fromEntries(lessons.map(lesson=>[lesson.id,false])),codes:{},attempts:{},failedCodes:{},hints:{},hintDiagnostics:{},solved:{},confirmedSolved:{},manualReviewStatus:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},taskSubmissionIds:{},verificationResults:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
+function activateStudentLocalState(session){ACTIVE_STORAGE_KEY=storageKeyForAccount(session);const accountSaved=readLocalJSON(ACTIVE_STORAGE_KEY);const defaults={currentKey:'1-1',openLessons:Object.fromEntries(lessons.map(lesson=>[lesson.id,false])),codes:{},attempts:{},failedCodes:{},hints:{},hintDiagnostics:{},solved:{},confirmedSolved:{},manualReviewStatus:{},ratings:{},inputs:{},manualRunPassed:{},unsentResults:{},taskSubmissionIds:{},verificationResults:{},freeTerminalCodes:{},experimentAnswers:{},task10Answers:{}};const next=Object.assign({},defaults,accountSaved||{});Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,next);if(state.currentKey==='8-14'||state.currentKey==='8-15'){state.currentKey='8-13';saveState();}freeTerminalLesson=null;freeTerminalCodes=state.freeTerminalCodes;}
 function currentTask(){return allTasks.find(t=>t.key===state.currentKey)||allTasks[0]}
 function getLesson(id){return lessons.find(l=>Number(l.id)===Number(id))}
 function lessonWithinCourseLimit(lessonId){const max=Number(COURSE_CONFIG.maxLessonNumber);return !(Number.isFinite(max)&&max>0&&Number(lessonId)>max)}
@@ -2632,7 +2585,7 @@ function renderNav(){
       });
     });
     if(authSession&&authSession.role==='student'&&l.tasks.some(t=>!taskIsAvailable(t))){
-      const note=document.createElement('div');note.className='task-locked-note';note.textContent=l.id===8?'Следующий этап проекта открывается после успешной проверки и подтверждённого сохранения предыдущего. После шестого этапа откроются самостоятельные задачи.':'Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
+      const note=document.createElement('div');note.className='task-locked-note';note.textContent=l.id===8?'Следующий этап проекта открывается после успешной проверки и подтверждённого сохранения предыдущего. После четвёртого этапа откроются самостоятельные задачи.':'Следующая задача откроется после успешной проверки и подтверждённого сохранения предыдущей.';body.appendChild(note);
     }
     wrap.appendChild(body);
     lessonNav.appendChild(wrap);
@@ -3491,8 +3444,6 @@ async function checkProjectStage3Economy(code){
 }
 function projectStaticContract(code,patterns,category){const source=String(code||'').toLowerCase();const missing=patterns.filter(pattern=>!pattern.test(source));return missing.length?{type:'wrong_answer',category,passedTests:0,totalTests:1,expected:'Выполни все требования текущего этапа.',actual:'Не найдены обязательные элементы: '+missing.map(pattern=>pattern.source).join(', ')}:{type:'success',category:'project_contract_passed',passedTests:1,totalTests:1}}
 async function checkProjectStage4Time(code){return projectStaticContract(code,[/time_left|time\.time|время/,/freeze|замороз/,/45/,/15/],'project_time_contract')}
-async function checkProjectStage5Hints(code){return projectStaticContract(code,[/abs\s*\(/,/подсказ|hint/,/%/,/прост/],'project_hints_contract')}
-async function checkProjectStage6Bluff(code){return projectStaticContract(code,[/has_lied/,/тяжел|hard/,/random/,/математ|%/],'project_bluff_contract')}
 function stripPythonCommentsAndStrings(source){return String(source||'').split(/\r?\n/).map(line=>line.replace(/#.*$/,'').replace(/(['"])(?:\\.|(?!\1)[^\\])*\1/g,'')).join('\n')}
 async function checkDigitsMath(code,task){
   const cleaned=stripPythonCommentsAndStrings(code);
@@ -3522,7 +3473,7 @@ async function checkCoinFlip(code){
   }
   return {type:'success',category:'all_tests_passed',passedTests:cases.length,totalTests:cases.length};
 }
-async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,digits_math:checkDigitsMath,project_stage1_base:checkProjectStage1Base,project_stage2_difficulty:checkProjectStage2Difficulty,project_stage3_economy:checkProjectStage3Economy,project_stage4_time:checkProjectStage4Time,project_stage5_hints:checkProjectStage5Hints,project_stage6_bluff:checkProjectStage6Bluff}})}
+async function checkTask(t,code){return PythonTaskChecker.run({task:t,code,runTest:runOneTest,customCheckers:{phone:checkPhone,guess:checkGuessProject,guess2_base:checkGuess2Base,guess2_attempts:checkGuess2Attempts,guess2_replay:checkGuess2Replay,guess2_difficulty:checkGuess2Difficulty,guess2_hotcold:checkGuess2HotCold,guess2_timer:checkGuess2Timer,guess2_research:checkGuess2Research,roulette:async()=>({type:'manual_review',category:'randomized_behavior'}),coin_flip:checkCoinFlip,digits_math:checkDigitsMath,project_stage1_base:checkProjectStage1Base,project_stage2_difficulty:checkProjectStage2Difficulty,project_stage3_economy:checkProjectStage3Economy,project_stage4_time:checkProjectStage4Time}})}
 function getStdinValues(){const raw=String(stdinInput.value||'').replace(/\r\n/g,'\n');if(raw==='')return [];const values=raw.split('\n');if(values.length&&values[values.length-1]==='')values.pop();return values}
 function showConsoleOutput(text,ok=true){consoleBox.classList.add('show');consoleOutput.className='console-output'+(ok?'':' error');consoleOutput.textContent=text||'(программа ничего не вывела)';consoleOutput.scrollTop=consoleOutput.scrollHeight}
 function appendTerminalLine(text,className=''){const value=String(text);terminalTranscript+=(terminalTranscript&&!terminalTranscript.endsWith('\n')?'\n':'')+value+'\n';consoleOutput.textContent=terminalTranscript;consoleOutput.classList.remove('empty','error');consoleOutput.scrollTop=consoleOutput.scrollHeight;}
