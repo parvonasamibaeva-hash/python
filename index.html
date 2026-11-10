@@ -3125,6 +3125,39 @@ function openForAnimation(){
   close.focus();
 }
 
+function openLesson9Review(){
+  const overlay=document.createElement('div');
+  overlay.className='while-animation-overlay';
+  overlay.setAttribute('role','dialog');
+  overlay.setAttribute('aria-modal','true');
+  overlay.setAttribute('aria-label','Повторение изученного');
+  const dialog=document.createElement('div');
+  dialog.className='while-animation-dialog';
+  const toolbar=document.createElement('div');
+  toolbar.className='while-animation-toolbar';
+  const title=document.createElement('span');
+  title.textContent='🔢 Повторение изученного';
+  const close=document.createElement('button');
+  close.type='button';
+  close.className='while-animation-close';
+  close.textContent='✕ Закрыть';
+  const frame=document.createElement('iframe');
+  frame.className='while-animation-frame';
+  frame.title='Повторение изученного: цикл while';
+  frame.setAttribute('allow','fullscreen');
+  frame.src='lesson9_review.html';
+  function closeDialog(){overlay.remove();document.removeEventListener('keydown',onKeyDown);}
+  function onKeyDown(event){if(event.key==='Escape')closeDialog();}
+  close.addEventListener('click',closeDialog);
+  overlay.addEventListener('click',event=>{if(event.target===overlay)closeDialog();});
+  document.addEventListener('keydown',onKeyDown);
+  toolbar.append(title,close);
+  dialog.append(toolbar,frame);
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  close.focus();
+}
+
 function renderNav(){
   lessonNav.innerHTML='';
   lessons.forEach(l=>{
@@ -3144,6 +3177,14 @@ function renderNav(){
     intro.className='lesson-intro';
     intro.textContent=l.subtitle;
     body.appendChild(intro);
+    if(l.id===9){
+      const reviewBtn=document.createElement('button');
+      reviewBtn.type='button';
+      reviewBtn.className='lesson-theory-link';
+      reviewBtn.textContent='Повторение изученного';
+      reviewBtn.onclick=openLesson9Review;
+      body.appendChild(reviewBtn);
+    }
     const theoryBtn=document.createElement('button');
     theoryBtn.className='lesson-theory-link';
     theoryBtn.textContent='📖 Теория занятия';
