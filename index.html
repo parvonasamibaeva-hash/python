@@ -3092,6 +3092,39 @@ function openVariablesIoAnimation(){
   close.focus();
 }
 
+function openForAnimation(){
+  const overlay=document.createElement('div');
+  overlay.className='while-animation-overlay';
+  overlay.setAttribute('role','dialog');
+  overlay.setAttribute('aria-modal','true');
+  overlay.setAttribute('aria-label','Интерактивная анимация: цикл for');
+  const dialog=document.createElement('div');
+  dialog.className='while-animation-dialog';
+  const toolbar=document.createElement('div');
+  toolbar.className='while-animation-toolbar';
+  const title=document.createElement('span');
+  title.textContent='🔢 Интерактивная анимация: цикл for';
+  const close=document.createElement('button');
+  close.type='button';
+  close.className='while-animation-close';
+  close.textContent='✕ Закрыть';
+  const frame=document.createElement('iframe');
+  frame.className='while-animation-frame';
+  frame.title='Интерактивная анимация цикла for Python';
+  frame.setAttribute('allow','fullscreen');
+  frame.src='for_interactive_lesson.html';
+  function closeDialog(){overlay.remove();document.removeEventListener('keydown',onKeyDown);}
+  function onKeyDown(event){if(event.key==='Escape')closeDialog();}
+  close.addEventListener('click',closeDialog);
+  overlay.addEventListener('click',event=>{if(event.target===overlay)closeDialog();});
+  document.addEventListener('keydown',onKeyDown);
+  toolbar.append(title,close);
+  dialog.append(toolbar,frame);
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+  close.focus();
+}
+
 function renderNav(){
   lessonNav.innerHTML='';
   lessons.forEach(l=>{
@@ -3116,6 +3149,14 @@ function renderNav(){
     theoryBtn.textContent='📖 Теория занятия';
     theoryBtn.onclick=()=>openLessonTheory(l.id);
     body.appendChild(theoryBtn);
+    if(l.id===9){
+      const forAnimationBtn=document.createElement('button');
+      forAnimationBtn.type='button';
+      forAnimationBtn.className='lesson-theory-link while-animation-nav-button';
+      forAnimationBtn.textContent='🧩 Интерактивная анимация: цикл for';
+      forAnimationBtn.onclick=openForAnimation;
+      body.appendChild(forAnimationBtn);
+    }
     if(l.id===1){
       const variablesIoAnimationBtn=document.createElement('button');
       variablesIoAnimationBtn.type='button';

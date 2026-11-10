@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Цикл for в Python — интерактивный урок</title>
+<style>
+:root{
+  --ink:#17233b;--muted:#65718a;--line:#e2e8f2;--bg:#f3f6fc;--white:#fff;
+  --blue:#3977f6;--blue-soft:#eaf1ff;--violet:#8057df;--violet-soft:#f1edff;
+  --green:#15966b;--green-soft:#e7f7f0;--orange:#e88a2d;--orange-soft:#fff3e5;
+  --red:#cf4d4d;--red-soft:#fff0f0;--shadow:0 10px 28px rgba(35,55,95,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input{font:inherit}
+.app{max-width:1180px;margin:auto;padding:27px 20px 42px}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:20px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:850;color:var(--blue);margin-bottom:8px}
+h1{font-size:clamp(28px,4vw,43px);line-height:1.08;letter-spacing:-.04em;margin:0 0 10px}
+.lead{max-width:800px;color:var(--muted);font-size:16px;line-height:1.55}
+.robot-mark{width:78px;height:78px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(145deg,var(--blue),var(--violet));color:white;font-size:39px;box-shadow:var(--shadow);flex:none}
+.big-idea{display:flex;gap:13px;align-items:center;background:#17233b;color:white;padding:16px 19px;border-radius:17px;margin:20px 0}
+.big-idea .bulb{font-size:27px}
+.big-idea strong{display:block;margin-bottom:3px}
+.big-idea span{font-size:14px;line-height:1.45;color:#dbe4f7}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:20px 0 15px}
+.tab{border:1px solid var(--line);background:white;color:var(--muted);padding:10px 14px;border-radius:11px;font-weight:800;cursor:pointer}
+.tab.active{background:var(--ink);border-color:var(--ink);color:white}
+.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--line);border-radius:19px;padding:19px;box-shadow:var(--shadow);margin-bottom:15px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+h2{font-size:20px;margin:0;letter-spacing:-.025em}
+h3{font-size:17px;margin:0 0 8px}
+.pill{font-size:11px;font-weight:850;letter-spacing:.05em;padding:6px 9px;border-radius:99px;background:var(--blue-soft);color:var(--blue);white-space:nowrap}
+.pill.violet{background:var(--violet-soft);color:var(--violet)}
+.muted{color:var(--muted);font-size:14px;line-height:1.55}
+.codebox{background:#111a2b;color:#e8efff;border-radius:14px;padding:15px 16px;overflow:auto}
+.code-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#93a3c4;font-weight:850;margin-bottom:9px}
+.code{font:15px/1.9 Consolas,Monaco,monospace;white-space:pre;min-height:30px}
+.kw{color:#bea7ff}.fn{color:#79d6c2}.num{color:#ffc879}.comment{color:#91a1c2}
+.token{font:inherit;border:1px solid #53627f;background:#293751;color:#fff;border-radius:6px;padding:0 5px;cursor:pointer}
+.token:hover,.token.selected{background:#4165a3;border-color:#90b7ff}
+.explain{padding:14px 15px;border-radius:13px;background:var(--blue-soft);color:#294f9b;font-size:14px;line-height:1.55;margin-top:12px;min-height:66px}
+.explain strong{color:#183f8b}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:15px}
+.grid-even{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#f7f9fd;border:1px solid var(--line);padding:11px 13px;border-radius:13px;margin:12px 0}
+.controls label{font-size:13px;font-weight:800}
+.controls input[type=range]{accent-color:var(--blue);width:140px}
+.controls input[type=text],.field input{width:100%;border:1px solid #cfd8e8;border-radius:9px;padding:9px 10px;background:white;color:var(--ink);font-weight:700}
+.count{font-weight:900;color:var(--blue)}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:850;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.primary{background:var(--blue);color:white}.secondary{background:#edf1f8;color:var(--ink)}
+.violet-btn{background:var(--violet);color:white}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.step-scene{background:linear-gradient(180deg,#f8faff,#eff4ff);border:1px solid #e1e9fb;border-radius:15px;padding:15px}
+.stations{display:flex;gap:7px;align-items:center;min-height:72px}
+.station{flex:1;min-width:0;background:white;border:2px dashed #cbd6eb;border-radius:12px;min-height:57px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;position:relative}
+.station b{font-size:19px;color:#98a5ba}.station small{font-size:10px;color:#98a5ba}
+.station.done{border:2px solid #a7e2ca;background:var(--green-soft)}.station.done b{color:var(--green)}
+.station.now{border:2px solid var(--blue);background:var(--blue-soft);transform:translateY(-3px)}
+.station.now b{color:var(--blue)}
+.station .bot{position:absolute;top:-24px;font-size:22px}
+.scene-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:9px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#f7f9fd;border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:850}
+.stat strong{font-size:24px;display:block;margin-top:4px;color:var(--blue)}
+.output{background:#f7f9fd;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;min-height:62px}
+.output-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:850;margin-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid #bce8d5;background:var(--green-soft);color:#08734f;border-radius:8px;padding:5px 9px;font-weight:850;font-size:13px}
+.tip{padding:11px 13px;border-radius:12px;background:var(--orange-soft);color:#875017;font-size:13px;line-height:1.5;margin-top:11px}
+.tip.green{background:var(--green-soft);color:#08734f}
+.tip.red{background:var(--red-soft);color:#a33d3d}
+.variable-box{display:grid;grid-template-columns:minmax(160px,.65fr) 1fr;gap:14px;align-items:start}
+.field label{display:block;font-size:12px;font-weight:850;color:var(--muted);margin-bottom:6px}
+.field input{font-size:17px}
+.validation{font-size:12px;line-height:1.45;margin-top:7px;min-height:18px}
+.var-flow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px}
+.var-assignment{background:var(--blue-soft);color:#2456b4;border:1px solid #c9d9ff;border-radius:10px;padding:9px 12px;font:800 15px Consolas,monospace}
+.var-arrow{color:#9aa7bd;font-size:20px}
+.mode-buttons{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.mode-btn{border:1px solid var(--line);background:#f7f9fd;color:#596781;padding:9px 12px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer}
+.mode-btn.active{background:var(--blue-soft);border-color:#b8ceff;color:#285bb9}
+.range-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.range-fields .field.hidden{display:none}
+.sequence{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-height:50px}
+.sequence .value{background:var(--green-soft);border:1px solid #bce8d5;color:#08734f;padding:8px 11px;border-radius:10px;font-size:16px;font-weight:900}
+.sequence .empty{font-size:13px;color:var(--muted)}
+.indent-switch{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.indent-choice{border:1px solid var(--line);background:#f7f9fd;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:800;color:#596781}
+.indent-choice.active{background:var(--blue-soft);border-color:#b8ceff;color:#285bb9}
+.indent-code{background:#111a2b;color:#e8efff;border-radius:14px;padding:15px;font:14px/2 Consolas,monospace;white-space:pre;overflow:auto}
+.indent-line{display:block;border-radius:5px;padding:0 7px}
+.indent-line.focus{background:#31466c;box-shadow:inset 3px 0 #68a0ff}
+.indent-line.error{background:#5b2b36;color:#ffd8d8}
+.indent-guide{color:#79d6c2}
+.output-lines{background:#f7f9fd;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:100px;font:13px/1.8 Consolas,monospace;white-space:pre-wrap}
+.compare{border-top:5px solid var(--blue)}.compare.purple{border-top-color:var(--violet)}
+.compare p{font-size:14px;color:var(--muted);line-height:1.5}
+.compare-code{background:#111a2b;color:#e8efff;border-radius:11px;padding:13px;font:13px/1.8 Consolas,monospace;white-space:pre}
+.quiz-q{padding:14px 0;border-bottom:1px solid var(--line)}
+.quiz-q:last-child{border:0}
+.quiz-q strong{display:block;line-height:1.45;margin-bottom:9px}
+.answer-row{display:flex;gap:7px;flex-wrap:wrap}
+.answer{border:1px solid var(--line);background:#f7f9fd;border-radius:9px;padding:8px 11px;font-size:13px;font-weight:750;color:#3d4b65;cursor:pointer}
+.answer.selected{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.answer.correct{background:var(--green-soft);border-color:#9cddc2;color:#08734f}
+.answer.wrong{background:var(--red-soft);border-color:#efc0c0;color:#a33d3d}
+.feedback{font-size:12px;color:var(--muted);margin-top:7px;min-height:16px}
+.footer{text-align:center;color:#8b96aa;font-size:12px;margin-top:20px}
+@media(max-width:800px){.grid2,.grid-even{grid-template-columns:1fr}.robot-mark{width:62px;height:62px;font-size:31px}}
+@media(max-width:520px){.app{padding:18px 12px 30px}.robot-mark{display:none}.card{padding:15px}.range-fields{grid-template-columns:1fr 1fr}.variable-box{grid-template-columns:1fr}.stations{gap:4px}.station{min-height:52px}.station b{font-size:16px}.tab{padding:9px 10px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hero">
+  <div>
+    <div class="eyebrow">Интерактивный урок Python</div>
+    <h1>Разбираемся с циклом <span style="color:var(--blue)">for</span></h1>
+    <div class="lead">Не просто нажимай кнопки — исследуй каждую часть команды. Узнай, что означает <b>i</b>, что скрывается в скобках и почему отступы в Python так важны.</div>
+  </div>
+  <div class="robot-mark">🤖</div>
+</header>
+
+<div class="big-idea">
+  <div class="bulb">💡</div>
+  <div><strong>Цикл for повторяет команды для каждого элемента последовательности.</strong><span>Например, можно попросить робота пройти по всем станциям: первой, второй, третьей и так далее.</span></div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-panel="syntax-panel">1. Устройство for</button>
+  <button class="tab" data-panel="variable-panel">2. Что такое i?</button>
+  <button class="tab" data-panel="range-panel">3. Скобки и range()</button>
+  <button class="tab" data-panel="indent-panel">4. Отступы</button>
+  <button class="tab" data-panel="compare-panel">5. for и while</button>
+  <button class="tab" data-panel="quiz-panel">6. Проверь себя</button>
+</nav>
+
+<!-- СИНТАКСИС -->
+<section class="panel active" id="syntax-panel">
+  <div class="card">
+    <div class="card-head"><h2>Из чего состоит команда for?</h2><span class="pill">НАЖИМАЙ НА ЧАСТИ КОДА</span></div>
+    <p class="muted">Нажми на любой выделенный фрагмент. Справа появится объяснение, за что он отвечает.</p>
+    <div class="codebox">
+      <div class="code-label">Одна строка цикла</div>
+      <div class="code"><button class="token" data-explain="keyword">for</button> <button class="token selected" data-explain="variable">i</button> <button class="token" data-explain="in">in</button> <button class="token" data-explain="rangeFunction">range</button><button class="token" data-explain="openParen">(</button><button class="token" data-explain="startArg">1</button><button class="token" data-explain="comma">,</button> <button class="token" data-explain="stopArg">6</button><button class="token" data-explain="closeParen">)</button><button class="token" data-explain="colon">:</button></div>
+    </div>
+    <div class="explain" id="syntax-explain"><strong>i — переменная цикла.</strong> В неё по очереди попадает очередное значение из последовательности. Имя i можно заменить другим подходящим именем.</div>
+    <div class="grid-even" style="margin-top:14px">
+      <div class="tip green"><b>Прочитай команду вслух:</b><br>«Для каждого значения i из последовательности range(1, 6) выполни команды ниже».</div>
+      <div class="tip"><b>Не забудь двоеточие :</b><br>Оно показывает Python, что дальше начинается блок команд цикла. Следующая строка должна иметь отступ.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Посмотри, как цикл выполняется по шагам</h2><span class="pill">ПОШАГОВАЯ АНИМАЦИЯ</span></div>
+    <div class="controls">
+      <label for="route-count">Количество станций:</label>
+      <input type="range" min="2" max="8" value="5" id="route-count">
+      <span class="count" id="route-count-label">5</span>
+    </div>
+    <div class="step-scene">
+      <div class="code-label" style="color:#7787a5">Робот проходит каждую станцию</div>
+      <div class="stations" id="stations"></div>
+      <div class="scene-foot"><span>Начало маршрута</span><span id="route-progress">0 из 5</span></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div>
+        <div class="codebox">
+          <div class="code-label">Код на Python</div>
+          <div class="code" id="route-code">for station in range(1, 6):</div>
+          <div class="code" style="padding-left:28px">print(station)</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="route-next">Следующий шаг →</button>
+          <button class="btn secondary" id="route-reset">↺ Сначала</button>
+        </div>
+      </div>
+      <div>
+        <div class="stat-grid">
+          <div class="stat"><small>Значение station</small><strong id="route-value">—</strong></div>
+          <div class="stat"><small>Номер повтора</small><strong id="route-iteration">0</strong></div>
+        </div>
+        <div class="output">
+          <div class="output-title">Что вывел print(station)</div>
+          <div class="chips" id="route-output"><span class="muted">Пока пусто</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="muted" id="route-message" style="margin-bottom:0">Нажми «Следующий шаг». Переменная station получит первое значение, и робот поедет на первую станцию.</p>
+  </div>
+</section>
+
+<!-- ПЕРЕМЕННАЯ -->
+<section class="panel" id="variable-panel">
+  <div class="card">
+    <div class="card-head"><h2>Что такое i? Это не специальная команда!</h2><span class="pill">ПЕРЕМЕННАЯ</span></div>
+    <p class="muted">Буква <b>i</b> — обычное имя переменной. Часто её используют как короткое обозначение номера или индекса. Но Python не требует именно букву i: имя можно выбрать самостоятельно.</p>
+    <div class="variable-box">
+      <div>
+        <div class="field">
+          <label for="var-name">Измени имя переменной</label>
+          <input type="text" id="var-name" value="i" maxlength="20" autocomplete="off" spellcheck="false">
+          <div class="validation" id="var-validation">Можно использовать i, number, step, cat...</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn secondary var-preset" data-name="number">number</button>
+          <button class="btn secondary var-preset" data-name="step">step</button>
+          <button class="btn secondary var-preset" data-name="cat">cat</button>
+        </div>
+      </div>
+      <div>
+        <div class="codebox">
+          <div class="code-label">Имя переменной подставляется в код</div>
+          <div class="code" id="var-code">for i in range(1, 5):</div>
+          <div class="code" style="padding-left:28px" id="var-print">print(i)</div>
+        </div>
+        <div class="var-flow" id="var-flow"><span class="var-assignment">i = 1</span><span class="var-arrow">→</span><span class="var-assignment">i = 2</span><span class="var-arrow">→</span><span class="var-assignment">i = 3</span><span class="var-arrow">→</span><span class="var-assignment">i = 4</span></div>
+      </div>
+    </div>
+    <div class="tip green"><b>Главное:</b> имя переменной должно быть одинаковым в строке for и внутри команды print. Если написать <code>for number</code>, а потом <code>print(i)</code>, Python не поймёт, откуда взять i.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Проверим на практике</h2><span class="pill">МЕНЯЙ ИМЯ И ЗАПУСКАЙ</span></div>
+    <p class="muted">Нажимай шаг за шагом. Смотри, как одно и то же имя переменной получает разные значения.</p>
+    <div class="stat-grid">
+      <div class="stat"><small>Текущее значение</small><strong id="var-current">—</strong></div>
+      <div class="stat"><small>Сколько раз выполнился цикл</small><strong id="var-count">0</strong></div>
+    </div>
+    <div class="output">
+      <div class="output-title">Вывод программы</div>
+      <div class="chips" id="var-results"><span class="muted">Пока пусто</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="var-next">Следующий шаг →</button>
+      <button class="btn secondary" id="var-reset">↺ Сначала</button>
+    </div>
+    <div class="tip"><b>Правила имени переменной (для начала):</b><br>• начинается с латинской буквы или знака _<br>• дальше могут быть буквы, цифры и _<br>• пробелы и дефисы использовать нельзя<br>• нельзя использовать зарезервированные слова Python, например for, if, while<br>• большие и маленькие буквы различаются: <code>cat</code> и <code>Cat</code> — разные имена.</div>
+  </div>
+</section>
+
+<!-- RANGE -->
+<section class="panel" id="range-panel">
+  <div class="card">
+    <div class="card-head"><h2>Что пишется в скобках range()?</h2><span class="pill">КОНСТРУКТОР ПОСЛЕДОВАТЕЛЬНОСТИ</span></div>
+    <p class="muted">Функция <b>range()</b> создаёт последовательность целых чисел. В круглых скобках указывают, откуда начинать, где остановиться и каким шагом двигаться.</p>
+    <div class="codebox">
+      <div class="code-label">Три возможных аргумента</div>
+      <div class="code"><span class="fn">range</span>(<span class="num">start</span>, <span class="num">stop</span>, <span class="num">step</span>)</div>
+    </div>
+    <div class="grid-even" style="margin-top:12px">
+      <div class="tip green"><b>start — начало</b><br>Первое число последовательности.</div>
+      <div class="tip"><b>stop — граница остановки</b><br>Это число в последовательность НЕ входит.</div>
+      <div class="tip"><b>step — шаг</b><br>На сколько увеличивать или уменьшать число.</div>
+      <div class="tip" style="background:var(--violet-soft);color:#6541b4"><b>Запятая ,</b><br>Разделяет аргументы. Скобки показывают, какие значения относятся к range().</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Собери свою команду range()</h2><span class="pill">ПОПРОБУЙ РАЗНЫЕ СКОБКИ</span></div>
+    <p class="muted">Выбери, сколько аргументов будет в скобках, затем измени числа.</p>
+    <div class="mode-buttons">
+      <button class="mode-btn active" data-mode="1">1 число: range(5)</button>
+      <button class="mode-btn" data-mode="2">2 числа: range(2, 6)</button>
+      <button class="mode-btn" data-mode="3">3 числа: range(2, 10, 2)</button>
+    </div>
+    <div class="range-fields">
+      <div class="field hidden" id="start-wrap"><label for="range-start">start — начало</label><input type="number" id="range-start" value="2" step="1"></div>
+      <div class="field"><label for="range-stop">stop — конец (не включается)</label><input type="number" id="range-stop" value="5" step="1"></div>
+      <div class="field hidden" id="step-wrap"><label for="range-step">step — шаг</label><input type="number" id="range-step" value="1" step="1"></div>
+    </div>
+    <div class="codebox">
+      <div class="code-label">Получившаяся команда</div>
+      <div class="code" id="range-code">range(5)</div>
+    </div>
+    <div class="output">
+      <div class="output-title">Какие числа получатся?</div>
+      <div class="sequence" id="range-sequence"><span class="value">0</span><span class="value">1</span><span class="value">2</span><span class="value">3</span><span class="value">4</span></div>
+    </div>
+    <div class="explain" id="range-explain"><strong>range(5)</strong> — Python начинает с 0 и идёт с шагом 1, пока не дойдёт до числа 5. Пятёрка не включается.</div>
+    <div class="btn-row">
+      <button class="btn secondary range-preset" data-mode="1" data-stop="5">range(5)</button>
+      <button class="btn secondary range-preset" data-mode="2" data-start="2" data-stop="6">range(2, 6)</button>
+      <button class="btn secondary range-preset" data-mode="3" data-start="2" data-stop="10" data-step="2">range(2, 10, 2)</button>
+      <button class="btn secondary range-preset" data-mode="3" data-start="5" data-stop="0" data-step="-1">range(5, 0, -1)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Четыре особенности скобок и range()</h2>
+    <div class="grid-even" style="margin-top:12px">
+      <div class="tip green"><b>1. Одно число</b><br><code>range(5)</code><br>Начало автоматически равно 0, шаг — 1.</div>
+      <div class="tip"><b>2. Два числа</b><br><code>range(2, 6)</code><br>Первое — начало, второе — граница остановки, шаг — 1.</div>
+      <div class="tip"><b>3. Три числа</b><br><code>range(2, 10, 2)</code><br>Начало, граница и шаг задаются явно.</div>
+      <div class="tip" style="background:var(--red-soft);color:#a33d3d"><b>4. Шаг не может быть нулём</b><br><code>range(1, 5, 0)</code> вызовет ошибку. Для движения назад используют отрицательный шаг.</div>
+    </div>
+    <p class="muted" style="margin-bottom:0">В range() передают целые числа. Десятичные числа вроде 1.5 для range() не подходят.</p>
+  </div>
+</section>
+
+<!-- ОТСТУПЫ -->
+<section class="panel" id="indent-panel">
+  <div class="card">
+    <div class="card-head"><h2>Почему отступы так важны?</h2><span class="pill">СТРУКТУРА PYTHON</span></div>
+    <p class="muted">В Python отступ — это не украшение и не просто красивое оформление. Именно по отступам Python понимает, какие команды входят внутрь цикла и должны повторяться.</p>
+    <div class="codebox">
+      <div class="code-label">Обрати внимание на четыре пробела перед print</div>
+      <div class="code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(1, 4):</div>
+      <div class="code" style="padding-left:32px"><span class="fn">print</span>(i)</div>
+    </div>
+    <div class="tip green"><b>Обычно используют 4 пробела.</b> Все команды, которые относятся к одному блоку цикла, должны начинаться с одинакового отступа.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Передвинь команду и посмотри, что изменится</h2><span class="pill">ИНТЕРАКТИВНЫЙ ЭКСПЕРИМЕНТ</span></div>
+    <p class="muted">Команда <code>print("Ура!")</code> может находиться внутри цикла, после цикла или вообще без нужного отступа. Выбери вариант.</p>
+    <div class="indent-switch">
+      <button class="indent-choice active" data-indent="inside">Внутри цикла</button>
+      <button class="indent-choice" data-indent="outside">После цикла</button>
+      <button class="indent-choice" data-indent="missing">Без отступа после for</button>
+    </div>
+    <div class="grid-even">
+      <div>
+        <div class="code-label" style="color:var(--muted)">Код</div>
+        <div class="indent-code" id="indent-code"></div>
+      </div>
+      <div>
+        <div class="code-label" style="color:var(--muted)">Что произойдёт при запуске?</div>
+        <div class="output-lines" id="indent-output"></div>
+      </div>
+    </div>
+    <div class="explain" id="indent-explain"></div>
+  </div>
+
+  <div class="card">
+    <h2>Запомни три правила</h2>
+    <div class="grid-even" style="margin-top:12px">
+      <div class="tip green"><b>Команда с отступом</b><br>Входит в цикл и повторяется на каждой итерации.</div>
+      <div class="tip"><b>Команда без отступа</b><br>Уже не входит в цикл. Она выполняется после того, как цикл закончится.</div>
+      <div class="tip"><b>Нет отступа после for:</b><br>Python выдаст IndentationError — он ожидает блок команд с отступом.</div>
+      <div class="tip" style="background:var(--violet-soft);color:#6541b4"><b>Вложенный цикл или if</b><br>Для нового блока добавляют ещё один уровень отступа — обычно ещё 4 пробела.</div>
+    </div>
+  </div>
+</section>
+
+<!-- СРАВНЕНИЕ -->
+<section class="panel" id="compare-panel">
+  <div class="grid-even">
+    <div class="card compare">
+      <h2 style="color:var(--blue)">🔵 for — перебираем</h2>
+      <p>Подходит, когда есть последовательность элементов или заранее понятно, сколько раз нужно повторить действие.</p>
+      <div class="compare-code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(1, 4):
+    <span class="fn">print</span>(i)</div>
+      <p><b>Как думает Python:</b><br>«Есть значения 1, 2, 3. Возьму первое, выполню команды. Потом второе. Потом третье. Значения закончились — стоп».</p>
+    </div>
+    <div class="card compare purple">
+      <h2 style="color:var(--violet)">🟣 while — пока условие верно</h2>
+      <p>Подходит, когда нужно повторять действие до тех пор, пока условие остаётся истинным.</p>
+      <div class="compare-code"><span class="kw">while</span> apples &lt; 3:
+    apples = apples + 1</div>
+      <p><b>Как думает Python:</b><br>«Проверю условие. Если True — выполню команды и проверю снова. Если False — остановлюсь».</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Две похожие задачи — два способа</h2>
+    <div class="grid-even" style="margin-top:12px">
+      <div class="tip green"><b>for:</b> «Пройди по всем 5 станциям маршрута».<br>Количество станций известно заранее.</div>
+      <div class="tip"><b>while:</b> «Собирай яблоки, пока корзина не наполнится».<br>Продолжение зависит от условия.</div>
+    </div>
+    <p class="muted">Оба цикла иногда могут решить одну и ту же задачу. Но for особенно удобен для перебора последовательностей, а while — когда повторение зависит от условия.</p>
+  </div>
+  <div class="card">
+    <h2>Мини-симулятор while: собери яблоки</h2>
+    <div class="controls">
+      <label for="apple-target">Сколько яблок собрать?</label>
+      <input type="range" min="2" max="7" value="4" id="apple-target">
+      <span class="count" id="apple-target-label" style="color:var(--violet)">4</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><small>Яблоки в корзине</small><strong id="apple-count" style="color:var(--violet)">0</strong></div>
+      <div class="stat"><small>Проверок условия</small><strong id="apple-checks" style="color:var(--violet)">0</strong></div>
+    </div>
+    <div class="condition" id="apple-condition" style="background:var(--violet-soft);padding:12px;border-radius:12px;margin-top:10px">
+      <b id="apple-formula">apples &lt; 4</b><span id="apple-verdict">Ещё не проверяли</span>
+    </div>
+    <div class="output-lines" id="apple-message">Нажми «Следующий шаг». Сначала Python проверит условие.</div>
+    <div class="btn-row">
+      <button class="btn violet-btn" id="apple-next">Следующий шаг →</button>
+      <button class="btn secondary" id="apple-reset">↺ Сначала</button>
+    </div>
+  </div>
+</section>
+
+<!-- ВИКТОРИНА -->
+<section class="panel" id="quiz-panel">
+  <div class="card">
+    <div class="card-head"><h2>Проверим, что ты понял</h2><span class="pill">МИНИ-ВИКТОРИНА</span></div>
+    <div id="quiz-list">
+      <div class="quiz-q" data-answer="b">
+        <strong>1. Что такое i в команде for i in range(5)?</strong>
+        <div class="answer-row"><button class="answer" data-value="a">Специальная команда Python</button><button class="answer" data-value="b">Имя переменной</button><button class="answer" data-value="c">Количество пробелов</button></div><div class="feedback"></div>
+      </div>
+      <div class="quiz-q" data-answer="c">
+        <strong>2. Какие числа выдаст range(2, 5)?</strong>
+        <div class="answer-row"><button class="answer" data-value="a">2, 3, 4, 5</button><button class="answer" data-value="b">0, 1, 2, 3, 4</button><button class="answer" data-value="c">2, 3, 4</button></div><div class="feedback"></div>
+      </div>
+      <div class="quiz-q" data-answer="a">
+        <strong>3. Что означает range(5)?</strong>
+        <div class="answer-row"><button class="answer" data-value="a">Числа от 0 до 4</button><button class="answer" data-value="b">Числа от 1 до 5</button><button class="answer" data-value="c">Только число 5</button></div><div class="feedback"></div>
+      </div>
+      <div class="quiz-q" data-answer="b">
+        <strong>4. Зачем нужен отступ перед командой внутри цикла?</strong>
+        <div class="answer-row"><button class="answer" data-value="a">Чтобы Python быстрее работал</button><button class="answer" data-value="b">Чтобы показать, что команда входит в цикл</button><button class="answer" data-value="c">Чтобы переменная стала числом</button></div><div class="feedback"></div>
+      </div>
+      <div class="quiz-q" data-answer="c">
+        <strong>5. Что произойдёт с range(1, 6, 2)?</strong>
+        <div class="answer-row"><button class="answer" data-value="a">1, 2, 3, 4, 5</button><button class="answer" data-value="b">1, 3, 5, 6</button><button class="answer" data-value="c">1, 3, 5</button></div><div class="feedback"></div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn primary" id="quiz-check">Проверить ответы</button><button class="btn secondary" id="quiz-reset">Пройти ещё раз</button></div>
+    <div id="quiz-score" style="font-weight:850;margin-top:12px" aria-live="polite"></div>
+  </div>
+</section>
+
+<div class="footer">Интерактивный учебный материал • Python • HTML + CSS + JavaScript</div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  // Вкладки
+  document.querySelectorAll('.tab').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === button));
+      document.querySelectorAll('.panel').forEach(x => x.classList.toggle('active', x.id === button.dataset.panel));
+    });
+  });
+
+  // Интерактивное объяснение частей синтаксиса
+  const syntaxText = {
+    variable: '<strong>i — переменная цикла.</strong> Это имя, в которое по очереди попадает очередное значение. Вместо i можно написать number, step, cat или другое допустимое имя.',
+    range: '<strong>range(1, 6) — последовательность чисел.</strong> Здесь 1 — начало, 6 — граница остановки. Получатся числа 1, 2, 3, 4, 5. Шестёрка не включается.',
+    keyword: '<strong>for — ключевое слово Python.</strong> Оно сообщает: сейчас начнётся цикл, который будет брать элементы по одному.',
+    in: '<strong>in означает «из».</strong> Переменная будет по очереди получать значения из последовательности справа.',
+    rangeFunction: '<strong>range — встроенная функция Python.</strong> Она создаёт последовательность целых чисел, по которой цикл for проходит по очереди.',
+    openParen: '<strong>Открывающая круглая скобка (</strong> показывает, что сейчас начнутся аргументы функции range. У неё должна быть парная закрывающая скобка.',
+    startArg: '<strong>Первый аргумент — начало.</strong> В примере range(1, 6) последовательность начинается с числа 1.',
+    comma: '<strong>Запятая разделяет аргументы.</strong> Она помогает Python понять, где заканчивается одно значение и начинается следующее.',
+    stopArg: '<strong>Второй аргумент — граница остановки.</strong> Число 6 не попадёт в последовательность: цикл остановится перед ним.',
+    closeParen: '<strong>Закрывающая круглая скобка )</strong> показывает, что аргументы функции закончились. Открывающая и закрывающая скобки должны быть парой.',
+    colon: '<strong>Двоеточие начинает блок команд.</strong> После строки for Python ожидает команды с отступом.'
+  };
+  document.querySelectorAll('[data-explain]').forEach(token => token.addEventListener('click', () => {
+    document.querySelectorAll('[data-explain]').forEach(t => t.classList.remove('selected'));
+    token.classList.add('selected');
+    $('syntax-explain').innerHTML = syntaxText[token.dataset.explain];
+  }));
+
+  // Демонстрация маршрута for
+  let routeN = 5, routeStep = 0;
+  function renderRoute() {
+    const wrap = $('stations'); wrap.innerHTML = '';
+    for (let n = 1; n <= routeN; n++) {
+      const item = document.createElement('div');
+      item.className = 'station' + (n <= routeStep ? ' done' : '') + (n === routeStep + 1 && routeStep < routeN ? ' now' : '');
+      const b = document.createElement('b'); b.textContent = n;
+      const small = document.createElement('small'); small.textContent = n <= routeStep ? 'готово' : 'станция';
+      item.append(b, small);
+      if (n === routeStep + 1 && routeStep < routeN) { const bot = document.createElement('span'); bot.className = 'bot'; bot.textContent = '🤖'; item.append(bot); }
+      wrap.append(item);
+    }
+    $('route-progress').textContent = `${routeStep} из ${routeN}`;
+    $('route-code').textContent = `for station in range(1, ${routeN + 1}):`;
+  }
+  function resetRoute() {
+    routeStep = 0; $('route-value').textContent = '—'; $('route-iteration').textContent = '0';
+    $('route-output').innerHTML = '<span class="muted">Пока пусто</span>';
+    $('route-message').textContent = 'Нажми «Следующий шаг». Переменная station получит первое значение, и робот поедет на первую станцию.';
+    $('route-next').disabled = false; renderRoute();
+  }
+  $('route-count').addEventListener('input', e => { routeN = Number(e.target.value); $('route-count-label').textContent = routeN; resetRoute(); });
+  $('route-next').addEventListener('click', () => {
+    if (routeStep >= routeN) return;
+    routeStep++;
+    $('route-value').textContent = routeStep; $('route-iteration').textContent = routeStep;
+    if (routeStep === 1) $('route-output').innerHTML = '';
+    const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = routeStep; $('route-output').append(chip);
+    $('route-message').textContent = `station = ${routeStep}. Робот выполнил print(station) и перешёл к следующему значению.`;
+    renderRoute();
+    if (routeStep === routeN) { $('route-message').textContent += ' Все значения закончились — цикл завершён!'; $('route-next').disabled = true; }
+  });
+  $('route-reset').addEventListener('click', resetRoute);
+  resetRoute();
+
+  // Переменная: имя можно менять
+  let varStep = 0;
+  const values = [1, 2, 3, 4];
+  const pythonKeywords = new Set(['False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield']);
+  const commonBuiltins = new Set(['print','range','list','str','int','float','sum','max','min','input']);
+  function currentVarName() { return $('var-name').value.trim(); }
+  function validVarName(name) { return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name) && !pythonKeywords.has(name); }
+  function updateVariable() {
+    const name = currentVarName();
+    const valid = validVarName(name);
+    $('var-validation').style.color = valid ? (commonBuiltins.has(name) ? '#a15d17' : '#15966b') : '#c34b4b';
+    $('var-validation').textContent = !name ? 'Введи имя переменной.' : !valid ? 'Такое имя не подходит: проверь правила и не используй ключевое слово Python.' : commonBuiltins.has(name) ? 'Такое имя допустимо, но лучше не использовать имя встроенной функции Python.' : 'Отлично! Такое имя подходит.';
+    $('var-code').textContent = `for ${name || '...'} in range(1, 5):`;
+    $('var-print').textContent = `print(${name || '...'})`;
+    renderVarFlow();
+    return valid;
+  }
+  function renderVarFlow() {
+    const name = currentVarName() || '...';
+    $('var-flow').innerHTML = '';
+    values.forEach((v, index) => {
+      if (index) { const arrow = document.createElement('span'); arrow.className = 'var-arrow'; arrow.textContent = '→'; $('var-flow').append(arrow); }
+      const item = document.createElement('span'); item.className = 'var-assignment'; item.textContent = `${name} = ${v}`; $('var-flow').append(item);
+    });
+  }
+  function resetVar() {
+    varStep = 0; $('var-current').textContent = '—'; $('var-count').textContent = '0';
+    $('var-results').innerHTML = '<span class="muted">Пока пусто</span>';
+    $('var-next').disabled = !updateVariable();
+  }
+  $('var-name').addEventListener('input', () => { const valid = updateVariable(); $('var-next').disabled = !valid; });
+  document.querySelectorAll('.var-preset').forEach(b => b.addEventListener('click', () => { $('var-name').value = b.dataset.name; resetVar(); }));
+  $('var-next').addEventListener('click', () => {
+    if (!validVarName(currentVarName()) || varStep >= values.length) return;
+    varStep++; $('var-current').textContent = values[varStep - 1]; $('var-count').textContent = varStep;
+    if (varStep === 1) $('var-results').innerHTML = '';
+    const chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = values[varStep - 1]; $('var-results').append(chip);
+    if (varStep === values.length) $('var-next').disabled = true;
+  });
+  $('var-reset').addEventListener('click', resetVar);
+  resetVar();
+
+  // range() builder
+  let rangeMode = 1;
+  function setRangeMode(mode) {
+    rangeMode = Number(mode);
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.mode) === rangeMode));
+    $('start-wrap').classList.toggle('hidden', rangeMode === 1);
+    $('step-wrap').classList.toggle('hidden', rangeMode !== 3);
+    updateRange();
+  }
+  function updateRange() {
+    const start = rangeMode === 1 ? 0 : Number($('range-start').value);
+    const stop = Number($('range-stop').value);
+    const step = rangeMode === 3 ? Number($('range-step').value) : 1;
+    const parts = rangeMode === 1 ? [stop] : rangeMode === 2 ? [start, stop] : [start, stop, step];
+    $('range-code').textContent = `range(${parts.join(', ')})`;
+    const seq = $('range-sequence'); seq.innerHTML = '';
+    if (![start, stop, step].every(Number.isInteger)) {
+      $('range-explain').innerHTML = '<strong>Нужны целые числа.</strong> В range() нельзя передавать десятичные числа.';
+      seq.innerHTML = '<span class="empty">Не удалось построить последовательность.</span>'; return;
+    }
+    if (step === 0) {
+      $('range-explain').innerHTML = '<strong>Ошибка!</strong> Шаг не может быть равен нулю. Иначе число не будет двигаться к границе остановки.';
+      seq.innerHTML = '<span class="empty">range() выдаст ошибку.</span>'; return;
+    }
+    const result = [];
+    if (step > 0) { for (let x = start; x < stop && result.length < 40; x += step) result.push(x); }
+    else { for (let x = start; x > stop && result.length < 40; x += step) result.push(x); }
+    if (result.length === 40) {
+      $('range-explain').innerHTML = '<strong>Первые 40 значений показаны.</strong> Последовательность длиннее; увеличь шаг или измени границы, чтобы увидеть её целиком.';
+    } else if (!result.length) {
+      $('range-explain').innerHTML = `<strong>Пустая последовательность.</strong> При шаге ${step} движение не ведёт от ${start} к ${stop}. Для движения вперёд нужен положительный шаг, назад — отрицательный.`;
+    } else {
+      result.forEach(v => { const chip = document.createElement('span'); chip.className = 'value'; chip.textContent = v; seq.append(chip); });
+      let explanation = rangeMode === 1
+        ? `В range(${stop}) начало автоматически равно 0, а шаг равен 1.`
+        : rangeMode === 2
+          ? `В range(${start}, ${stop}) Python начинает с ${start} и прибавляет 1.`
+          : `В range(${start}, ${stop}, ${step}) Python начинает с ${start} и каждый раз меняет число на ${step}.`;
+      explanation += ` Граница ${stop} не включается.`;
+      $('range-explain').innerHTML = `<strong>${explanation}</strong>`;
+    }
+  }
+  document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', () => setRangeMode(b.dataset.mode)));
+  ['range-start','range-stop','range-step'].forEach(id => $(id).addEventListener('input', updateRange));
+  document.querySelectorAll('.range-preset').forEach(b => b.addEventListener('click', () => {
+    $('range-start').value = b.dataset.start ?? 2;
+    $('range-stop').value = b.dataset.stop ?? 5;
+    $('range-step').value = b.dataset.step ?? 1;
+    setRangeMode(b.dataset.mode);
+  }));
+  updateRange();
+
+  // Отступы: демонстрация трёх ситуаций
+  function renderIndent(mode) {
+    document.querySelectorAll('.indent-choice').forEach(b => b.classList.toggle('active', b.dataset.indent === mode));
+    const code = $('indent-code'), output = $('indent-output'), explain = $('indent-explain');
+    code.innerHTML = '';
+    const addLine = (text, cls='') => { const line = document.createElement('span'); line.className = 'indent-line ' + cls; line.textContent = text; code.append(line); };
+    if (mode === 'inside') {
+      addLine('for i in range(1, 4):');
+      addLine('····print(i)', 'focus');
+      addLine('····print("Ура!")');
+      output.textContent = '1\nУра!\n2\nУра!\n3\nУра!';
+      explain.innerHTML = '<strong>Обе команды с отступом.</strong> Значит, обе находятся внутри цикла. Поэтому print(i) и print("Ура!") выполняются три раза — по одному разу для каждого значения i.';
+    } else if (mode === 'outside') {
+      addLine('for i in range(1, 4):');
+      addLine('····print(i)', 'focus');
+      addLine('print("Готово!")');
+      output.textContent = '1\n2\n3\nГотово!';
+      explain.innerHTML = '<strong>print("Готово!") без отступа.</strong> Эта команда уже находится за пределами цикла. Сначала цикл три раза выводит числа, а затем слово «Готово!» появляется один раз.';
+    } else {
+      addLine('for i in range(1, 4):');
+      addLine('print(i)', 'error');
+      output.textContent = 'IndentationError\nexpected an indented block';
+      explain.innerHTML = '<strong>Ошибка отступа!</strong> После двоеточия Python ждёт блок команд с отступом. Без отступа он не понимает, какие команды нужно повторять.';
+    }
+  }
+  document.querySelectorAll('.indent-choice').forEach(b => b.addEventListener('click', () => renderIndent(b.dataset.indent)));
+  renderIndent('inside');
+
+  // while mini simulation
+  let appleTarget = 4, appleCount = 0, appleChecks = 0, appleDone = false;
+  function resetApple() {
+    appleCount = 0; appleChecks = 0; appleDone = false;
+    $('apple-count').textContent = 0; $('apple-checks').textContent = 0;
+    $('apple-formula').textContent = `apples < ${appleTarget}`;
+    $('apple-verdict').textContent = 'Ещё не проверяли';
+    $('apple-message').textContent = 'Нажми «Следующий шаг». Сначала Python проверит условие.';
+    $('apple-next').disabled = false;
+  }
+  $('apple-target').addEventListener('input', e => { appleTarget = Number(e.target.value); $('apple-target-label').textContent = appleTarget; resetApple(); });
+  $('apple-next').addEventListener('click', () => {
+    if (appleDone) return;
+    appleChecks++;
+    if (appleCount < appleTarget) {
+      $('apple-verdict').textContent = 'True — условие верно';
+      $('apple-condition').style.background = 'var(--green-soft)';
+      $('apple-message').textContent = `Проверка ${appleChecks}: ${appleCount} < ${appleTarget} — True. Выполняем тело цикла и добавляем яблоко.`;
+      appleCount++;
+      $('apple-message').textContent += ` Теперь apples = ${appleCount}.`;
+    } else {
+      $('apple-verdict').textContent = 'False — стоп';
+      $('apple-condition').style.background = 'var(--red-soft)';
+      $('apple-message').textContent = `Проверка ${appleChecks}: ${appleCount} < ${appleTarget} — False. Условие не выполняется, цикл завершён.`;
+      appleDone = true; $('apple-next').disabled = true;
+    }
+    $('apple-count').textContent = appleCount; $('apple-checks').textContent = appleChecks;
+  });
+  $('apple-reset').addEventListener('click', resetApple);
+  resetApple();
+
+  // Викторина
+  document.querySelectorAll('.quiz-q').forEach(q => q.querySelectorAll('.answer').forEach(b => b.addEventListener('click', () => {
+    q.querySelectorAll('.answer').forEach(x => x.classList.remove('selected'));
+    b.classList.add('selected'); q.dataset.chosen = b.dataset.value; q.querySelector('.feedback').textContent = '';
+  })));
+  $('quiz-check').addEventListener('click', () => {
+    let score = 0; const qs = [...document.querySelectorAll('.quiz-q')];
+    qs.forEach(q => {
+      const correct = q.dataset.answer, chosen = q.dataset.chosen;
+      q.querySelectorAll('.answer').forEach(b => {
+        b.classList.remove('correct','wrong');
+        if (b.dataset.value === correct) b.classList.add('correct');
+        if (b.dataset.value === chosen && chosen !== correct) b.classList.add('wrong');
+      });
+      if (chosen === correct) { score++; q.querySelector('.feedback').textContent = 'Верно!'; }
+      else q.querySelector('.feedback').textContent = chosen ? 'Попробуй ещё раз — правильный вариант подсвечен.' : 'Сначала выбери ответ.';
+    });
+    $('quiz-score').textContent = `Результат: ${score} из ${qs.length}. ` + (score === qs.length ? 'Отлично! Ты разобрался с for! 🎉' : 'Посмотри объяснения и попробуй ещё раз.');
+  });
+  $('quiz-reset').addEventListener('click', () => {
+    document.querySelectorAll('.quiz-q').forEach(q => {
+      delete q.dataset.chosen; q.querySelectorAll('.answer').forEach(b => b.classList.remove('selected','correct','wrong'));
+      q.querySelector('.feedback').textContent = '';
+    });
+    $('quiz-score').textContent = '';
+  });
+})();
+</script>
+</body>
+</html>
