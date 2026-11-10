@@ -28,3 +28,20 @@ test('numeric sequence checker accepts newline output and rejects incorrect answ
  context.runOneTest=async()=>({ok:true,output:'4'});
  assert.equal((await context.checkLesson9For('for i in [4]: print(i)',t)).type,'wrong_answer');
 });
+test('lesson 9 starts without supplied code and uses answer fields for count tasks',()=>{
+ assert.ok(tasks.every(t=>t.starter===''));
+ assert.deepEqual(tasks.filter(t=>t.answerMode==='number').map(t=>t.id),[3,4]);
+ assert.match(html,/if\(isLesson9NumberAnswer\(t\)\)\{taskExamples.innerHTML='';return\}/);
+});
+test('numeric submissions reject incorrect answers and save correct answers through existing flow',async()=>{
+ const task={...tasks[2],key:'9-3',lessonId:9};
+ let value='15',sends=0;
+ const ctx={state:{codes:{},solved:{},attempts:{}},document:{getElementById:()=>({value})},runButton:{},saveState(){},showStatus(){},recordVerificationResult(){},recordTaskFailure(){},hideTaskHints(){},renderNav(){},updateStats(){},updateProgress(){},updateSubmitButton(){},sendTaskResult:async()=>{sends++;return {success:false}}};
+ vm.createContext(ctx);
+ vm.runInContext(html.slice(html.indexOf('async function submitLesson9NumberAnswer('),html.indexOf('async function runPython(')),ctx);
+ await ctx.submitLesson9NumberAnswer(task);
+ assert.equal(sends,0);assert.equal(ctx.state.solved[task.key],undefined);
+ value='14';await ctx.submitLesson9NumberAnswer(task);
+ assert.equal(sends,1);assert.equal(ctx.state.solved[task.key],true);
+ assert.equal(ctx.state.confirmedSolved,undefined,'failed save must not confirm completion');
+});
