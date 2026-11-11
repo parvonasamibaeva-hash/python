@@ -45,3 +45,7 @@ test('numeric submissions reject incorrect answers and save correct answers thro
  assert.equal(sends,1);assert.equal(ctx.state.solved[task.key],true);
  assert.equal(ctx.state.confirmedSolved,undefined,'failed save must not confirm completion');
 });
+test('lesson 9 places Caesar cipher at task 13',()=>{
+ assert.deepEqual(tasks.slice(9,13).map(t=>t.short),['Запуск ракеты','Чаевые','Все нечётные на отрезке','Шифр Цезаря']);
+ assert.deepEqual(tasks.slice(9,13).map(t=>t.id),[10,11,12,13]);
+});
