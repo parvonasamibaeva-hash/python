@@ -17,7 +17,8 @@ test('lesson 9 follows lesson 8 and preserves all 17 document exercises',()=>{
 test('for checker rejects missing loop and forbidden if, ignores comments and strings',async()=>{
  context.runOneTest=async()=>({ok:true,output:'1 3 5 7 9'});
  assert.equal((await context.checkLesson9For('print("for i in range(3):")',tasks[0])).category,'method_requirement');
- assert.equal((await context.checkLesson9For('for i in range(10):\n    if i % 2: print(i)',tasks[12])).category,'method_requirement');
+ const oddTask=tasks.find(x=>x.short==='Все нечётные на отрезке');
+ assert.equal((await context.checkLesson9For('for i in range(10):\n    if i % 2: print(i)',oddTask)).category,'method_requirement');
  const odd=tasks.find(x=>x.short==='Все нечётные на отрезке');
  const t={...odd,tests:[odd.tests[0]]};
  assert.equal((await context.checkLesson9For('for i in range(1, 10, 2):\n    print(i) # if is not used',t)).type,'success');
