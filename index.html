@@ -4315,8 +4315,8 @@ async function checkLesson10Tournament(code){
     {players:[2,2,1,3,1],computers:[1,3,3,1,1],player:2,computer:2,winner:'draw',description:'2 победы игрока, 2 победы компьютера и 1 ничья'},
     {players:[1,1,2,2,3],computers:[3,3,1,1,2],player:0,computer:5,winner:'computer',description:'5 побед компьютера'}
   ];
-  const playerLabel=/(мои\s+очки|очки\s+игрока|сч[её]т\s+игрока|player\s+score|my_score)/i;
-  const computerLabel=/(очки\s+компьютера|сч[её]т\s+компьютера|computer\s+score|pc_score)/i;
+  const playerLabel=/(твои\s+очки|мои\s+очки|твой\s+сч[её]т|очки\s+игрока|сч[её]т\s+игрока|игрок\s*:|ты\s*:|player\s+score|my_score)/i;
+  const computerLabel=/(очки\s+компьютера|сч[её]т\s+компьютера|компьютер\s*:|computer\s+score|pc_score)/i;
   for(let i=0;i<cases.length;i++){
     const test=cases[i];
     const result=await runOneTest(code,test.players.map(String),{randomRange:[1,3],randomValues:test.computers});
@@ -4325,7 +4325,7 @@ async function checkLesson10Tournament(code){
     if(contract)return {type:'wrong_answer',category:'lesson10_round_count',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:contract,actual:result.output,feedback:'В турнире должно быть ровно пять раундов. '+contract};
     const playerScore=lesson10Score(result.output,playerLabel);
     const computerScore=lesson10Score(result.output,computerLabel);
-    if(!playerScore||!computerScore)return {type:'wrong_answer',category:'lesson10_score_output',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'Выведи итоговые строки «Мои очки: ...» и «Очки компьютера: ...». Слова могут отличаться, но обе цифры должны быть понятны.',actual:result.output,feedback:'В конце турнира выведи отдельно количество очков игрока и компьютера, чтобы система могла проверить счёт.'};
+    if(!playerScore||!computerScore)return {type:'wrong_answer',category:'lesson10_score_output',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'Выведи итоговый счёт игрока и компьютера. Например: «Твои очки: 2» и «Очки компьютера: 1». Можно также вывести обе цифры в одной строке с понятными подписями.',actual:result.output,feedback:'Система не нашла итоговые очки в выводе. В конце турнира выведи подписи «Твои очки: ...» и «Очки компьютера: ...» либо «Игрок: ...» и «Компьютер: ...».'};
     if(playerScore.value!==test.player||computerScore.value!==test.computer)return {type:'wrong_answer',category:'lesson10_score_count',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:'Игрок: '+test.player+', компьютер: '+test.computer+' ('+test.description+').',actual:result.output,feedback:'Счёт посчитан неверно. Проверь, что за победу игрока увеличивается только счётчик игрока, за победу компьютера — только его счётчик, а при ничьей счёт не меняется.'};
     const winnerOutput=lesson10WinnerAfterScoreboard(result.output,playerScore,computerScore);
     if(!lesson10OutcomeMatches(winnerOutput,test.winner))return {type:'wrong_answer',category:'lesson10_tournament_winner',passedTests:i,totalTests:cases.length,failedTest:i+1,expected:test.winner==='player'?'Победа игрока в турнире':test.winner==='computer'?'Победа компьютера в турнире':'Ничья в турнире',actual:result.output,feedback:'После подсчёта очков объяви итогового победителя турнира. Сравни два счётчика через if / elif / else.'};
