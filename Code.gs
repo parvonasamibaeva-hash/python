@@ -514,6 +514,7 @@ function taskPrerequisiteGroups_(lessonId,taskId) {
   // В занятии 8 сначала выполняются шесть этапов проекта (8-10…8-15).
   // После финального этапа открывается набор из девяти самостоятельных задач (8-1…8-9).
   if(lesson===8&&task===10)return [[]];
+  if(lesson===10&&task===4)return [[{lessonId:10,taskId:2}]];
   if(lesson===8&&task>=11&&task<=15)return [[{lessonId:8,taskId:task-1}]];
   if(lesson===8&&task===1)return [[{lessonId:8,taskId:15}]];
   if(lesson===8&&task>=2&&task<=9)return [[{lessonId:8,taskId:task-1}]];
